@@ -4,6 +4,7 @@ Pydantic schemas for analysis / OCR API endpoints.
 
 from typing import List, Optional
 from pydantic import BaseModel
+from app.schemas.product_info import ProductInfoSchema
 
 
 class OCRBlockSchema(BaseModel):
@@ -35,6 +36,8 @@ class ImageAnalysisResult(BaseModel):
     quality: Optional[QualitySchema] = None
     ocr: Optional[OCRDataSchema] = None
     error: Optional[str] = None
+    # Phase 3: structured product information (None if not yet extracted)
+    product_info: Optional[ProductInfoSchema] = None
 
 
 class AnalysisResponse(BaseModel):

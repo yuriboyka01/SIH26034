@@ -2,12 +2,15 @@
 Analysis service — orchestrates quality analysis, preprocessing, OCR, and persistence.
 
 Coordinates:
-  image_path → quality check → OCR → persist → return AnalysisResult
+  image_path → quality check → OCR → persist → extraction → return AnalysisResult
+
+Phase 3: After OCR is persisted, ExtractionService converts text blocks into
+structured product information and persists it to product_info table.
 
 This service intentionally stays ignorant of legal rules (Phase 4+).
 """
 
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 
 from sqlalchemy.orm import Session
@@ -19,11 +22,12 @@ from app.models.ocr_result import (
     OCRTextBlock as OCRTextBlockModel,
     QualityStatus,
 )
-from app.models.inspection import InspectionStatus
+from app.models.inspection import InspectionStatus, Inspection
 from app.models.inspection_image import InspectionImage
 from app.repositories.ocr_repository import OCRRepository
 from app.repositories.inspection_repository import InspectionRepository
 from app.repositories.image_repository import ImageRepository
+from app.services.extraction_service import ExtractionService
 from app.core.exceptions import NotFoundError, BadRequestError
 from app.core.logging import logger
 
@@ -36,10 +40,11 @@ class AnalysisService:
         self.ocr_repo = OCRRepository(db)
         self.insp_repo = InspectionRepository(db)
         self.img_repo = ImageRepository(db)
+        self.extraction_svc = ExtractionService(db)
 
     def analyze_inspection(self, inspection_id: UUID, user_id: UUID) -> dict:
         """
-        Run OCR on every image attached to an inspection.
+        Run OCR + Phase 3 extraction on every image attached to an inspection.
 
         Returns a dict matching the API response schema.
         Raises NotFoundError if inspection not found or not owned by user.
@@ -64,7 +69,7 @@ class AnalysisService:
         any_poor = False
 
         for image in images:
-            result = self._analyze_image(image)
+            result = self._analyze_image(image, inspection)
             image_results.append(result)
             if result.get("quality", {}).get("status") == "POOR":
                 any_poor = True
@@ -79,13 +84,12 @@ class AnalysisService:
             "images": image_results,
         }
 
-    def _analyze_image(self, image: InspectionImage) -> dict:
+    def _analyze_image(self, image: InspectionImage, inspection: Optional[Inspection] = None) -> dict:
         """
-        Run OCR on a single image and persist the result.
+        Run OCR + Phase 3 extraction on a single image and persist results.
 
         Returns a dict compatible with the ImageAnalysisResult schema.
-        Errors are caught and returned as status dicts so one bad image
-        doesn't fail the entire inspection.
+        Errors are caught per-image so one bad image doesn't fail the whole inspection.
         """
         image_id = image.id
         image_path = image.file_path
@@ -131,10 +135,23 @@ class AnalysisService:
 
             self.ocr_repo.commit()
             logger.info(
-                f"ANALYSIS | done | image_id={image_id} | "
+                f"ANALYSIS | OCR done | image_id={image_id} | "
                 f"blocks={len(ocr.blocks)} | quality={ocr.quality.status} | "
                 f"time={ocr.processing_time_ms}ms"
             )
+
+            # --- Phase 3: Run extraction on the persisted OCR result ---
+            product_info_dict = None
+            try:
+                product_info_dict = self.extraction_svc.extract_and_persist(
+                    db_ocr_result=db_result,
+                    inspection_product_name=inspection.product_name if inspection else None,
+                    inspection_brand=inspection.brand if inspection else None,
+                )
+                self.ocr_repo.commit()  # commit product_info record
+            except Exception as ext_exc:
+                logger.warning(f"EXTRACTION | failed (non-fatal) | image_id={image_id} | error={ext_exc}")
+                # Extraction failure is non-fatal — OCR results are still returned
 
             return {
                 "image_id": str(image_id),
@@ -161,6 +178,7 @@ class AnalysisService:
                         for b in ocr.blocks
                     ],
                 },
+                "product_info": product_info_dict,
             }
 
         except Exception as exc:
@@ -173,6 +191,7 @@ class AnalysisService:
                 "error": str(exc),
                 "quality": None,
                 "ocr": None,
+                "product_info": None,
             }
 
     def get_analysis_results(self, inspection_id: UUID, user_id: UUID) -> dict:
@@ -194,8 +213,32 @@ class AnalysisService:
                     "status": "NOT_ANALYSED",
                     "quality": None,
                     "ocr": None,
+                    "product_info": None,
                 })
                 continue
+
+            # Load product_info if available
+            product_info_dict = None
+            if db_result.product_info:
+                pi = db_result.product_info
+                product_info_dict = {
+                    "product_name": pi.product_name,
+                    "brand_name": pi.brand_name,
+                    "manufacturer": pi.manufacturer,
+                    "net_quantity": pi.net_quantity,
+                    "mrp": pi.mrp,
+                    "manufacturing_date": pi.manufacturing_date,
+                    "expiry_date": pi.expiry_date,
+                    "batch_number": pi.batch_number,
+                    "country_of_origin": pi.country_of_origin,
+                    "ingredients": pi.ingredients,
+                    "license_number": pi.license_number,
+                    "customer_care": pi.customer_care,
+                    "warnings": pi.warnings,
+                    "fields": pi.get_fields(),
+                    "total_blocks_processed": pi.total_blocks_processed,
+                    "extraction_version": pi.extraction_version,
+                }
 
             image_results.append({
                 "image_id": str(image.id),
@@ -225,6 +268,7 @@ class AnalysisService:
                         for b in db_result.text_blocks
                     ],
                 },
+                "product_info": product_info_dict,
             })
 
         return {

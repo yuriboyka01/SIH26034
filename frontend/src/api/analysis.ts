@@ -4,6 +4,7 @@
  */
 
 import client from './client';
+import type { ProductInfo } from './product_info';
 
 export interface OCRBlock {
   text: string;
@@ -34,6 +35,8 @@ export interface ImageAnalysisResult {
   quality: QualityData | null;
   ocr: OCRData | null;
   error?: string;
+  // Phase 3: structured product information
+  product_info: ProductInfo | null;
 }
 
 export interface AnalysisResponse {

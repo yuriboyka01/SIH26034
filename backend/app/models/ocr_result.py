@@ -59,6 +59,7 @@ class OCRResult(Base):
     # Relationships
     image = relationship("InspectionImage", back_populates="ocr_results")
     text_blocks = relationship("OCRTextBlock", back_populates="ocr_result", cascade="all, delete-orphan")
+    product_info = relationship("ProductInfo", back_populates="ocr_result", uselist=False, cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<OCRResult image={self.image_id} engine={self.engine}>"

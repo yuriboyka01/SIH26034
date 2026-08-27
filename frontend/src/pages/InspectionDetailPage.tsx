@@ -13,6 +13,7 @@ import {
 } from '../api/inspections';
 import { analyzeInspection, getAnalysisResults, type AnalysisResponse } from '../api/analysis';
 import OCRResultsPanel from '../components/OCRResultsPanel';
+import ProductInfoPanel from '../components/ProductInfoPanel';
 import {
   ArrowLeft,
   Upload,
@@ -310,9 +311,9 @@ export default function InspectionDetailPage() {
         <div className="flex items-center gap-3 bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-4 mb-6">
           <Loader2 className="w-5 h-5 text-indigo-400 animate-spin flex-shrink-0" />
           <div>
-            <p className="text-sm font-medium text-indigo-300">Running OCR analysis…</p>
+            <p className="text-sm font-medium text-indigo-300">Running OCR analysis + extraction…</p>
             <p className="text-xs text-slate-400 mt-0.5">
-              OpenCV preprocessing + PaddleOCR · This may take 10–30 seconds per image
+              OpenCV preprocessing + PaddleOCR + Phase 3 field extraction · This may take 10–30 seconds per image
             </p>
           </div>
         </div>
@@ -416,40 +417,50 @@ export default function InspectionDetailPage() {
                   </div>
 
                   {/* Content: Image + OCR panel */}
-                  <div className="p-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    {/* Raw image thumbnail */}
-                    <div>
-                      <img
-                        src={image.url}
-                        alt={image.original_filename}
-                        className="w-full rounded-xl object-contain max-h-96"
-                        loading="lazy"
-                      />
+                  <div className="p-4 space-y-4">
+                    {/* Image + OCR panel side-by-side on large screens */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      {/* Raw image thumbnail */}
+                      <div>
+                        <img
+                          src={image.url}
+                          alt={image.original_filename}
+                          className="w-full rounded-xl object-contain max-h-96"
+                          loading="lazy"
+                        />
+                      </div>
+
+                      {/* OCR Results */}
+                      <div>
+                        {ocrResult ? (
+                          <OCRResultsPanel imageUrl={image.url} result={ocrResult} />
+                        ) : (
+                          <div
+                            className="h-full flex flex-col items-center justify-center rounded-xl p-6 text-center"
+                            style={{
+                              background: 'rgba(255,255,255,0.03)',
+                              border: '1px solid rgba(255,255,255,0.07)',
+                              minHeight: '200px',
+                            }}
+                          >
+                            <ScanText className="w-10 h-10 mb-3" style={{ color: 'rgba(255,255,255,0.2)' }} />
+                            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                              Click <strong className="text-indigo-400">Analyse Inspection</strong> to run OCR
+                            </p>
+                            <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                              Bounding boxes and detected text will appear here
+                            </p>
+                          </div>
+                        )}
+                      </div>
                     </div>
 
-                    {/* OCR Results */}
-                    <div>
-                      {ocrResult ? (
-                        <OCRResultsPanel imageUrl={image.url} result={ocrResult} />
-                      ) : (
-                        <div
-                          className="h-full flex flex-col items-center justify-center rounded-xl p-6 text-center"
-                          style={{
-                            background: 'rgba(255,255,255,0.03)',
-                            border: '1px solid rgba(255,255,255,0.07)',
-                            minHeight: '200px',
-                          }}
-                        >
-                          <ScanText className="w-10 h-10 mb-3" style={{ color: 'rgba(255,255,255,0.2)' }} />
-                          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                            Click <strong className="text-indigo-400">Analyse Inspection</strong> to run OCR
-                          </p>
-                          <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.25)' }}>
-                            Bounding boxes and detected text will appear here
-                          </p>
-                        </div>
-                      )}
-                    </div>
+                    {/* Phase 3: Product Information Panel (full width below) */}
+                    {ocrResult && ocrResult.status === 'OK' && (
+                      <div>
+                        <ProductInfoPanel productInfo={ocrResult.product_info ?? null} />
+                      </div>
+                    )}
                   </div>
                 </div>
               );
