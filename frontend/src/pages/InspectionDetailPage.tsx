@@ -12,6 +12,9 @@ import {
   type Inspection,
 } from '../api/inspections';
 import { analyzeInspection, getAnalysisResults, type AnalysisResponse } from '../api/analysis';
+import { getProductInfo, type ProductInfo } from '../api/product_info';
+import { getComplianceReports, runComplianceAnalysis, type ComplianceReport } from '../api/compliance';
+import { ComplianceResultsPanel } from '../components/ComplianceResultsPanel';
 import OCRResultsPanel from '../components/OCRResultsPanel';
 import ProductInfoPanel from '../components/ProductInfoPanel';
 import {
@@ -40,6 +43,8 @@ export default function InspectionDetailPage() {
 
   // Phase 2: Analysis state
   const [analysisResult, setAnalysisResult] = useState<AnalysisResponse | null>(null);
+  const [productInfo, setProductInfo] = useState<ProductInfo | null>(null);
+  const [complianceReports, setComplianceReports] = useState<ComplianceReport[]>([]);
   const [analysing, setAnalysing] = useState(false);
   const [analysisError, setAnalysisError] = useState('');
 
@@ -48,6 +53,20 @@ export default function InspectionDetailPage() {
     try {
       const data = await getInspection(id);
       setInspection(data);
+      
+      // Fetch product info & compliance if available
+      const [info, comp] = await Promise.all([
+        getProductInfo(id).catch(() => null),
+        getComplianceReports(id).catch(() => null)
+      ]);
+      if (info && info.product_info_list && info.product_info_list.length > 0) {
+        setProductInfo(info.product_info_list[0]);
+      } else {
+        setProductInfo(null);
+      }
+      if (comp && comp.reports) {
+        setComplianceReports(comp.reports);
+      }
     } catch (err) {
       console.error('Failed to fetch inspection:', err);
     } finally {
@@ -61,9 +80,7 @@ export default function InspectionDetailPage() {
     if (id) {
       getAnalysisResults(id)
         .then((res) => {
-          // Only show if at least one image has been analysed
-          const hasResults = res.images.some((img) => img.status === 'OK');
-          if (hasResults) setAnalysisResult(res);
+          if (res) setAnalysisResult(res);
         })
         .catch(() => {
           // No results yet — that's fine
@@ -120,7 +137,6 @@ export default function InspectionDetailPage() {
       await fetchInspection();
       setSuccessMsg('Image deleted.');
       setTimeout(() => setSuccessMsg(''), 2000);
-      // Clear analysis if images changed
       setAnalysisResult(null);
     } catch (err: unknown) {
       const e = err as { response?: { data?: { error?: { message?: string } } } };
@@ -146,9 +162,23 @@ export default function InspectionDetailPage() {
     setAnalysisError('');
     setAnalysing(true);
     try {
-      const result = await analyzeInspection(id);
-      setAnalysisResult(result);
-      // Refresh inspection to get updated status
+      const [analysisData, compData] = await Promise.all([
+        analyzeInspection(id),
+        runComplianceAnalysis(id)
+      ]);
+      setAnalysisResult(analysisData);
+      
+      if (compData && compData.reports) {
+        setComplianceReports(compData.reports);
+      }
+      
+      const info = await getProductInfo(id);
+      if (info && info.product_info_list && info.product_info_list.length > 0) {
+        setProductInfo(info.product_info_list[0]);
+      } else {
+        setProductInfo(null);
+      }
+      
       await fetchInspection();
     } catch (err: unknown) {
       const e = err as { response?: { data?: { error?: { message?: string } } } };
@@ -192,9 +222,6 @@ export default function InspectionDetailPage() {
     COMPLETED: 'Completed',
     NEEDS_REVIEW: 'Needs Review',
   };
-
-  // Map image id → url for OCR overlay (reserved for future use)
-  // const imageUrlMap = Object.fromEntries(inspection.images.map((img) => [img.id, img.url]));
 
   const hasImages = inspection.images.length > 0;
 
@@ -382,11 +409,14 @@ export default function InspectionDetailPage() {
           </div>
         ) : (
           <div className="space-y-8">
+            {/* Rules Engine & Extracted Info Row */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+              <ComplianceResultsPanel reports={complianceReports} isAnalyzing={analysing} />
+              <ProductInfoPanel productInfo={productInfo} />
+            </div>
+
             {inspection.images.map((image) => {
-              // Find OCR result for this image
-              const ocrResult = analysisResult?.images.find(
-                (r) => r.image_id === image.id
-              ) ?? null;
+              const ocrResult = analysisResult?.images.find((r) => r.image_id === image.id) ?? null;
 
               return (
                 <div
@@ -418,7 +448,6 @@ export default function InspectionDetailPage() {
 
                   {/* Content: Image + OCR panel */}
                   <div className="p-4 space-y-4">
-                    {/* Image + OCR panel side-by-side on large screens */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                       {/* Raw image thumbnail */}
                       <div>
@@ -447,20 +476,10 @@ export default function InspectionDetailPage() {
                             <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
                               Click <strong className="text-indigo-400">Analyse Inspection</strong> to run OCR
                             </p>
-                            <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.25)' }}>
-                              Bounding boxes and detected text will appear here
-                            </p>
                           </div>
                         )}
                       </div>
                     </div>
-
-                    {/* Phase 3: Product Information Panel (full width below) */}
-                    {ocrResult && ocrResult.status === 'OK' && (
-                      <div>
-                        <ProductInfoPanel productInfo={ocrResult.product_info ?? null} />
-                      </div>
-                    )}
                   </div>
                 </div>
               );

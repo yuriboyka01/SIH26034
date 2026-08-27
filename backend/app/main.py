@@ -12,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.exceptions import register_exception_handlers
 from app.core.logging import logger
-from app.api import auth, inspections, images, dashboard, analysis, product_info
+from app.api import auth, inspections, images, dashboard, analysis, product_info, compliance
 
 app = FastAPI(
     title="SIH26034 — Legal Metrology Compliance System",
@@ -21,7 +21,7 @@ app = FastAPI(
         "Legal Metrology (Packaged Commodities) Rules, 2011 by scanning "
         "products, images and labels."
     ),
-    version="3.0.0-phase3",
+    version="4.0.0-phase4",
     docs_url="/docs",
     redoc_url="/redoc",
 )
@@ -45,12 +45,13 @@ app.include_router(images.router)
 app.include_router(dashboard.router)
 app.include_router(analysis.router)
 app.include_router(product_info.router)
+app.include_router(compliance.router)
 
 
 @app.get("/api/health", tags=["System"])
 def health_check():
     """Health check endpoint."""
-    return {"status": "healthy", "version": "3.0.0-phase3"}
+    return {"status": "healthy", "version": "4.0.0-phase4"}
 
 
 @app.on_event("startup")

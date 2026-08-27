@@ -7,6 +7,7 @@ from app.models.inspection import Inspection, InspectionStatus
 from app.models.inspection_image import InspectionImage, ImageType
 from app.models.ocr_result import OCRResult, OCRTextBlock, QualityStatus
 from app.models.product_info import ProductInfo  # Phase 3
+from app.models.compliance import ComplianceReport, ComplianceRuleResult  # Phase 4
 
 __all__ = [
     "User",
@@ -19,4 +20,6 @@ __all__ = [
     "OCRTextBlock",
     "QualityStatus",
     "ProductInfo",
+    "ComplianceReport",
+    "ComplianceRuleResult",
 ]
