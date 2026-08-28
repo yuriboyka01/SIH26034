@@ -1,518 +1,87 @@
-/**
- * Inspection detail page — Phase 2: upload images + trigger OCR analysis.
- * Shows bounding-box overlay and detected text blocks after analysis.
- */
-
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import {
-  getInspection,
-  uploadInspectionImage,
-  deleteInspectionImage,
-  type Inspection,
-} from '../api/inspections';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { AlertCircle, ArrowLeft, Download, FileText, ImageIcon, Loader2, RefreshCw, ScanText, Trash2, Upload, X } from 'lucide-react';
+import { deleteInspectionImage, getInspection, uploadInspectionImage, type Inspection, type InspectionImage } from '../api/inspections';
 import { analyzeInspection, getAnalysisResults, type AnalysisResponse } from '../api/analysis';
 import { getProductInfo, type ProductInfo } from '../api/product_info';
 import { getComplianceReports, runComplianceAnalysis, type ComplianceReport } from '../api/compliance';
 import { downloadReport } from '../api/reports';
-import { ComplianceResultsPanel } from '../components/ComplianceResultsPanel';
 import OCRResultsPanel from '../components/OCRResultsPanel';
 import ProductInfoPanel from '../components/ProductInfoPanel';
-import {
-  ArrowLeft,
-  Upload,
-  Trash2,
-  ImageIcon,
-  Loader2,
-  AlertCircle,
-  CheckCircle,
-  X,
-  ScanText,
-  RefreshCw,
-  FileText,
-  Download
-} from 'lucide-react';
+import { ComplianceResultsPanel } from '../components/ComplianceResultsPanel';
+import { Alert, EmptyState, LoadingState, ProgressStages, SectionHeader, StatusBadge } from '../components/ui';
+
+type AnalysisPhase = 'idle' | 'ocr' | 'extraction' | 'rules';
 
 export default function InspectionDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const [inspection, setInspection] = useState<Inspection | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [error, setError] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
-  const [dragOver, setDragOver] = useState(false);
+  const [inspection, setInspection] = useState<Inspection | null>(null); const [loading, setLoading] = useState(true); const [error, setError] = useState(''); const [success, setSuccess] = useState('');
+  const [uploading, setUploading] = useState(false); const [uploadProgress, setUploadProgress] = useState(0); const [dragOver, setDragOver] = useState(false); const [deleteCandidate, setDeleteCandidate] = useState<string | null>(null);
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResponse | null>(null); const [productInfo, setProductInfo] = useState<ProductInfo | null>(null); const [complianceReports, setComplianceReports] = useState<ComplianceReport[]>([]); const [analysing, setAnalysing] = useState(false); const [analysisPhase, setAnalysisPhase] = useState<AnalysisPhase>('idle'); const [analysisProgress, setAnalysisProgress] = useState(0); const [processedImageCount, setProcessedImageCount] = useState(0); const [analysisError, setAnalysisError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Phase 2: Analysis state
-  const [analysisResult, setAnalysisResult] = useState<AnalysisResponse | null>(null);
-  const [productInfo, setProductInfo] = useState<ProductInfo | null>(null);
-  const [complianceReports, setComplianceReports] = useState<ComplianceReport[]>([]);
-  const [analysing, setAnalysing] = useState(false);
-  const [analysisError, setAnalysisError] = useState('');
-
-  const fetchInspection = useCallback(async () => {
-    if (!id) return;
-    try {
-      const data = await getInspection(id);
-      setInspection(data);
-      
-      // Fetch product info & compliance if available
-      const [info, comp] = await Promise.all([
-        getProductInfo(id).catch(() => null),
-        getComplianceReports(id).catch(() => null)
-      ]);
-      if (info && info.product_info_list && info.product_info_list.length > 0) {
-        setProductInfo(info.product_info_list[0]);
-      } else {
-        setProductInfo(null);
-      }
-      if (comp && comp.reports) {
-        setComplianceReports(comp.reports);
-      }
-    } catch (err) {
-      console.error('Failed to fetch inspection:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [id]);
-
-  // On mount: load inspection + any persisted OCR results
-  useEffect(() => {
-    fetchInspection();
-    if (id) {
-      getAnalysisResults(id)
-        .then((res) => {
-          if (res) setAnalysisResult(res);
-        })
-        .catch(() => {
-          // No results yet — that's fine
-        });
-    }
-  }, [fetchInspection, id]);
-
-  const handleFileUpload = async (files: FileList | null) => {
-    if (!files || files.length === 0 || !id) return;
-
-    setError('');
-    setSuccessMsg('');
-    setUploading(true);
-    setUploadProgress(0);
-
-    try {
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-
-        const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
-        if (!validTypes.includes(file.type)) {
-          setError(`${file.name}: Only JPG, PNG, and WEBP images are supported.`);
-          continue;
-        }
-
-        if (file.size > 10 * 1024 * 1024) {
-          setError(`${file.name}: File size exceeds 10MB limit.`);
-          continue;
-        }
-
-        await uploadInspectionImage(id, file, 'OTHER', (progress) => {
-          setUploadProgress(progress);
-        });
-      }
-
-      setSuccessMsg('Image(s) uploaded successfully!');
-      setTimeout(() => setSuccessMsg(''), 3000);
-      await fetchInspection();
-    } catch (err: unknown) {
-      const e = err as { response?: { data?: { error?: { message?: string } } } };
-      setError(e?.response?.data?.error?.message || 'Failed to upload image.');
-    } finally {
-      setUploading(false);
-      setUploadProgress(0);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-    }
-  };
-
-  const handleDelete = async (imageId: string) => {
-    if (!id || !confirm('Delete this image?')) return;
-
-    try {
-      await deleteInspectionImage(id, imageId);
-      await fetchInspection();
-      setSuccessMsg('Image deleted.');
-      setTimeout(() => setSuccessMsg(''), 2000);
-      setAnalysisResult(null);
-    } catch (err: unknown) {
-      const e = err as { response?: { data?: { error?: { message?: string } } } };
-      setError(e?.response?.data?.error?.message || 'Failed to delete image.');
-    }
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOver(true);
-  };
-
-  const handleDragLeave = () => setDragOver(false);
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOver(false);
-    handleFileUpload(e.dataTransfer.files);
-  };
-
+  const fetchInspection = useCallback(async () => { if (!id) return; try { const [record, info, compliance] = await Promise.all([getInspection(id), getProductInfo(id).catch(() => null), getComplianceReports(id).catch(() => null)]); setInspection(record); setProductInfo(info?.product_info_list?.[0] || null); setComplianceReports(compliance?.reports || []); } catch { setError('The inspection record could not be loaded. Please return to the register and try again.'); } finally { setLoading(false); } }, [id]);
+  useEffect(() => { fetchInspection(); if (id) getAnalysisResults(id).then(setAnalysisResult).catch(() => undefined); }, [fetchInspection, id]);
+  const flash = (message: string) => { setSuccess(message); window.setTimeout(() => setSuccess(''), 3000); };
+  const handleFileUpload = async (files: FileList | null) => { if (!files?.length || !id) return; setError(''); setUploading(true); setUploadProgress(0); try { for (const file of Array.from(files)) { if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) { setError(`${file.name}: only JPG, PNG, and WEBP evidence is supported.`); continue; } if (file.size > 10 * 1024 * 1024) { setError(`${file.name}: file size exceeds the 10 MB limit.`); continue; } await uploadInspectionImage(id, file, 'OTHER', setUploadProgress); } await fetchInspection(); flash('Evidence uploaded. Run analysis when the evidence set is ready.'); } catch (err: unknown) { const detail = err as { response?: { data?: { error?: { message?: string } } } }; setError(detail.response?.data?.error?.message || 'Evidence could not be uploaded. Please try again.'); } finally { setUploading(false); setUploadProgress(0); if (fileInputRef.current) fileInputRef.current.value = ''; } };
+  const confirmDelete = async () => { if (!id || !deleteCandidate) return; try { await deleteInspectionImage(id, deleteCandidate); setDeleteCandidate(null); setAnalysisResult(null); await fetchInspection(); flash('Evidence image deleted.'); } catch (err: unknown) { const detail = err as { response?: { data?: { error?: { message?: string } } } }; setError(detail.response?.data?.error?.message || 'Evidence could not be deleted.'); } };
   const handleAnalyze = async () => {
     if (!id) return;
-    setAnalysisError('');
-    setAnalysing(true);
+    setAnalysisError(''); setAnalysing(true); setAnalysisPhase('ocr'); setAnalysisProgress(12); setProcessedImageCount(0);
+    let progressTimer: number | undefined;
     try {
-      const [analysisData, compData] = await Promise.all([
-        analyzeInspection(id),
-        runComplianceAnalysis(id)
-      ]);
-      setAnalysisResult(analysisData);
-      
-      if (compData && compData.reports) {
-        setComplianceReports(compData.reports);
-      }
-      
+      // OCR is a synchronous server operation, so advance only within the OCR phase
+      // until its response arrives instead of claiming that later stages are complete.
+      progressTimer = window.setInterval(() => setAnalysisProgress((progress) => Math.min(progress + 3, 68)), 900);
+      const analysis = await analyzeInspection(id);
+      window.clearInterval(progressTimer); progressTimer = undefined;
+      setAnalysisResult(analysis); setProcessedImageCount(analysis.images.length); setAnalysisPhase('extraction'); setAnalysisProgress(74);
       const info = await getProductInfo(id);
-      if (info && info.product_info_list && info.product_info_list.length > 0) {
-        setProductInfo(info.product_info_list[0]);
-      } else {
-        setProductInfo(null);
-      }
-      
-      await fetchInspection();
+      setProductInfo(info.product_info_list?.[0] || null); setAnalysisPhase('rules'); setAnalysisProgress(88);
+      const compliance = await runComplianceAnalysis(id);
+      setComplianceReports(compliance.reports || []); setAnalysisProgress(100);
+      await fetchInspection(); flash('Evidence analysis and rule evaluation completed.');
     } catch (err: unknown) {
-      const e = err as { response?: { data?: { error?: { message?: string } } } };
-      setAnalysisError(e?.response?.data?.error?.message || 'Analysis failed. Please try again.');
+      const detail = err as { response?: { data?: { error?: { message?: string } } } };
+      setAnalysisError(detail.response?.data?.error?.message || 'Analysis could not be completed. Review the evidence and try again.');
     } finally {
-      setAnalysing(false);
+      if (progressTimer) window.clearInterval(progressTimer);
+      setAnalysing(false); setAnalysisPhase('idle');
     }
   };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-6 h-6 text-indigo-400 animate-spin" />
-      </div>
-    );
-  }
-
-  if (!inspection) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-slate-400">Inspection not found.</p>
-        <Link to="/inspections" className="text-indigo-400 hover:text-indigo-300 text-sm mt-2 inline-block">
-          Back to Inspections
-        </Link>
-      </div>
-    );
-  }
-
-  const statusStyles: Record<string, string> = {
-    CREATED: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-    IMAGES_UPLOADED: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-    PROCESSING: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
-    COMPLETED: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-    NEEDS_REVIEW: 'bg-red-500/10 text-red-400 border-red-500/20',
-  };
-
-  const statusLabels: Record<string, string> = {
-    CREATED: 'Created',
-    IMAGES_UPLOADED: 'Images Uploaded',
-    PROCESSING: 'Processing',
-    COMPLETED: 'Completed',
-    NEEDS_REVIEW: 'Needs Review',
-  };
+  if (loading) return <LoadingState label="Opening inspection workspace" />;
+  if (!inspection) return <EmptyState icon={<AlertCircle size={28} />} title="Inspection unavailable" description="The requested inspection could not be found or loaded." action={<Link to="/inspections" className="ui-button-secondary">Back to register</Link>} />;
 
   const hasImages = inspection.images.length > 0;
+  // A stored error/placeholder result is not a completed analysis. It must keep the
+  // first-run action available so the user is not presented with only "Re-run".
+  const hasSuccessfulAnalysis = analysisResult?.images.some((result) => result.status === 'OK') || false;
+  const hasReports = complianceReports.length > 0;
+  const phaseIndex: Record<AnalysisPhase, number> = { idle: 0, ocr: 1, extraction: 2, rules: 3 };
+  const phaseCompleteThrough: Record<AnalysisPhase, number> = { idle: -1, ocr: 0, extraction: 1, rules: 2 };
+  const stages = ['Evidence', 'OCR', 'Extraction', 'Rules', 'Findings', 'Report']; const activeIndex = analysing ? phaseIndex[analysisPhase] : !hasImages ? 0 : hasReports ? 5 : hasSuccessfulAnalysis ? 3 : 0; const completeThrough = analysing ? phaseCompleteThrough[analysisPhase] : hasReports ? 4 : hasSuccessfulAnalysis ? 2 : hasImages ? 0 : -1;
+  return <div className="space-y-6"><Link to="/inspections" className="inline-flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[#bcd4ff]"><ArrowLeft size={16} /> Back to inspection register</Link>
+    <section className="app-surface overflow-hidden"><div className="flex flex-wrap items-start justify-between gap-5 px-5 py-5 sm:px-6"><div><p className="app-kicker">Inspection · <span className="font-mono">{inspection.inspection_number}</span></p><div className="mt-2 flex flex-wrap items-center gap-3"><h2 className="text-xl font-semibold tracking-tight text-[var(--text)] sm:text-2xl">{inspection.product_name}</h2><StatusBadge value={inspection.status} /></div><p className="mt-2 text-sm text-[var(--text-muted)]">{inspection.brand} <span className="mx-2 text-[var(--text-faint)]">·</span><span className="font-mono text-xs">Opened {new Date(inspection.created_at).toLocaleString()}</span></p></div><div className="flex flex-wrap gap-2">{hasReports && <><button onClick={() => downloadReport(id!, 'pdf')} className="ui-button-secondary"><FileText size={16} /> PDF</button><button onClick={() => downloadReport(id!, 'docx')} className="ui-button-secondary"><Download size={16} /> DOCX</button></>}{hasImages && <button onClick={handleAnalyze} disabled={analysing} className="ui-button-primary">{analysing ? <><Loader2 size={16} className="animate-spin" /> Analysing evidence…</> : hasSuccessfulAnalysis ? <><RefreshCw size={16} /> Re-run analysis</> : <><ScanText size={16} /> Analyze evidence</>}</button>}</div></div><div className="border-t border-[var(--line)] px-5 py-4 sm:px-6"><ProgressStages stages={stages} activeIndex={activeIndex} completeThrough={completeThrough} /></div></section>
+    {error && <Alert tone="error">{error}<button aria-label="Dismiss" className="ml-auto -mr-1 text-current" onClick={() => setError('')}><X size={16} /></button></Alert>}{analysisError && <Alert tone="error">{analysisError}<button aria-label="Dismiss" className="ml-auto -mr-1 text-current" onClick={() => setAnalysisError('')}><X size={16} /></button></Alert>}{success && <Alert tone="success">{success}</Alert>}
+    {analysing && <AnalysisProgress phase={analysisPhase} progress={analysisProgress} imageCount={inspection.images.length} processedImageCount={processedImageCount} />}
+    <section className="grid gap-5 xl:grid-cols-[minmax(0,.95fr)_minmax(0,1.05fr)]"><div className="space-y-5"><section className="app-surface overflow-hidden"><SectionHeader eyebrow="Evidence" title="Evidence collection" description="Upload package images to establish the inspection record." /><div className="p-4"><div onDragOver={(event) => { event.preventDefault(); setDragOver(true); }} onDragLeave={() => setDragOver(false)} onDrop={(event) => { event.preventDefault(); setDragOver(false); handleFileUpload(event.dataTransfer.files); }} onClick={() => fileInputRef.current?.click()} className={`cursor-pointer border border-dashed p-6 text-center transition-colors ${dragOver ? 'border-[#7ea6ff] bg-[#111d31]' : 'border-[var(--line-strong)] bg-[#0a0f18] hover:border-[#5873a6]'}`}>{uploading ? <div><Loader2 size={24} className="mx-auto animate-spin text-[#8cc1ff]" /><p className="mt-3 text-sm text-[var(--text)]">Uploading evidence · {uploadProgress}%</p><div className="mx-auto mt-3 h-1 w-44 overflow-hidden bg-[#1a2535]"><div className="h-full bg-[#5b8cff]" style={{ width: `${uploadProgress}%` }} /></div></div> : <><Upload size={25} className="mx-auto text-[var(--text-faint)]" /><p className="mt-3 text-sm font-semibold text-[var(--text)]">Add package evidence</p><p className="mt-1 text-xs text-[var(--text-muted)]">Drop JPG, PNG, or WEBP files here · maximum 10 MB per image</p></>}<input ref={fileInputRef} type="file" accept=".jpg,.jpeg,.png,.webp" multiple className="hidden" onChange={(event) => handleFileUpload(event.target.files)} /></div></div></section>
+      {hasImages ? <div className="space-y-5">{inspection.images.map((image) => <EvidenceItem key={image.id} image={image} result={analysisResult?.images.find((result) => result.image_id === image.id) || null} pendingDelete={deleteCandidate === image.id} onAskDelete={() => setDeleteCandidate(image.id)} onCancelDelete={() => setDeleteCandidate(null)} onConfirmDelete={confirmDelete} />)}</div> : <EmptyState icon={<ImageIcon size={28} />} title="No evidence attached" description="Upload a package image to begin OCR extraction and compliance analysis." />}</div>
+      <aside className="space-y-5"><ProductInfoPanel productInfo={productInfo} /><ComplianceResultsPanel reports={complianceReports} isAnalyzing={analysing} />{hasReports && <section className="app-surface overflow-hidden"><SectionHeader eyebrow="Report" title="Official report ready" description="The report includes the inspection identity, evidence-linked rules, and current compliance outcome." /><div className="flex flex-wrap gap-2 p-4"><button onClick={() => downloadReport(id!, 'pdf')} className="ui-button-secondary"><FileText size={16} /> Download PDF</button><button onClick={() => downloadReport(id!, 'docx')} className="ui-button-secondary"><Download size={16} /> Download DOCX</button></div></section>}</aside></section>
+  </div>;
+}
 
-  return (
-    <div className="animate-fade-in">
-      {/* Back link */}
-      <Link
-        to="/inspections"
-        className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-white mb-6 transition-colors"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Back to Inspections
-      </Link>
+function AnalysisProgress({ phase, progress, imageCount, processedImageCount }: { phase: AnalysisPhase; progress: number; imageCount: number; processedImageCount: number }) {
+  const phaseCopy: Record<Exclude<AnalysisPhase, 'idle'>, { title: string; description: string }> = {
+    ocr: { title: 'Reading package evidence', description: `Running image-quality checks and OCR for ${imageCount} uploaded ${imageCount === 1 ? 'image' : 'images'}.` },
+    extraction: { title: 'Extracting package declarations', description: 'Saving the text and matching label details to their source evidence.' },
+    rules: { title: 'Evaluating compliance rules', description: 'Checking extracted declarations against the applicable legal-metrology rules.' },
+  };
+  const current = phaseCopy[phase === 'idle' ? 'ocr' : phase];
+  const steps: Array<{ phase: Exclude<AnalysisPhase, 'idle'>; label: string }> = [{ phase: 'ocr', label: 'OCR & image quality' }, { phase: 'extraction', label: 'Declaration extraction' }, { phase: 'rules', label: 'Rule evaluation' }];
+  const order: Record<AnalysisPhase, number> = { idle: 0, ocr: 1, extraction: 2, rules: 3 };
+  return <section className="app-surface overflow-hidden" aria-live="polite"><div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4"><div className="flex items-start gap-3"><Loader2 size={19} className="mt-0.5 shrink-0 animate-spin text-[#8cc1ff]" /><div><p className="text-sm font-semibold text-[var(--text)]">{current.title}</p><p className="mt-1 text-xs leading-relaxed text-[var(--text-muted)]">{current.description}</p></div></div><div className="text-right"><span className="block font-mono text-sm font-semibold text-[#b9d6ff]">{progress}%</span><span className="font-mono text-[11px] text-[var(--text-muted)]">{processedImageCount} / {imageCount} images processed</span></div></div><div className="h-1.5 bg-[#182131]"><div className="h-full bg-[#5b8cff] transition-[width] duration-500" style={{ width: `${progress}%` }} /></div><ol className="grid gap-2 px-5 py-3 text-xs sm:grid-cols-3">{steps.map((step) => <li key={step.phase} className={`flex items-center gap-2 ${order[step.phase] < order[phase] ? 'text-[#8ce0b5]' : step.phase === phase ? 'text-[#cce4ff]' : 'text-[var(--text-faint)]'}`}><span className={`grid h-5 w-5 place-items-center rounded-full border text-[10px] ${order[step.phase] < order[phase] ? 'border-[#35c98a] bg-[#35c98a]/10' : step.phase === phase ? 'border-[#5b8cff] bg-[#5b8cff]/10' : 'border-[var(--line-strong)]'}`}>{order[step.phase] < order[phase] ? '✓' : order[step.phase]}</span>{step.label}</li>)}</ol></section>;
+}
 
-      {/* Inspection Header */}
-      <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6 mb-6">
-        <div className="flex items-start justify-between flex-wrap gap-4">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-xl font-bold text-white">{inspection.product_name}</h1>
-              <span
-                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-                  statusStyles[inspection.status] || statusStyles['CREATED']
-                }`}
-              >
-                {statusLabels[inspection.status] || inspection.status}
-              </span>
-            </div>
-            <div className="space-y-1">
-              <p className="text-sm text-slate-400">
-                <span className="text-slate-500">Brand:</span>{' '}
-                <span className="text-slate-200">{inspection.brand}</span>
-              </p>
-              <p className="text-sm text-slate-400">
-                <span className="text-slate-500">Inspection #:</span>{' '}
-                <span className="font-mono text-slate-200">{inspection.inspection_number}</span>
-              </p>
-              <p className="text-sm text-slate-400">
-                <span className="text-slate-500">Created:</span>{' '}
-                {new Date(inspection.created_at).toLocaleString()}
-              </p>
-            </div>
-          </div>
-
-          {/* ── Action Buttons ── */}
-          <div className="flex items-center gap-3">
-            {complianceReports.length > 0 && (
-              <>
-                <button
-                  onClick={() => downloadReport(id!, 'pdf')}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 bg-slate-700/50 hover:bg-slate-700 text-white border border-slate-600/50"
-                  title="Download PDF Report"
-                >
-                  <FileText className="w-4 h-4 text-red-400" />
-                  PDF
-                </button>
-                <button
-                  onClick={() => downloadReport(id!, 'docx')}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 bg-slate-700/50 hover:bg-slate-700 text-white border border-slate-600/50"
-                  title="Download DOCX Report"
-                >
-                  <Download className="w-4 h-4 text-blue-400" />
-                  DOCX
-                </button>
-              </>
-            )}
-
-            {hasImages && (
-              <button
-                onClick={handleAnalyze}
-                disabled={analysing}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 disabled:opacity-60"
-                style={{
-                  background: analysing
-                    ? 'rgba(99,102,241,0.3)'
-                    : 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-                  color: '#fff',
-                  boxShadow: analysing ? 'none' : '0 4px 20px rgba(99,102,241,0.4)',
-                }}
-              >
-                {analysing ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Analysing…
-                  </>
-                ) : analysisResult ? (
-                  <>
-                    <RefreshCw className="w-4 h-4" />
-                    Re-Analyse
-                  </>
-                ) : (
-                  <>
-                    <ScanText className="w-4 h-4" />
-                    Analyse Inspection
-                  </>
-                )}
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Messages */}
-      {error && (
-        <div className="flex items-center justify-between bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-4">
-          <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
-            <p className="text-sm text-red-400">{error}</p>
-          </div>
-          <button onClick={() => setError('')}>
-            <X className="w-4 h-4 text-red-400 hover:text-red-300" />
-          </button>
-        </div>
-      )}
-
-      {analysisError && (
-        <div className="flex items-center justify-between bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-4">
-          <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
-            <p className="text-sm text-red-400">{analysisError}</p>
-          </div>
-          <button onClick={() => setAnalysisError('')}>
-            <X className="w-4 h-4 text-red-400 hover:text-red-300" />
-          </button>
-        </div>
-      )}
-
-      {successMsg && (
-        <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3 mb-4">
-          <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-          <p className="text-sm text-emerald-400">{successMsg}</p>
-        </div>
-      )}
-
-      {/* Analysing indicator */}
-      {analysing && (
-        <div className="flex items-center gap-3 bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-4 mb-6">
-          <Loader2 className="w-5 h-5 text-indigo-400 animate-spin flex-shrink-0" />
-          <div>
-            <p className="text-sm font-medium text-indigo-300">Running OCR analysis + extraction…</p>
-            <p className="text-xs text-slate-400 mt-0.5">
-              OpenCV preprocessing + PaddleOCR + Phase 3 field extraction · This may take 10–30 seconds per image
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Upload Area */}
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold text-white mb-3">Upload Images</h2>
-        <div
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          className={`border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200 cursor-pointer ${
-            dragOver
-              ? 'border-indigo-400 bg-indigo-500/10'
-              : 'border-slate-600 hover:border-slate-500 bg-slate-800/30'
-          }`}
-          onClick={() => fileInputRef.current?.click()}
-        >
-          {uploading ? (
-            <div className="space-y-3">
-              <Loader2 className="w-8 h-8 text-indigo-400 animate-spin mx-auto" />
-              <p className="text-sm text-slate-300">Uploading… {uploadProgress}%</p>
-              <div className="w-48 mx-auto bg-slate-700 rounded-full h-1.5">
-                <div
-                  className="bg-indigo-500 h-1.5 rounded-full transition-all duration-300"
-                  style={{ width: `${uploadProgress}%` }}
-                />
-              </div>
-            </div>
-          ) : (
-            <>
-              <Upload className="w-8 h-8 text-slate-400 mx-auto mb-3" />
-              <p className="text-sm text-slate-300 mb-1">
-                Drag &amp; drop images here, or click to browse
-              </p>
-              <p className="text-xs text-slate-500">
-                Supports JPG, PNG, WEBP · Max 10MB per file
-              </p>
-            </>
-          )}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".jpg,.jpeg,.png,.webp"
-            multiple
-            className="hidden"
-            onChange={(e) => handleFileUpload(e.target.files)}
-          />
-        </div>
-      </div>
-
-      {/* ── Images + OCR Results ── */}
-      <div>
-        <h2 className="text-lg font-semibold text-white mb-3">
-          Uploaded Images ({inspection.images.length})
-        </h2>
-
-        {inspection.images.length === 0 ? (
-          <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-8 text-center">
-            <ImageIcon className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-            <p className="text-slate-400 text-sm">No images uploaded yet</p>
-            <p className="text-slate-500 text-xs mt-1">
-              Upload package images to begin the inspection
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-8">
-            {/* Rules Engine & Extracted Info Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-              <ComplianceResultsPanel reports={complianceReports} isAnalyzing={analysing} />
-              <ProductInfoPanel productInfo={productInfo} />
-            </div>
-
-            {inspection.images.map((image) => {
-              const ocrResult = analysisResult?.images.find((r) => r.image_id === image.id) ?? null;
-
-              return (
-                <div
-                  key={image.id}
-                  className="bg-slate-800/50 border border-slate-700/50 rounded-xl overflow-hidden"
-                >
-                  {/* Image header row */}
-                  <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700/50">
-                    <div className="flex items-center gap-2">
-                      <ImageIcon className="w-4 h-4 text-slate-400" />
-                      <span className="text-sm text-slate-300 truncate max-w-xs">
-                        {image.original_filename}
-                      </span>
-                      <span className="text-xs px-1.5 py-0.5 rounded bg-slate-700 text-slate-300">
-                        {image.image_type}
-                      </span>
-                      <span className="text-xs text-slate-500">
-                        {(image.file_size / 1024).toFixed(0)} KB
-                      </span>
-                    </div>
-                    <button
-                      onClick={() => handleDelete(image.id)}
-                      className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors"
-                      title="Delete image"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-
-                  {/* Content: Image + OCR panel */}
-                  <div className="p-4 space-y-4">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      {/* Raw image thumbnail */}
-                      <div>
-                        <img
-                          src={image.url}
-                          alt={image.original_filename}
-                          className="w-full rounded-xl object-contain max-h-96"
-                          loading="lazy"
-                        />
-                      </div>
-
-                      {/* OCR Results */}
-                      <div>
-                        {ocrResult ? (
-                          <OCRResultsPanel imageUrl={image.url} result={ocrResult} />
-                        ) : (
-                          <div
-                            className="h-full flex flex-col items-center justify-center rounded-xl p-6 text-center"
-                            style={{
-                              background: 'rgba(255,255,255,0.03)',
-                              border: '1px solid rgba(255,255,255,0.07)',
-                              minHeight: '200px',
-                            }}
-                          >
-                            <ScanText className="w-10 h-10 mb-3" style={{ color: 'rgba(255,255,255,0.2)' }} />
-                            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                              Click <strong className="text-indigo-400">Analyse Inspection</strong> to run OCR
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    </div>
-  );
+function EvidenceItem({ image, result, pendingDelete, onAskDelete, onCancelDelete, onConfirmDelete }: { image: InspectionImage; result: AnalysisResponse['images'][number] | null; pendingDelete: boolean; onAskDelete: () => void; onCancelDelete: () => void; onConfirmDelete: () => void }) {
+  return <section className="app-surface overflow-hidden"><header className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--line)] px-4 py-3"><div className="min-w-0"><p className="truncate text-sm font-semibold text-[var(--text)]">{image.original_filename}</p><p className="mt-1 font-mono text-[10px] uppercase tracking-wide text-[var(--text-faint)]">{image.image_type} · {(image.file_size / 1024).toFixed(0)} KB</p></div>{pendingDelete ? <div className="flex items-center gap-2"><span className="text-xs text-[#ffc4c4]">Remove this evidence?</span><button className="ui-button-danger !min-h-8 !px-2 !text-xs" onClick={onConfirmDelete}>Delete</button><button className="ui-icon-button" onClick={onCancelDelete} aria-label="Cancel delete"><X size={15} /></button></div> : <button className="ui-icon-button hover:!text-[#ffb4b4]" onClick={onAskDelete} aria-label={`Delete ${image.original_filename}`}><Trash2 size={16} /></button>}</header><div className="p-4">{result ? <OCRResultsPanel imageUrl={image.url} result={result} /> : <div className="overflow-hidden rounded-md border border-[var(--line)] bg-[#080d15]"><img src={image.url} alt={image.original_filename} className="max-h-[520px] w-full object-contain" loading="lazy" /><div className="border-t border-[var(--line)] px-4 py-3"><p className="text-sm font-semibold text-[var(--text)]">Evidence ready for analysis</p><p className="mt-1 text-xs text-[var(--text-muted)]">Run analysis to extract OCR declarations and evaluate applicable rules.</p></div></div>}</div></section>;
 }

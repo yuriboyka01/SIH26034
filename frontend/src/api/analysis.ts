@@ -48,7 +48,7 @@ export interface AnalysisResponse {
 /** Trigger OCR analysis on all images of an inspection. */
 export async function analyzeInspection(inspectionId: string): Promise<AnalysisResponse> {
   const response = await client.post<AnalysisResponse>(
-    `/api/inspections/${inspectionId}/analyze`
+    `/inspections/${inspectionId}/analyze`
   );
   return response.data;
 }
@@ -56,7 +56,7 @@ export async function analyzeInspection(inspectionId: string): Promise<AnalysisR
 /** Get persisted OCR results without re-running analysis. */
 export async function getAnalysisResults(inspectionId: string): Promise<AnalysisResponse> {
   const response = await client.get<AnalysisResponse>(
-    `/api/inspections/${inspectionId}/analysis`
+    `/inspections/${inspectionId}/analysis`
   );
   return response.data;
 }

@@ -46,7 +46,7 @@ export interface ProductInfoResponse {
 /** Fetch structured product info for an inspection (after analysis). */
 export async function getProductInfo(inspectionId: string): Promise<ProductInfoResponse> {
   const response = await client.get<ProductInfoResponse>(
-    `/api/inspections/${inspectionId}/product-info`
+    `/inspections/${inspectionId}/product-info`
   );
   return response.data;
 }

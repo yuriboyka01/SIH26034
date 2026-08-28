@@ -1,115 +1,12 @@
-/**
- * New Inspection page — form to create a new inspection.
- */
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AlertCircle, ArrowLeft, ArrowRight, Loader2, Package, Tag } from 'lucide-react';
 import { createInspection } from '../api/inspections';
-import { Package, Tag, Loader2, AlertCircle } from 'lucide-react';
+import { ProgressStages } from '../components/ui';
 
 export default function NewInspectionPage() {
-  const [productName, setProductName] = useState('');
-  const [brand, setBrand] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [productName, setProductName] = useState(''); const [brand, setBrand] = useState(''); const [error, setError] = useState(''); const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    try {
-      const inspection = await createInspection({
-        product_name: productName,
-        brand,
-      });
-      navigate(`/inspections/${inspection.id}`);
-    } catch (err: any) {
-      const msg =
-        err?.response?.data?.error?.message || 'Failed to create inspection.';
-      setError(msg);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="animate-fade-in max-w-lg">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white">New Inspection</h1>
-        <p className="text-sm text-slate-400 mt-1">
-          Create a new package compliance inspection
-        </p>
-      </div>
-
-      <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6">
-        {error && (
-          <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-4">
-            <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
-            <p className="text-sm text-red-400">{error}</p>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label
-              htmlFor="productName"
-              className="block text-sm font-medium text-slate-300 mb-1.5"
-            >
-              Product Name
-            </label>
-            <div className="relative">
-              <Package className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input
-                id="productName"
-                type="text"
-                value={productName}
-                onChange={(e) => setProductName(e.target.value)}
-                required
-                placeholder="e.g., Basmati Rice 5kg"
-                className="w-full pl-10 pr-4 py-2.5 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label
-              htmlFor="brand"
-              className="block text-sm font-medium text-slate-300 mb-1.5"
-            >
-              Brand
-            </label>
-            <div className="relative">
-              <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input
-                id="brand"
-                type="text"
-                value={brand}
-                onChange={(e) => setBrand(e.target.value)}
-                required
-                placeholder="e.g., India Gate"
-                className="w-full pl-10 pr-4 py-2.5 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-              />
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-2.5 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-medium rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/25"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Creating...
-              </>
-            ) : (
-              'Create Inspection'
-            )}
-          </button>
-        </form>
-      </div>
-    </div>
-  );
+  const submit = async (event: React.FormEvent) => { event.preventDefault(); setError(''); setLoading(true); try { const inspection = await createInspection({ product_name: productName, brand }); navigate(`/inspections/${inspection.id}`); } catch (err: any) { setError(err?.response?.data?.error?.message || 'The inspection could not be created. Please try again.'); } finally { setLoading(false); } };
+  return <div className="mx-auto max-w-3xl space-y-7"><button className="inline-flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[#bcd4ff]" onClick={() => navigate('/inspections')}><ArrowLeft size={16} /> Back to register</button><header><p className="app-kicker">Step 1 of 3 · Case intake</p><h2 className="app-title mt-2">Open an evidence record.</h2><p className="app-subtitle mt-3">Record the packaged product first. Evidence and compliance analysis continue in the inspection workspace.</p></header><section className="app-surface overflow-hidden"><div className="border-b border-[var(--line)] px-5 py-5 sm:px-7"><ProgressStages stages={['Case details', 'Evidence', 'Analysis & decision']} activeIndex={0} /></div><div className="p-5 sm:p-7">{error && <div className="ui-alert ui-alert-error mb-6" role="alert"><AlertCircle size={17} />{error}</div>}<div className="mb-6"><p className="app-kicker">Case details</p><h3 className="section-title mt-2">Product identification</h3><p className="mt-1 text-sm text-[var(--text-muted)]">Use the declaration printed on the product package wherever possible.</p></div><form className="space-y-6" onSubmit={submit}><div><label className="ui-label" htmlFor="productName">Product name</label><div className="relative"><Package className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-faint)]" size={17} /><input className="ui-input pl-10" id="productName" value={productName} onChange={(event) => setProductName(event.target.value)} required placeholder="e.g. Packaged Basmati Rice, 5 kg" /></div><p className="ui-field-hint">This label identifies the inspection throughout the workspace.</p></div><div><label className="ui-label" htmlFor="brand">Brand</label><div className="relative"><Tag className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-faint)]" size={17} /><input className="ui-input pl-10" id="brand" value={brand} onChange={(event) => setBrand(event.target.value)} required placeholder="e.g. India Gate" /></div></div><div className="flex flex-col-reverse gap-3 border-t border-[var(--line)] pt-6 sm:flex-row sm:justify-end"><button type="button" className="ui-button-secondary" onClick={() => navigate('/inspections')}>Cancel</button><button className="ui-button-primary" type="submit" disabled={loading}>{loading ? <><Loader2 size={16} className="animate-spin" /> Creating record…</> : <>Continue to evidence <ArrowRight size={16} /></>}</button></div></form></div></section></div>;
 }

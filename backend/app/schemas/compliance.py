@@ -12,6 +12,7 @@ class ComplianceStatus(str, Enum):
     FAIL = "FAIL"
     REVIEW = "REVIEW"
     NOT_APPLICABLE = "NOT_APPLICABLE"
+    NOT_ANALYSED = "NOT_ANALYSED"
 
 
 class RuleSeverity(str, Enum):

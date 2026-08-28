@@ -1,138 +1,17 @@
-import React from 'react';
-import { ComplianceReport, RuleResult } from '../api/compliance';
+import { AlertTriangle, CheckCircle2, FileSearch, Scale } from 'lucide-react';
+import type { ComplianceReport, RuleResult } from '../api/compliance';
 import { EvidenceViewer } from './EvidenceViewer';
+import { EmptyState, SectionHeader, StatusBadge } from './ui';
 
-interface ComplianceResultsPanelProps {
-  reports: ComplianceReport[];
-  isAnalyzing: boolean;
+export function ComplianceResultsPanel({ reports, isAnalyzing }: { reports: ComplianceReport[]; isAnalyzing: boolean }) {
+  if (isAnalyzing) return <section className="app-surface p-5"><div className="flex items-start gap-3"><FileSearch size={20} className="mt-0.5 animate-pulse text-[#8cc1ff]" /><div><p className="section-title">Evaluating compliance rules</p><p className="mt-1 text-sm leading-relaxed text-[var(--text-muted)]">Comparing extracted declarations against the configured legal-metrology rules.</p></div></div><div className="mt-4 h-1 overflow-hidden bg-[#1b2636]"><div className="h-full w-2/3 bg-[#5b8cff]" /></div></section>;
+  if (!reports.length) return <EmptyState icon={<Scale size={28} />} title="Rule evaluation pending" description="Upload package evidence and run analysis to create an evidence-linked compliance assessment." />;
+  return <div className="space-y-5">{reports.map((report, index) => <section key={report.image_id} className="app-surface overflow-hidden"><SectionHeader eyebrow={`Evidence assessment ${index + 1}`} title="Compliance findings" description={`${report.total_rules_checked} rules evaluated against extracted declarations.`} action={<StatusBadge value={report.overall_status} />} /><div className="grid border-b border-[var(--line)] grid-cols-4">{[{ label: 'Passed', value: report.passed_count, tone: 'text-[#73dfaa]' }, { label: 'Failed', value: report.failed_count, tone: 'text-[#ff9999]' }, { label: 'Review', value: report.review_count, tone: 'text-[#f3c973]' }, { label: 'Not applicable', value: report.not_applicable_count, tone: 'text-[var(--text-muted)]' }].map((metric) => <div key={metric.label} className="border-r border-[var(--line)] px-3 py-3 last:border-r-0"><p className="metric-label">{metric.label}</p><p className={`mt-1 font-mono text-lg font-semibold ${metric.tone}`}>{metric.value}</p></div>)}</div><div className="divide-y divide-[var(--line)]">{report.rule_results.map((result) => <RuleFinding key={result.rule_id} result={result} />)}</div></section>)}</div>;
 }
 
-const statusColors = {
-  PASS: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-  FAIL: 'bg-red-100 text-red-800 border-red-200',
-  REVIEW: 'bg-amber-100 text-amber-800 border-amber-200',
-  NOT_APPLICABLE: 'bg-slate-100 text-slate-800 border-slate-200',
-};
+function RuleFinding({ result }: { result: RuleResult }) {
+  const isFailure = result.status === 'FAIL'; const Icon = isFailure ? AlertTriangle : result.status === 'PASS' ? CheckCircle2 : Scale;
+  return <article className="p-4 sm:p-5"><div className="flex flex-wrap items-start justify-between gap-3"><div className="flex min-w-0 gap-3"><Icon size={19} className={`mt-0.5 shrink-0 ${isFailure ? 'text-[#ff9999]' : result.status === 'PASS' ? 'text-[#73dfaa]' : 'text-[#f3c973]'}`} /><div><div className="flex flex-wrap items-center gap-2"><p className="font-mono text-[11px] font-bold text-[#a9c7ff]">{result.rule_id}</p><span className="rounded border border-[var(--line-strong)] px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[var(--text-muted)]">{result.severity}</span></div><h4 className="mt-1 text-sm font-semibold text-[var(--text)]">{result.rule_name}</h4><p className="mt-1 text-sm leading-relaxed text-[var(--text-muted)]">{result.message}</p></div></div><StatusBadge value={result.status} /></div><div className="mt-4 grid gap-3 border-t border-[var(--line)] pt-4 lg:grid-cols-[1fr_1fr_.9fr]"><FindingValue label="Expected" value={result.expected} /><FindingValue label={result.field ? `Detected · ${result.field}` : 'Detected'} value={result.actual || 'Not detected'} /><div><p className="metric-label">Rule reference</p><p className="mt-1 text-xs leading-relaxed text-[var(--text-muted)]">{result.source_reference || 'Not provided'}</p></div></div>{result.evidence && <div className="mt-4"><EvidenceViewer evidence={result.evidence} /></div>}</article>;
+}
 
-const bgColors = {
-  PASS: 'bg-emerald-50 border-emerald-100',
-  FAIL: 'bg-red-50 border-red-100',
-  REVIEW: 'bg-amber-50 border-amber-100',
-  NOT_APPLICABLE: 'bg-slate-50 border-slate-100',
-};
-
-export const ComplianceResultsPanel: React.FC<ComplianceResultsPanelProps> = ({ reports, isAnalyzing }) => {
-  if (isAnalyzing) {
-    return (
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
-        <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center">
-          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          Running Compliance Checks...
-        </h3>
-        <p className="text-sm text-slate-500">Checking declarations against Legal Metrology Rules, 2011.</p>
-      </div>
-    );
-  }
-
-  if (!reports || reports.length === 0) {
-    return (
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
-        <h3 className="text-lg font-semibold text-slate-800 mb-2">Compliance Rules Engine</h3>
-        <p className="text-sm text-slate-500">
-          Run analysis to check the extracted product info against the Legal Metrology Rules, 2011.
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-6">
-      {reports.map((report) => (
-        <div key={report.image_id} className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
-          {/* Header */}
-          <div className="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
-            <h3 className="text-lg font-semibold text-slate-800">Compliance Report</h3>
-            <span className={`px-3 py-1 rounded-full text-sm font-semibold border ${statusColors[report.overall_status]}`}>
-              {report.overall_status}
-            </span>
-          </div>
-
-          {/* Metrics */}
-          <div className="grid grid-cols-5 divide-x divide-slate-100 border-b border-slate-100 text-center text-sm bg-white">
-            <div className="p-3">
-              <div className="text-slate-500">Total Checked</div>
-              <div className="font-semibold text-slate-800 text-lg">{report.total_rules_checked}</div>
-            </div>
-            <div className="p-3 bg-emerald-50">
-              <div className="text-emerald-700">Passed</div>
-              <div className="font-semibold text-emerald-800 text-lg">{report.passed_count}</div>
-            </div>
-            <div className="p-3 bg-red-50">
-              <div className="text-red-700">Failed</div>
-              <div className="font-semibold text-red-800 text-lg">{report.failed_count}</div>
-            </div>
-            <div className="p-3 bg-amber-50">
-              <div className="text-amber-700">Review</div>
-              <div className="font-semibold text-amber-800 text-lg">{report.review_count}</div>
-            </div>
-            <div className="p-3 bg-slate-50">
-              <div className="text-slate-600">N/A</div>
-              <div className="font-semibold text-slate-700 text-lg">{report.not_applicable_count}</div>
-            </div>
-          </div>
-
-          {/* Rule Results List */}
-          <div className="divide-y divide-slate-100">
-            {report.rule_results.map((rr: RuleResult) => (
-              <div key={rr.rule_id} className={`p-4 border-l-4 ${bgColors[rr.status]} hover:opacity-90 transition-opacity`}>
-                <div className="flex justify-between items-start mb-2">
-                  <div className="flex items-center space-x-2">
-                    <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-white">
-                      {rr.rule_id}
-                    </span>
-                    <h4 className="font-semibold text-slate-800">{rr.rule_name}</h4>
-                  </div>
-                  <span className={`text-xs font-semibold px-2 py-1 rounded border ${statusColors[rr.status]}`}>
-                    {rr.status}
-                  </span>
-                </div>
-                
-                <p className="text-sm text-slate-700 mb-3">{rr.message}</p>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs bg-white/50 rounded p-3 border border-slate-200/50">
-                  <div className="space-y-4">
-                    <div>
-                      <span className="font-semibold text-slate-500 block mb-1">Requirement:</span>
-                      <span className="text-slate-700 block">{rr.expected}</span>
-                      <span className="text-slate-400 block mt-1 italic text-[10px]">{rr.source_reference}</span>
-                    </div>
-                    {rr.field && (
-                      <div>
-                        <span className="font-semibold text-slate-500 block mb-1">Observation ({rr.field}):</span>
-                        {rr.actual ? (
-                          <span className="font-mono bg-white px-2 py-1 border border-slate-200 rounded text-slate-800">
-                            {rr.actual}
-                          </span>
-                        ) : (
-                          <span className="italic text-slate-400">Not detected</span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                  {rr.evidence && (
-                    <div>
-                      <EvidenceViewer evidence={rr.evidence} />
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};
+function FindingValue({ label, value }: { label: string; value: string }) { return <div><p className="metric-label">{label}</p><p className="mt-1 break-words font-mono text-xs leading-relaxed text-[#dbe3ef]">{value}</p></div>; }

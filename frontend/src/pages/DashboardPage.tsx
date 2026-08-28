@@ -1,204 +1,34 @@
-/**
- * Dashboard page — Phase 5 Enforcement Dashboard with Compliance KPIs.
- */
-
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { ArrowRight, ClipboardList, FileSearch, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { getDashboardAnalytics, type DashboardAnalyticsResponse } from '../api/dashboard';
 import ViolationChart from '../components/ViolationChart';
-import {
-  ClipboardList,
-  CheckCircle2,
-  XCircle,
-  AlertTriangle,
-  PlusCircle,
-  ArrowRight,
-  Loader2,
-  BarChart3
-} from 'lucide-react';
+import { Alert, EmptyState, LoadingState, Metric, SectionHeader, StatusBadge } from '../components/ui';
 
 export default function DashboardPage() {
   const [data, setData] = useState<DashboardAnalyticsResponse | null>(null);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const analytics = await getDashboardAnalytics();
-        setData(analytics);
-      } catch (err) {
-        console.error('Failed to fetch dashboard analytics:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-6 h-6 text-indigo-400 animate-spin" />
-      </div>
-    );
-  }
+  const [failed, setFailed] = useState(false);
+  useEffect(() => { getDashboardAnalytics().then(setData).catch(() => setFailed(true)).finally(() => setLoading(false)); }, []);
+  if (loading) return <LoadingState label="Preparing compliance operations overview" />;
 
   const kpis = data?.kpis;
-
-  const statCards = [
-    {
-      label: 'Compliant',
-      value: kpis?.compliant_count || 0,
-      icon: CheckCircle2,
-      color: 'from-emerald-500 to-emerald-600',
-      bgColor: 'bg-emerald-500/10',
-      textColor: 'text-emerald-400',
-    },
-    {
-      label: 'Non-Compliant',
-      value: kpis?.non_compliant_count || 0,
-      icon: XCircle,
-      color: 'from-red-500 to-red-600',
-      bgColor: 'bg-red-500/10',
-      textColor: 'text-red-400',
-    },
-    {
-      label: 'Needs Review',
-      value: kpis?.review_count || 0,
-      icon: AlertTriangle,
-      color: 'from-amber-500 to-amber-600',
-      bgColor: 'bg-amber-500/10',
-      textColor: 'text-amber-400',
-    },
-    {
-      label: 'Not Analysed',
-      value: kpis?.not_analysed_count || 0,
-      icon: ClipboardList,
-      color: 'from-slate-500 to-slate-600',
-      bgColor: 'bg-slate-500/10',
-      textColor: 'text-slate-400',
-    },
-  ];
-
-  return (
-    <div className="animate-fade-in">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-white">Enforcement Dashboard</h1>
-          <p className="text-sm text-slate-400 mt-1">
-            Total Inspections: <span className="font-semibold text-white">{kpis?.total_inspections || 0}</span>
-            {' '}· Compliance Rate: <span className="font-semibold text-white">{kpis?.compliance_rate || 0}%</span>
-          </p>
-        </div>
-        <Link
-          to="/inspections/new"
-          className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-lg shadow-indigo-500/25"
-        >
-          <PlusCircle className="w-4 h-4" />
-          New Inspection
-        </Link>
-      </div>
-
-      {/* Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {statCards.map((card, i) => (
-          <div
-            key={card.label}
-            className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 hover:border-slate-600/50 transition-all duration-300"
-            style={{ animationDelay: `${i * 100}ms` }}
-          >
-            <div className="flex items-center justify-between mb-3">
-              <div className={`p-2 rounded-lg ${card.bgColor}`}>
-                <card.icon className={`w-5 h-5 ${card.textColor}`} />
-              </div>
-            </div>
-            <p className="text-2xl font-bold text-white">{card.value}</p>
-            <p className="text-sm text-slate-400 mt-1">{card.label}</p>
-          </div>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        {/* Top Violations */}
-        <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl flex flex-col">
-          <div className="flex items-center gap-2 p-5 border-b border-slate-700/50">
-            <BarChart3 className="w-5 h-5 text-indigo-400" />
-            <h2 className="text-lg font-semibold text-white">Top Violations</h2>
-          </div>
-          <div className="p-5 flex-1">
-            <ViolationChart violations={data?.top_violations || []} />
-          </div>
-        </div>
-
-        {/* Recent Inspections */}
-        <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl flex flex-col">
-          <div className="flex items-center justify-between p-5 border-b border-slate-700/50">
-            <h2 className="text-lg font-semibold text-white">Recent Inspections</h2>
-            <Link
-              to="/inspections"
-              className="flex items-center gap-1 text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
-            >
-              View All
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-
-          {!data?.recent_inspections || data.recent_inspections.length === 0 ? (
-            <div className="p-8 text-center flex-1 flex flex-col items-center justify-center">
-              <ClipboardList className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-              <p className="text-slate-400">No inspections yet</p>
-            </div>
-          ) : (
-            <div className="divide-y divide-slate-700/50 flex-1">
-              {data.recent_inspections.map((inspection) => (
-                <Link
-                  key={inspection.id}
-                  to={`/inspections/${inspection.id}`}
-                  className="flex items-center justify-between p-4 hover:bg-slate-700/20 transition-colors"
-                >
-                  <div>
-                    <p className="text-sm font-medium text-white">{inspection.product_name}</p>
-                    <p className="text-xs text-slate-400 mt-0.5">
-                      {inspection.inspection_number} · {inspection.brand}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <ComplianceBadge status={inspection.compliance_status} />
-                    <ArrowRight className="w-4 h-4 text-slate-500" />
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ComplianceBadge({ status }: { status: string }) {
-  const styles: Record<string, string> = {
-    PASS: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-    FAIL: 'bg-red-500/10 text-red-400 border-red-500/20',
-    REVIEW: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-    NOT_ANALYSED: 'bg-slate-500/10 text-slate-400 border-slate-500/20',
-  };
-
-  const labels: Record<string, string> = {
-    PASS: 'Pass',
-    FAIL: 'Fail',
-    REVIEW: 'Review',
-    NOT_ANALYSED: 'Not Analysed',
-  };
-
-  return (
-    <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-        styles[status] || styles['NOT_ANALYSED']
-      }`}
-    >
-      {labels[status] || status}
-    </span>
-  );
+  const openCases = (kpis?.review_count || 0) + (kpis?.not_analysed_count || 0);
+  const ruleBreaches = data?.top_violations.reduce((total, item) => total + item.count, 0) || 0;
+  return <div className="space-y-7">
+    <section className="flex flex-col justify-between gap-5 md:flex-row md:items-end"><div><p className="app-kicker">Compliance operations</p><h2 className="app-title mt-2">Decision-ready inspection oversight.</h2><p className="app-subtitle mt-3">Monitor evidence-led cases, unresolved reviews, and rule outcomes from one operational workspace.</p></div><Link to="/inspections/new" className="ui-button-primary"><Plus size={16} /> New inspection</Link></section>
+    {failed && <Alert tone="error">Dashboard data could not be loaded. You can continue working in the inspection register.</Alert>}
+    <section className="grid overflow-hidden border border-[var(--line)] bg-[var(--surface)] sm:grid-cols-2 xl:grid-cols-4" aria-label="Operational metrics">
+      <Metric label="Inspections" value={kpis?.total_inspections || 0} detail="Recorded in this workspace" tone="info" />
+      <Metric label="Open cases" value={openCases} detail="Awaiting analysis or review" tone="review" />
+      <Metric label="Compliance rate" value={`${kpis?.compliance_rate || 0}%`} detail="Across analysed inspections" tone="pass" />
+      <Metric label="Rule breaches" value={ruleBreaches} detail="Across listed rule findings" tone="fail" />
+    </section>
+    <section className="grid gap-5 xl:grid-cols-[.95fr_1.05fr]">
+      <article className="app-surface overflow-hidden"><SectionHeader eyebrow="Rule distribution" title="Frequent rule failures" description="The rule references occurring most often in recorded reports." action={<FileSearch size={18} className="text-[var(--text-faint)]" />} /><div className="p-5"><ViolationChart violations={data?.top_violations || []} /></div></article>
+      <article className="app-surface overflow-hidden"><SectionHeader eyebrow="Case queue" title="Recent inspections" description="Latest evidence records in the current workspace." action={<Link to="/inspections" className="text-xs font-semibold text-[#a9c7ff] hover:text-white">View register</Link>} />
+        {data?.recent_inspections?.length ? <div className="divide-y divide-[var(--line)]">{data.recent_inspections.map((inspection) => <Link key={inspection.id} to={`/inspections/${inspection.id}`} className="group flex items-center justify-between gap-4 px-5 py-4 transition-colors hover:bg-[var(--surface-raised)]"><div className="min-w-0"><p className="truncate text-sm font-semibold text-[var(--text)]">{inspection.product_name}</p><p className="mt-1 truncate font-mono text-[11px] text-[var(--text-faint)]">{inspection.inspection_number} · {inspection.brand}</p></div><div className="flex shrink-0 items-center gap-3"><StatusBadge value={inspection.compliance_status} /><ArrowRight size={16} className="text-[var(--text-faint)] transition-colors group-hover:text-[#a9c7ff]" /></div></Link>)}</div> : <EmptyState icon={<ClipboardList size={28} />} title="No inspections yet" description="Create an inspection to begin evidence-based compliance analysis." action={<Link to="/inspections/new" className="ui-button-primary">Create inspection</Link>} />}
+      </article>
+    </section>
+  </div>;
 }

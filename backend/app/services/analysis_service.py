@@ -71,7 +71,7 @@ class AnalysisService:
         for image in images:
             result = self._analyze_image(image, inspection)
             image_results.append(result)
-            if result.get("quality", {}).get("status") == "POOR":
+            if result.get("quality") and result["quality"].get("status") == "POOR":
                 any_poor = True
 
         # --- Update inspection status ---
@@ -92,7 +92,9 @@ class AnalysisService:
         Errors are caught per-image so one bad image doesn't fail the whole inspection.
         """
         image_id = image.id
-        image_path = image.file_path
+        from app.core.config import settings
+        import os
+        image_path = os.path.join(settings.UPLOAD_DIR, image.file_path)
 
         try:
             logger.info(f"ANALYSIS | starting | image_id={image_id} | path={image_path}")
