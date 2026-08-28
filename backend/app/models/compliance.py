@@ -39,6 +39,10 @@ class ComplianceReport(Base):
     review_count = Column(Integer, nullable=False, default=0)
     not_applicable_count = Column(Integer, nullable=False, default=0)
     
+    # Phase 5: Report auditability — version tracking
+    engine_version = Column(String(50), nullable=True)
+    ruleset_version = Column(String(50), nullable=True)
+    
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
     # Relationships

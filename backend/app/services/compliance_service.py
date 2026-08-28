@@ -15,7 +15,7 @@ from app.repositories.compliance_repository import ComplianceRepository
 from app.repositories.product_repository import ProductInfoRepository
 from app.repositories.inspection_repository import InspectionRepository
 from app.repositories.image_repository import ImageRepository
-from app.compliance.engine import ComplianceRuleEngine
+from app.compliance.engine import ComplianceRuleEngine, ENGINE_VERSION, RULESET_VERSION
 from app.core.exceptions import NotFoundError, BadRequestError
 from app.core.logging import logger
 
@@ -76,6 +76,8 @@ class ComplianceService:
                 failed_count=report_schema.failed_count,
                 review_count=report_schema.review_count,
                 not_applicable_count=report_schema.not_applicable_count,
+                engine_version=ENGINE_VERSION,
+                ruleset_version=RULESET_VERSION,
             )
 
             for rr in report_schema.rule_results:

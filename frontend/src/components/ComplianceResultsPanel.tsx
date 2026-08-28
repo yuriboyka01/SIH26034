@@ -1,5 +1,6 @@
 import React from 'react';
 import { ComplianceReport, RuleResult } from '../api/compliance';
+import { EvidenceViewer } from './EvidenceViewer';
 
 interface ComplianceResultsPanelProps {
   reports: ComplianceReport[];
@@ -101,22 +102,29 @@ export const ComplianceResultsPanel: React.FC<ComplianceResultsPanelProps> = ({ 
                 
                 <p className="text-sm text-slate-700 mb-3">{rr.message}</p>
                 
-                <div className="grid grid-cols-2 gap-4 text-xs bg-white/50 rounded p-3 border border-slate-200/50">
-                  <div>
-                    <span className="font-semibold text-slate-500 block mb-1">Requirement:</span>
-                    <span className="text-slate-700 block">{rr.expected}</span>
-                    <span className="text-slate-400 block mt-1 italic text-[10px]">{rr.source_reference}</span>
-                  </div>
-                  {rr.field && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs bg-white/50 rounded p-3 border border-slate-200/50">
+                  <div className="space-y-4">
                     <div>
-                      <span className="font-semibold text-slate-500 block mb-1">Observation ({rr.field}):</span>
-                      {rr.actual ? (
-                        <span className="font-mono bg-white px-2 py-1 border border-slate-200 rounded text-slate-800">
-                          {rr.actual}
-                        </span>
-                      ) : (
-                        <span className="italic text-slate-400">Not detected</span>
-                      )}
+                      <span className="font-semibold text-slate-500 block mb-1">Requirement:</span>
+                      <span className="text-slate-700 block">{rr.expected}</span>
+                      <span className="text-slate-400 block mt-1 italic text-[10px]">{rr.source_reference}</span>
+                    </div>
+                    {rr.field && (
+                      <div>
+                        <span className="font-semibold text-slate-500 block mb-1">Observation ({rr.field}):</span>
+                        {rr.actual ? (
+                          <span className="font-mono bg-white px-2 py-1 border border-slate-200 rounded text-slate-800">
+                            {rr.actual}
+                          </span>
+                        ) : (
+                          <span className="italic text-slate-400">Not detected</span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  {rr.evidence && (
+                    <div>
+                      <EvidenceViewer evidence={rr.evidence} />
                     </div>
                   )}
                 </div>

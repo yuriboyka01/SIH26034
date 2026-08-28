@@ -6,10 +6,10 @@ GET  /api/inspections              — List user's inspections
 GET  /api/inspections/{id}         — Get inspection details with images
 """
 
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -42,16 +42,35 @@ def create_inspection(
 
 @router.get("", response_model=List[InspectionListResponse])
 def list_inspections(
+    response: Response,
+    search: Optional[str] = None,
+    status: Optional[str] = None,
+    compliance_status: Optional[str] = None,
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
     skip: int = 0,
     limit: int = 50,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """List inspections for the current user."""
+    """List inspections for the current user, with optional search and filters."""
     service = InspectionService(db)
-    inspections = service.list_inspections(
-        user_id=current_user.id, skip=skip, limit=limit
+    
+    inspections, total_count = service.search_inspections(
+        user_id=current_user.id,
+        search_term=search,
+        status=status,
+        compliance_status=compliance_status,
+        date_from=date_from,
+        date_to=date_to,
+        skip=skip,
+        limit=limit
     )
+
+    # Set pagination headers so we don't break existing JSON array response schema
+    response.headers["X-Total-Count"] = str(total_count)
+    response.headers["X-Page"] = str((skip // limit) + 1 if limit > 0 else 1)
+    response.headers["X-Page-Size"] = str(limit)
 
     result = []
     for insp in inspections:

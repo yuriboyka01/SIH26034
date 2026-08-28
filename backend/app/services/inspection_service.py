@@ -5,7 +5,7 @@ Inspection service — business logic for inspection lifecycle management.
 import random
 import string
 from datetime import datetime, timezone
-from typing import List, Dict
+from typing import List, Dict, Optional, Tuple
 from uuid import UUID
 
 from sqlalchemy.orm import Session
@@ -63,6 +63,29 @@ class InspectionService:
     ) -> List[Inspection]:
         """List inspections for a user."""
         return self.repo.list_by_user(user_id, skip=skip, limit=limit)
+
+    def search_inspections(
+        self,
+        user_id: UUID,
+        search_term: Optional[str] = None,
+        status: Optional[str] = None,
+        compliance_status: Optional[str] = None,
+        date_from: Optional[str] = None,
+        date_to: Optional[str] = None,
+        skip: int = 0,
+        limit: int = 50
+    ) -> Tuple[List[Inspection], int]:
+        """Search and filter inspections with pagination."""
+        return self.repo.search_inspections(
+            user_id=user_id,
+            search_term=search_term,
+            status=status,
+            compliance_status=compliance_status,
+            date_from=date_from,
+            date_to=date_to,
+            skip=skip,
+            limit=limit
+        )
 
     def update_status(
         self, inspection_id: UUID, status: InspectionStatus

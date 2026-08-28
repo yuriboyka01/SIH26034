@@ -33,6 +33,7 @@ export interface InspectionListItem {
   product_name: string;
   brand: string;
   status: string;
+  compliance_status?: string;
   created_at: string;
   image_count: number;
 }
@@ -56,9 +57,27 @@ export async function createInspection(data: CreateInspectionRequest): Promise<I
   return response.data;
 }
 
-export async function getInspections(): Promise<InspectionListItem[]> {
-  const response = await client.get<InspectionListItem[]>('/inspections');
-  return response.data;
+export interface GetInspectionsParams {
+  search?: string;
+  status?: string;
+  compliance_status?: string;
+  date_from?: string;
+  date_to?: string;
+  skip?: number;
+  limit?: number;
+}
+
+export interface PaginatedInspections {
+  items: InspectionListItem[];
+  totalCount: number;
+}
+
+export async function getInspections(params?: GetInspectionsParams): Promise<PaginatedInspections> {
+  const response = await client.get<InspectionListItem[]>('/inspections', { params });
+  return {
+    items: response.data,
+    totalCount: parseInt(response.headers['x-total-count'] || '0', 10),
+  };
 }
 
 export async function getInspection(id: string): Promise<Inspection> {

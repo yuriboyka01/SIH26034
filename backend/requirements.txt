@@ -31,11 +31,13 @@ pytest-asyncio==0.24.0
 # ── Phase 2: Computer Vision + OCR ──────────────────────────────────────────
 # CPU-only PaddlePaddle (no CUDA required)
 paddlepaddle==2.6.2
-# PaddleOCR — text detection, recognition, and angle classification
-paddleocr<3.0.0
+paddleocr==2.8.1
 # OpenCV (headless — no GUI dependencies)
 opencv-python-headless>=4.9.0
 # Image loading/manipulation
 Pillow>=10.0.0
 # Numerical computing (required by OpenCV and PaddlePaddle)
 numpy>=1.24.0
+
+# ── Phase 5: Reporting ──────────────────────────────────────────────────────
+reportlab>=4.0.0

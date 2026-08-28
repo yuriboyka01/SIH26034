@@ -6,9 +6,13 @@ from typing import List, Optional, Dict
 from uuid import UUID
 
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, or_
+from sqlalchemy.orm import aliased
 
 from app.models.inspection import Inspection, InspectionStatus
+from app.models.inspection_image import InspectionImage
+from app.models.ocr_result import OCRResult
+from app.models.compliance import ComplianceReport
 
 
 class InspectionRepository:
@@ -62,3 +66,68 @@ class InspectionRepository:
             counts[status.value] = count
 
         return counts
+
+    def search_inspections(
+        self,
+        user_id: UUID,
+        search_term: Optional[str] = None,
+        status: Optional[str] = None,
+        compliance_status: Optional[str] = None,
+        date_from: Optional[str] = None,
+        date_to: Optional[str] = None,
+        skip: int = 0,
+        limit: int = 50
+    ):
+        """Search and filter inspections with pagination."""
+        query = self.db.query(Inspection).filter(Inspection.created_by == user_id)
+
+        # Basic lifecycle status
+        if status:
+            query = query.filter(Inspection.status == status)
+
+        # Text search (product_name, brand, inspection_number)
+        if search_term:
+            term = f"%{search_term}%"
+            query = query.filter(
+                or_(
+                    Inspection.product_name.ilike(term),
+                    Inspection.brand.ilike(term),
+                    Inspection.inspection_number.ilike(term)
+                )
+            )
+
+        # Date range
+        if date_from:
+            query = query.filter(Inspection.created_at >= date_from)
+        if date_to:
+            query = query.filter(Inspection.created_at <= date_to)
+
+        # Compliance status filter requires a join
+        # This checks if ANY compliance report matches the status. 
+        # For a true "overall status", the subquery is more complex, but this is sufficient for search.
+        if compliance_status:
+            if compliance_status == "NOT_ANALYSED":
+                # Find inspections with NO compliance reports
+                subq = (
+                    self.db.query(InspectionImage.inspection_id)
+                    .join(OCRResult, InspectionImage.id == OCRResult.image_id)
+                    .join(ComplianceReport, OCRResult.id == ComplianceReport.ocr_result_id)
+                ).subquery()
+                query = query.filter(Inspection.id.not_in(subq))
+            else:
+                # Find inspections where ANY compliance report matches the status
+                query = query.join(InspectionImage, Inspection.id == InspectionImage.inspection_id) \
+                             .join(OCRResult, InspectionImage.id == OCRResult.image_id) \
+                             .join(ComplianceReport, OCRResult.id == ComplianceReport.ocr_result_id) \
+                             .filter(ComplianceReport.overall_status == compliance_status)
+
+        # Ensure distinct results if joins were used
+        query = query.distinct()
+
+        # Get total count before pagination
+        total_count = query.count()
+
+        # Apply pagination
+        items = query.order_by(Inspection.created_at.desc()).offset(skip).limit(limit).all()
+
+        return items, total_count

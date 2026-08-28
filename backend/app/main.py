@@ -12,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.exceptions import register_exception_handlers
 from app.core.logging import logger
-from app.api import auth, inspections, images, dashboard, analysis, product_info, compliance
+from app.api import auth, inspections, images, dashboard, analysis, product_info, compliance, reports
 
 app = FastAPI(
     title="SIH26034 — Legal Metrology Compliance System",
@@ -46,6 +46,7 @@ app.include_router(dashboard.router)
 app.include_router(analysis.router)
 app.include_router(product_info.router)
 app.include_router(compliance.router)
+app.include_router(reports.router)
 
 
 @app.get("/api/health", tags=["System"])

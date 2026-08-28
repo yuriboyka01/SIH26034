@@ -14,6 +14,7 @@ import {
 import { analyzeInspection, getAnalysisResults, type AnalysisResponse } from '../api/analysis';
 import { getProductInfo, type ProductInfo } from '../api/product_info';
 import { getComplianceReports, runComplianceAnalysis, type ComplianceReport } from '../api/compliance';
+import { downloadReport } from '../api/reports';
 import { ComplianceResultsPanel } from '../components/ComplianceResultsPanel';
 import OCRResultsPanel from '../components/OCRResultsPanel';
 import ProductInfoPanel from '../components/ProductInfoPanel';
@@ -28,6 +29,8 @@ import {
   X,
   ScanText,
   RefreshCw,
+  FileText,
+  Download
 } from 'lucide-react';
 
 export default function InspectionDetailPage() {
@@ -266,38 +269,61 @@ export default function InspectionDetailPage() {
             </div>
           </div>
 
-          {/* ── Analyze Button ── */}
-          {hasImages && (
-            <button
-              onClick={handleAnalyze}
-              disabled={analysing}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 disabled:opacity-60"
-              style={{
-                background: analysing
-                  ? 'rgba(99,102,241,0.3)'
-                  : 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-                color: '#fff',
-                boxShadow: analysing ? 'none' : '0 4px 20px rgba(99,102,241,0.4)',
-              }}
-            >
-              {analysing ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Analysing…
-                </>
-              ) : analysisResult ? (
-                <>
-                  <RefreshCw className="w-4 h-4" />
-                  Re-Analyse
-                </>
-              ) : (
-                <>
-                  <ScanText className="w-4 h-4" />
-                  Analyse Inspection
-                </>
-              )}
-            </button>
-          )}
+          {/* ── Action Buttons ── */}
+          <div className="flex items-center gap-3">
+            {complianceReports.length > 0 && (
+              <>
+                <button
+                  onClick={() => downloadReport(id!, 'pdf')}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 bg-slate-700/50 hover:bg-slate-700 text-white border border-slate-600/50"
+                  title="Download PDF Report"
+                >
+                  <FileText className="w-4 h-4 text-red-400" />
+                  PDF
+                </button>
+                <button
+                  onClick={() => downloadReport(id!, 'docx')}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 bg-slate-700/50 hover:bg-slate-700 text-white border border-slate-600/50"
+                  title="Download DOCX Report"
+                >
+                  <Download className="w-4 h-4 text-blue-400" />
+                  DOCX
+                </button>
+              </>
+            )}
+
+            {hasImages && (
+              <button
+                onClick={handleAnalyze}
+                disabled={analysing}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 disabled:opacity-60"
+                style={{
+                  background: analysing
+                    ? 'rgba(99,102,241,0.3)'
+                    : 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                  color: '#fff',
+                  boxShadow: analysing ? 'none' : '0 4px 20px rgba(99,102,241,0.4)',
+                }}
+              >
+                {analysing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Analysing…
+                  </>
+                ) : analysisResult ? (
+                  <>
+                    <RefreshCw className="w-4 h-4" />
+                    Re-Analyse
+                  </>
+                ) : (
+                  <>
+                    <ScanText className="w-4 h-4" />
+                    Analyse Inspection
+                  </>
+                )}
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

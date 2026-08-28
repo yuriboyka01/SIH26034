@@ -40,8 +40,17 @@ class InspectionListResponse(BaseModel):
     status: str
     created_at: datetime
     image_count: int = 0
+    compliance_status: Optional[str] = None # Phase 5: Pass/Fail/Review
 
     model_config = {"from_attributes": True}
+
+
+class PaginatedInspectionListResponse(BaseModel):
+    """Schema for paginated inspection list."""
+    items: List[InspectionListResponse]
+    total_count: int
+    page: int
+    page_size: int
 
 
 class DashboardStats(BaseModel):

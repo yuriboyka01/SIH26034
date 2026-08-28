@@ -13,6 +13,10 @@ from app.schemas.compliance import (
 )
 from app.compliance.rules import REGISTERED_RULES
 
+# Auditable version constants
+ENGINE_VERSION = "1.0.0"
+RULESET_VERSION = "LM-2011-v1"
+
 
 class ComplianceRuleEngine:
     """
