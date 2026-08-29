@@ -23,7 +23,7 @@ services:
     staticPublishPath: "./frontend/dist"
     envVars:
       - key: NODE_VERSION
-        value: 18.0.0
+        value: 20.0.0
       - key: VITE_API_URL
         value: "https://sih26034-backend.onrender.com"
 
