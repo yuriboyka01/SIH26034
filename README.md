@@ -45,7 +45,6 @@ sih26034/
 ├── data/uploads/      # Local file storage
 ├── docs/              # Project documentation
 ├── rules/             # Future legal metrology rules
-├── docker-compose.yml # PostgreSQL service
 ├── .env.example       # Environment template
 └── README.md
 ```
@@ -67,7 +66,7 @@ sih26034/
 
 - **Python** 3.10+
 - **Node.js** 18+
-- **Docker** (for PostgreSQL)
+- **PostgreSQL** 16+
 
 ### 1. Clone & Configure
 
@@ -80,9 +79,7 @@ cp .env.example .env
 
 ### 2. Start PostgreSQL
 
-```bash
-docker compose up -d
-```
+Ensure PostgreSQL is running locally and the database `sih26034` exists. Update `.env` with your PostgreSQL credentials.
 
 ### 3. Backend Setup
 

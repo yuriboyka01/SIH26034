@@ -4,7 +4,6 @@
 
 - Python 3.10+
 - Node.js 18+
-- Docker & Docker Compose
 - Git
 
 ## Local Setup
@@ -29,14 +28,7 @@ Default values work for local development. For production, change:
 
 ### 3. Start PostgreSQL
 
-```bash
-docker compose up -d
-```
-
-Verify:
-```bash
-docker compose ps
-```
+Ensure PostgreSQL is running locally and the database `sih26034` exists.
 
 ### 4. Backend
 
