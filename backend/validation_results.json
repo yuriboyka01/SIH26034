@@ -986,12 +986,12 @@
         "value": "500ml",
         "detection_status": "DETECTED",
         "evidence": {
-          "source_text": "Net Quantity:500ml (455 g)",
-          "confidence": 0.9142360687255859,
+          "source_text": "Net Quantity:500ml (455 g) 2-1",
+          "confidence": 0.7589676380157471,
           "bbox": [
             91.0,
             781.0,
-            359.0,
+            754.0,
             811.0
           ]
         }
@@ -1043,11 +1043,11 @@
         "value": "ence",
         "detection_status": "DETECTED",
         "evidence": {
-          "source_text": "FSSAI licence No.",
-          "confidence": 0.9154149293899536,
+          "source_text": "FOR SALE IN INDIA ONLY AND NOT FOR EXPORT FSSAI licence No.",
+          "confidence": 0.9223655462265015,
           "bbox": [
-            385.0,
-            938.0,
+            86.0,
+            928.0,
             483.0,
             956.0
           ]
@@ -1079,15 +1079,15 @@
       },
       {
         "field_name": "commodity",
-        "value": "ma of the commodityRefined Sunflower Oil",
+        "value": "ma of the commodityRefined Sunflower Oil 900 kd 261d",
         "detection_status": "DETECTED",
         "evidence": {
-          "source_text": "ma of the commodityRefined Sunflower Oil",
-          "confidence": 0.8862751722335815,
+          "source_text": "ma of the commodityRefined Sunflower Oil 900 kd 261d",
+          "confidence": 0.6780045628547668,
           "bbox": [
             84.0,
             754.0,
-            332.0,
+            747.0,
             781.0
           ]
         }
@@ -1100,10 +1100,10 @@
       },
       {
         "field_name": "sale_restrictions",
-        "value": "FOR SALE IN INDIA ONLY AND NOT FOR EXPORT",
+        "value": "FOR SALE IN INDIA ONLY AND NOT FOR EXPORT FSSAI licence No.",
         "detection_status": "DETECTED",
         "evidence": {
-          "source_text": "FOR SALE IN INDIA ONLY AND NOT FOR EXPORT",
+          "source_text": "FOR SALE IN INDIA ONLY AND NOT FOR EXPORT FSSAI licence No.",
           "confidence": 0.9,
           "bbox": null
         }
@@ -2128,21 +2128,30 @@
         "value": "100g",
         "detection_status": "UNCERTAIN",
         "evidence": {
-          "source_text": "Serving Size-100g",
-          "confidence": 0.9750201106071472,
+          "source_text": "Serving Size-100g /05",
+          "confidence": 0.9649027287960052,
           "bbox": [
             84.0,
-            571.0,
-            216.0,
+            546.0,
+            431.0,
             593.0
           ]
         }
       },
       {
         "field_name": "mrp",
-        "value": null,
-        "detection_status": "NOT_DETECTED",
-        "evidence": null
+        "value": "928",
+        "detection_status": "UNCERTAIN",
+        "evidence": {
+          "source_text": "-Total Sugars 928",
+          "confidence": 0.9264947474002838,
+          "bbox": [
+            97.0,
+            854.0,
+            290.0,
+            886.0
+          ]
+        }
       },
       {
         "field_name": "manufacturing_date",
@@ -2203,11 +2212,11 @@
         "value": "10012042000132",
         "detection_status": "DETECTED",
         "evidence": {
-          "source_text": "fssai No:10012042000132",
-          "confidence": 0.9138432145118713,
+          "source_text": "Protein 0g 0% fssai No:10012042000132",
+          "confidence": 0.876517042517662,
           "bbox": [
-            504.0,
-            884.0,
+            94.0,
+            883.0,
             729.0,
             915.0
           ]
@@ -2249,10 +2258,10 @@
       },
       {
         "field_name": "storage_instructions",
-        "value": "KEEP AWAY FROM DIRECT SUNLIGHT | STORAGE INSTRUCTIONS",
+        "value": "Total Fat 0g 0% KEEP AWAY FROM DIRECT SUNLIGHT STORE IT IN A COOL AND DRY PLACE | STORAGE INSTRUCTIONS An15090012015&22000:2018",
         "detection_status": "DETECTED",
         "evidence": {
-          "source_text": "KEEP AWAY FROM DIRECT SUNLIGHT",
+          "source_text": "Total Fat 0g 0% KEEP AWAY FROM DIRECT SUNLIGHT STORE IT IN A COOL AND DRY PLACE",
           "confidence": 0.9,
           "bbox": null
         }
@@ -2790,15 +2799,15 @@
       },
       {
         "field_name": "manufacturer",
-        "value": "Tata Consumer Products Limited Tata Centre,",
+        "value": "Tata Consumer Products Limited Tata Centre, Ingredients:Tea (98.5%",
         "detection_status": "DETECTED",
         "evidence": {
-          "source_text": "Mkt byTata Consumer Products Limited Tata Centre,",
-          "confidence": 0.8988662362098694,
+          "source_text": "Mkt byTata Consumer Products Limited Tata Centre, Ingredients:Tea (98.5%",
+          "confidence": 0.9255571961402893,
           "bbox": [
             101.0,
-            836.0,
-            422.0,
+            829.0,
+            607.0,
             866.0
           ]
         }
@@ -2835,9 +2844,18 @@
       },
       {
         "field_name": "batch_number",
-        "value": null,
-        "detection_status": "NOT_DETECTED",
-        "evidence": null
+        "value": "Date",
+        "detection_status": "DETECTED",
+        "evidence": {
+          "source_text": "BN Date of Packaging Use By",
+          "confidence": 0.9711811741193136,
+          "bbox": [
+            106.0,
+            668.0,
+            570.0,
+            706.0
+          ]
+        }
       },
       {
         "field_name": "country_of_origin",
@@ -2847,16 +2865,16 @@
       },
       {
         "field_name": "ingredients",
-        "value": "Real Elaichi",
+        "value": "BN Date of Packaging Use By",
         "detection_status": "DETECTED",
         "evidence": {
-          "source_text": "Ingredients",
-          "confidence": 0.9901697039604187,
+          "source_text": "Added Long Leaves Ingredients",
+          "confidence": 0.9865496456623077,
           "bbox": [
-            434.0,
+            282.0,
             641.0,
             521.0,
-            670.0
+            671.0
           ]
         }
       },
@@ -2865,13 +2883,13 @@
         "value": "10014031001025",
         "detection_status": "DETECTED",
         "evidence": {
-          "source_text": "Lic.No.10014031001025",
-          "confidence": 0.9644209742546082,
+          "source_text": "Lic.No.10014031001025 ROSE MAX1.5%,",
+          "confidence": 0.945783793926239,
           "bbox": [
             104.0,
             901.0,
-            260.0,
-            928.0
+            602.0,
+            931.0
           ]
         }
       },

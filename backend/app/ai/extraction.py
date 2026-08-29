@@ -925,6 +925,61 @@ def _extract_sale_restrictions(blocks: List[_Block]) -> ExtractedField:
 
 # ── Public API ────────────────────────────────────────────────────────────────
 
+def _group_blocks_spatially(blocks: List[_Block]) -> List[_Block]:
+    """Group blocks that are roughly on the same horizontal line."""
+    with_bbox = [b for b in blocks if b.bbox is not None and len(b.bbox) == 4]
+    without_bbox = [b for b in blocks if b.bbox is None or len(b.bbox) != 4]
+    
+    if not with_bbox:
+        return blocks
+        
+    def _cy(b: _Block) -> float:
+        return (b.bbox[1] + b.bbox[3]) / 2.0
+        
+    def _h(b: _Block) -> float:
+        return b.bbox[3] - b.bbox[1]
+        
+    with_bbox.sort(key=_cy)
+    lines: List[List[_Block]] = []
+    
+    for b in with_bbox:
+        cy = _cy(b)
+        matched_line = None
+        for line in lines:
+            line_cys = [_cy(lb) for lb in line]
+            avg_cy = sum(line_cys) / len(line_cys)
+            avg_h = sum([_h(lb) for lb in line]) / len(line)
+            if abs(cy - avg_cy) < (avg_h * 0.5):
+                matched_line = line
+                break
+                
+        if matched_line is not None:
+            matched_line.append(b)
+        else:
+            lines.append([b])
+            
+    merged_blocks: List[_Block] = []
+    for line in lines:
+        if len(line) == 1:
+            merged_blocks.append(line[0])
+            continue
+            
+        line.sort(key=lambda b: b.bbox[0])
+        avg_conf = sum(b.confidence for b in line) / len(line)
+        x1 = min(b.bbox[0] for b in line)
+        y1 = min(b.bbox[1] for b in line)
+        x2 = max(b.bbox[2] for b in line)
+        y2 = max(b.bbox[3] for b in line)
+        
+        merged_blocks.append(_Block(
+            text=" ".join(b.text for b in line),
+            confidence=avg_conf,
+            bbox=[x1, y1, x2, y2]
+        ))
+        
+    return merged_blocks + without_bbox
+
+
 def extract_product_info(
     ocr_blocks: List[dict],
     inspection_product_name: Optional[str] = None,
@@ -943,15 +998,20 @@ def extract_product_info(
         if b.get("text") or b.get("normalized_text")
     ]
     
+    original_blocks_count = len(blocks)
+    
     # 1. Attempt LLM extraction first
     llm_result = _extract_with_gemini(blocks, inspection_product_name, inspection_brand)
     if llm_result:
         logger.info("EXTRACTION | Gemini extraction successful.")
+        llm_result.total_blocks_processed = original_blocks_count
         return llm_result
         
     logger.warning("EXTRACTION | Gemini extraction failed or skipped. Falling back to regex extractors.")
     
     # 2. Fallback to deterministic regex extraction
+    # Group OCR blocks spatially before running regex to fix label/value splitting
+    blocks = _group_blocks_spatially(blocks)
     mrp_field = _extract_mrp(blocks)
     qty_field = _extract_net_quantity(blocks)
     date_fields = _extract_dates(blocks)
@@ -1033,6 +1093,6 @@ def extract_product_info(
         storage_instructions=storage_field.value,
         sale_restrictions=sale_restrict_field.value,
         fields=all_fields,
-        total_blocks_processed=len(blocks),
+        total_blocks_processed=original_blocks_count,
         extraction_version="1.0-fallback",
     )
