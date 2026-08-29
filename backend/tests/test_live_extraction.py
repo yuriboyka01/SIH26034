@@ -4,10 +4,10 @@ import pytest
 
 from app.ai.extraction import extract_product_info
 
-@pytest.mark.skipif("GEMINI_API_KEY" not in os.environ, reason="Live integration test requires GEMINI_API_KEY")
-def test_live_gemini_extraction():
+@pytest.mark.skipif("GROQ_API_KEY" not in os.environ, reason="Live integration test requires GROQ_API_KEY")
+def test_live_groq_extraction():
     """
-    Live integration test against the real Gemini API.
+    Live integration test against the real Groq API.
     Verifies the model parsing and schema validation work end-to-end.
     """
     # Simple synthetic blocks to avoid needing heavy OCR in the test
@@ -24,7 +24,7 @@ def test_live_gemini_extraction():
     result = extract_product_info(synthetic_blocks, inspection_product_name="Super Energy Drink")
 
     assert result is not None
-    assert result.extraction_version in ["2.0-gemini", "1.0-fallback"]
+    assert result.extraction_version in ["2.0-groq", "1.0-fallback"]
     assert result.product_name == "Super Energy Drink"
     assert result.mrp == "50"
     

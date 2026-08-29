@@ -18,9 +18,9 @@ Software system to check compliance of Packaged Commodities under **Legal Metrol
     ▼    ▼    ▼
   Auth  Insp. Storage
   Svc   Svc   Svc
-    │
-    ▼
-PostgreSQL
+    └────┼────┘
+         ▼
+    PostgreSQL
 ```
 
 ## 📂 Repository Structure
@@ -74,8 +74,10 @@ sih26034/
 git clone <repository-url>
 cd sih26034
 cp .env.example .env
-# Edit .env if needed (defaults work for local dev)
 ```
+Open the `.env` file and configure your environment:
+- **Database**: Update PostgreSQL credentials if needed.
+- **LLM Extraction (Optional)**: To use the AI extraction features, generate an API key at [Groq Console](https://console.groq.com/keys) and set `GROQ_API_KEY=your_key_here`. If omitted, the system safely falls back to regex-based extraction.
 
 ### 2. Start PostgreSQL
 

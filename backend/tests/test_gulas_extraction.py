@@ -13,20 +13,20 @@ def gulas_blocks():
         return json.load(f)
 
 
-@patch("app.ai.extraction.genai")
-@patch.dict(os.environ, {"GEMINI_API_KEY": "fake_test_key"})
-def test_gulas_extraction_llm_success(mock_genai, gulas_blocks):
+@patch("app.ai.extraction.Groq")
+@patch.dict(os.environ, {"GROQ_API_KEY": "fake_test_key"})
+def test_gulas_extraction_llm_success(mock_groq, gulas_blocks):
     """
-    Test that the Gemini LLM extraction pathway successfully extracts
+    Test that the Groq LLM extraction pathway successfully extracts
     the expected structured data from noisy OCR blocks.
     """
-    # Create a mock for the genai Client and response
     mock_client = MagicMock()
-    mock_genai.Client.return_value = mock_client
+    mock_groq.return_value = mock_client
     
     mock_response = MagicMock()
     # Mock the LLM returning structured JSON data
-    mock_response.text = json.dumps({
+    mock_choice = MagicMock()
+    mock_choice.message.content = json.dumps({
         "product_name": {"value": "Gulas Jaggery Powder", "evidence": None},
         "brand_name": {"value": "Gulas", "evidence": {"source_text": "Gulas"}},
         "manufacturer": {"value": "SUNRAJA", "evidence": {"source_text": "SUNRAJA"}},
@@ -41,14 +41,15 @@ def test_gulas_extraction_llm_success(mock_genai, gulas_blocks):
         "customer_care": {"value": "18001234567", "evidence": {"source_text": "Customer Care 18001234567"}},
         "warnings": {"value": "KEEP AWAY FROM DIRECT SUNLIGHT", "evidence": {"source_text": "KEEP AWAY FROM DIRECT SUNLIGHT"}}
     })
-    mock_client.models.generate_content.return_value = mock_response
+    mock_response.choices = [mock_choice]
+    mock_client.chat.completions.create.return_value = mock_response
 
     # Run extraction
     result = extract_product_info(gulas_blocks, inspection_product_name="Gulas Sugar")
 
-    # Assert that the Gemini pathway was used and returned the expected structured data
+    # Assert that the Groq pathway was used and returned the expected structured data
     assert result is not None
-    assert result.extraction_version == "2.0-gemini"
+    assert result.extraction_version == "2.0-groq"
     assert result.product_name == "Gulas Jaggery Powder"
     assert result.brand_name == "Gulas"
     assert result.manufacturer == "SUNRAJA"
@@ -72,7 +73,7 @@ def test_gulas_extraction_llm_success(mock_genai, gulas_blocks):
 @patch.dict(os.environ, {}, clear=True)
 def test_gulas_extraction_fallback(gulas_blocks):
     """
-    Test that if GEMINI_API_KEY is missing, it gracefully falls back
+    Test that if GROQ_API_KEY is missing, it gracefully falls back
     to the legacy regex extractors and does not crash.
     """
     # Run extraction with no API key

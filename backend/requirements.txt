@@ -43,4 +43,4 @@ numpy>=1.24.0
 reportlab>=4.0.0
 
 # ── Phase 3: AI Extraction ──────────────────────────────────────────────────
-google-genai>=2.20.0
+groq>=0.9.0

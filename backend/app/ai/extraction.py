@@ -22,9 +22,9 @@ import os
 import json
 from pydantic import BaseModel, Field
 try:
-    from google import genai
+    from groq import Groq
 except ImportError:
-    genai = None
+    Groq = None
 
 class LLMEvidence(BaseModel):
     source_text: str = Field(description="The exact text snippet from the OCR that contains this value.")
@@ -57,13 +57,13 @@ class LLMProductData(BaseModel):
 
 from typing import List, Optional, Any
 
-def _extract_with_gemini(blocks: List[Any], inspection_product_name: Optional[str], inspection_brand: Optional[str]) -> Optional[Any]:
-    if genai is None:
-        logger.warning("google-genai not installed. Skipping LLM extraction.")
+def _extract_with_groq(blocks: List[Any], inspection_product_name: Optional[str], inspection_brand: Optional[str]) -> Optional[Any]:
+    if Groq is None:
+        logger.warning("groq not installed. Skipping LLM extraction.")
         return None
-    api_key = settings.GEMINI_API_KEY or os.getenv("GEMINI_API_KEY")
+    api_key = settings.GROQ_API_KEY or os.getenv("GROQ_API_KEY")
     if not api_key:
-        logger.warning("GEMINI_API_KEY not found. Skipping LLM extraction.")
+        logger.warning("GROQ_API_KEY not found. Skipping LLM extraction.")
         return None
         
     text_content = "\n".join([b.text for b in blocks])
@@ -75,43 +75,43 @@ You are an expert compliance extraction engine. Extract structured product data 
 For each field, if the information is present, provide the extracted 'value' and the exact 'source_text' from the OCR output used to derive it.
 If a field is missing, return null for both value and evidence. DO NOT hallucinate or guess missing values.
 The OCR text may be noisy.
+Return ONLY a valid JSON object matching the requested schema. Do not return markdown blocks or any other text.
 
 OCR Text:
 {text_content}
 """
 
     try:
-        client = genai.Client(api_key=api_key)
+        client = Groq(api_key=api_key)
         response = None
         last_error = None
         for attempt in range(3):
             try:
-                response = client.models.generate_content(
-                    model='gemini-3.7-flash',
-                    contents=prompt,
-                    config={
-                        'response_mime_type': 'application/json',
-                        'response_schema': LLMProductData,
-                        'temperature': 0.0,
-                    },
+                response = client.chat.completions.create(
+                    model='llama3-70b-8192',
+                    messages=[
+                        {"role": "system", "content": "You are a JSON generating assistant. Always return raw JSON."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    response_format={"type": "json_object"},
+                    temperature=0.0,
                 )
                 break
             except Exception as retry_err:
                 last_error = retry_err
-                # Gemini's shared capacity throws transient 503 UNAVAILABLE under load.
-                # Retry a couple of times with a short backoff before giving up to regex.
-                if "503" in str(retry_err) or "UNAVAILABLE" in str(retry_err):
-                    logger.warning(f"Gemini 503/UNAVAILABLE (attempt {attempt + 1}/3), retrying...")
+                if "503" in str(retry_err) or "rate limit" in str(retry_err).lower():
+                    logger.warning(f"Groq Rate Limit/503 (attempt {attempt + 1}/3), retrying...")
                     time.sleep(2 * (attempt + 1))
                     continue
                 raise
         if response is None:
-            raise last_error or RuntimeError("Gemini extraction: no response after retries")
+            raise last_error or RuntimeError("Groq extraction: no response after retries")
         
-        if not response.text:
+        response_text = response.choices[0].message.content
+        if not response_text:
             return None
             
-        data = LLMProductData.model_validate_json(response.text)
+        data = LLMProductData.model_validate_json(response_text)
         
         import difflib
 
@@ -233,10 +233,10 @@ OCR Text:
             sale_restrictions=sale_restrict_field.value,
             fields=all_fields,
             total_blocks_processed=len(blocks),
-            extraction_version="2.0-gemini",
+            extraction_version="2.0-groq",
         )
     except Exception as e:
-        logger.error(f"Gemini extraction failed: {e}")
+        logger.error(f"Groq extraction failed: {e}")
         return None
 
 
@@ -1001,13 +1001,14 @@ def extract_product_info(
     original_blocks_count = len(blocks)
     
     # 1. Attempt LLM extraction first
-    llm_result = _extract_with_gemini(blocks, inspection_product_name, inspection_brand)
+    llm_result = _extract_with_groq(blocks, inspection_product_name, inspection_brand)
     if llm_result:
-        logger.info("EXTRACTION | Gemini extraction successful.")
+        logger.info("EXTRACTION | Groq extraction successful.")
         llm_result.total_blocks_processed = original_blocks_count
         return llm_result
-        
-    logger.warning("EXTRACTION | Gemini extraction failed or skipped. Falling back to regex extractors.")
+
+    # 3. Fallback regex pipeline (if LLM fails, rate-limits, or key missing)
+    logger.warning("EXTRACTION | Groq extraction failed or skipped. Falling back to regex extractors.")
     
     # 2. Fallback to deterministic regex extraction
     # Group OCR blocks spatially before running regex to fix label/value splitting

@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 
 # Ensure .env (repo root) is loaded into the real process environment.
 # pydantic-settings only feeds .env values into THIS Settings object; it does
-# NOT set os.environ. Modules that call os.getenv(...) directly (e.g. Gemini
+# NOT set os.environ. Modules that call os.getenv(...) directly (e.g. Groq
 # extraction in app/ai/extraction.py) need this explicit load or they silently
 # see None and fall back to regex-only extraction.
 load_dotenv()
@@ -35,8 +35,8 @@ class Settings(BaseSettings):
     # CORS
     CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
 
-    # AI extraction (Gemini) — optional, falls back to regex extraction if unset
-    GEMINI_API_KEY: Optional[str] = None
+    # AI extraction (Groq) — optional, falls back to regex extraction if unset
+    GROQ_API_KEY: Optional[str] = None
 
     @property
     def cors_origins_list(self) -> List[str]:
