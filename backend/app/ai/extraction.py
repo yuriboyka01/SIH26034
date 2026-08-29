@@ -12,9 +12,234 @@ Design principles:
 """
 
 import re
+import time
 from dataclasses import dataclass, field
 from typing import List, Optional
 from app.core.logging import logger
+from app.core.config import settings
+
+import os
+import json
+from pydantic import BaseModel, Field
+try:
+    from google import genai
+except ImportError:
+    genai = None
+
+class LLMEvidence(BaseModel):
+    source_text: str = Field(description="The exact text snippet from the OCR that contains this value.")
+
+class LLMExtractedField(BaseModel):
+    value: Optional[str] = Field(None, description="The extracted value, or null if not found. Do not hallucinate.")
+    evidence: Optional[LLMEvidence] = Field(None, description="The evidence pointing to the source OCR text. Null if value is null.")
+
+class LLMProductData(BaseModel):
+    product_name: LLMExtractedField
+    brand_name: LLMExtractedField
+    manufacturer: LLMExtractedField
+    net_quantity: LLMExtractedField
+    mrp: LLMExtractedField
+    manufacturing_date: LLMExtractedField
+    expiry_date: LLMExtractedField
+    batch_number: LLMExtractedField
+    country_of_origin: LLMExtractedField
+    ingredients: LLMExtractedField
+    license_number: LLMExtractedField
+    customer_care: LLMExtractedField
+    warnings: LLMExtractedField
+    # New fields from real-package analysis
+    email: LLMExtractedField = LLMExtractedField()
+    unit_sale_price: LLMExtractedField = LLMExtractedField()
+    packaging_date: LLMExtractedField = LLMExtractedField()
+    commodity: LLMExtractedField = LLMExtractedField()
+    storage_instructions: LLMExtractedField = LLMExtractedField()
+    sale_restrictions: LLMExtractedField = LLMExtractedField()
+
+from typing import List, Optional, Any
+
+def _extract_with_gemini(blocks: List[Any], inspection_product_name: Optional[str], inspection_brand: Optional[str]) -> Optional[Any]:
+    if genai is None:
+        logger.warning("google-genai not installed. Skipping LLM extraction.")
+        return None
+    api_key = settings.GEMINI_API_KEY or os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        logger.warning("GEMINI_API_KEY not found. Skipping LLM extraction.")
+        return None
+        
+    text_content = "\n".join([b.text for b in blocks])
+    if not text_content.strip():
+        return None
+
+    prompt = f"""
+You are an expert compliance extraction engine. Extract structured product data from the following OCR text of a product package.
+For each field, if the information is present, provide the extracted 'value' and the exact 'source_text' from the OCR output used to derive it.
+If a field is missing, return null for both value and evidence. DO NOT hallucinate or guess missing values.
+The OCR text may be noisy.
+
+OCR Text:
+{text_content}
+"""
+
+    try:
+        client = genai.Client(api_key=api_key)
+        response = None
+        last_error = None
+        for attempt in range(3):
+            try:
+                response = client.models.generate_content(
+                    model='gemini-3.7-flash',
+                    contents=prompt,
+                    config={
+                        'response_mime_type': 'application/json',
+                        'response_schema': LLMProductData,
+                        'temperature': 0.0,
+                    },
+                )
+                break
+            except Exception as retry_err:
+                last_error = retry_err
+                # Gemini's shared capacity throws transient 503 UNAVAILABLE under load.
+                # Retry a couple of times with a short backoff before giving up to regex.
+                if "503" in str(retry_err) or "UNAVAILABLE" in str(retry_err):
+                    logger.warning(f"Gemini 503/UNAVAILABLE (attempt {attempt + 1}/3), retrying...")
+                    time.sleep(2 * (attempt + 1))
+                    continue
+                raise
+        if response is None:
+            raise last_error or RuntimeError("Gemini extraction: no response after retries")
+        
+        if not response.text:
+            return None
+            
+        data = LLMProductData.model_validate_json(response.text)
+        
+        import difflib
+
+        def _map_field(name: str, llm_field: LLMExtractedField) -> ExtractedField:
+            if not llm_field or not llm_field.value:
+                return ExtractedField(field_name=name, value=None, detection_status="NOT_DETECTED")
+            
+            source_text = None
+            matched_confidence = None
+            matched_bbox = None
+            
+            if llm_field.evidence and llm_field.evidence.source_text:
+                source_text = llm_field.evidence.source_text
+                
+                # Normalize strings for comparison
+                def normalize(s: str) -> str:
+                    return re.sub(r'[\W_]+', '', s).lower()
+                    
+                norm_source = normalize(source_text)
+                
+                best_ratio = 0.0
+                best_block = None
+                
+                for b in blocks:
+                    norm_block = normalize(b.text)
+                    if not norm_block or not norm_source:
+                        continue
+                        
+                    # Exact/substring match on normalized strings
+                    if norm_source in norm_block or norm_block in norm_source:
+                        best_ratio = 1.0
+                        best_block = b
+                        break
+                        
+                    # Fuzzy match
+                    ratio = difflib.SequenceMatcher(None, norm_source, norm_block).ratio()
+                    if ratio > best_ratio:
+                        best_ratio = ratio
+                        best_block = b
+                        
+                # Explicit similarity threshold
+                if best_ratio > 0.8 and best_block:
+                    matched_confidence = best_block.confidence
+                    matched_bbox = best_block.bbox
+                    
+            evidence = None
+            if source_text:
+                evidence = FieldEvidence(
+                    source_text=source_text,
+                    confidence=matched_confidence if matched_confidence is not None else 0.0,
+                    bbox=matched_bbox
+                )
+                
+            return ExtractedField(
+                field_name=name,
+                value=llm_field.value,
+                # Fail closed: if we have a value but couldn't map the evidence confidently to a block bbox, mark UNCERTAIN
+                detection_status="DETECTED" if (evidence and matched_bbox) else "UNCERTAIN",
+                evidence=evidence
+            )
+
+        mrp_field = _map_field("mrp", data.mrp)
+        qty_field = _map_field("net_quantity", data.net_quantity)
+        mfg_date_field = _map_field("manufacturing_date", data.manufacturing_date)
+        exp_date_field = _map_field("expiry_date", data.expiry_date)
+        batch_field = _map_field("batch_number", data.batch_number)
+        origin_field = _map_field("country_of_origin", data.country_of_origin)
+        license_field = _map_field("license_number", data.license_number)
+        care_field = _map_field("customer_care", data.customer_care)
+        mfr_field = _map_field("manufacturer", data.manufacturer)
+        ingredients_field = _map_field("ingredients", data.ingredients)
+        warnings_field = _map_field("warnings", data.warnings)
+        brand_field = _map_field("brand_name", data.brand_name)
+        prod_field = _map_field("product_name", data.product_name)
+        # New fields — semantically distinct from existing ones
+        email_field = _map_field("email", data.email)
+        usp_field = _map_field("unit_sale_price", data.unit_sale_price)
+        pkg_date_field = _map_field("packaging_date", data.packaging_date)
+        commodity_field = _map_field("commodity", data.commodity)
+        storage_field = _map_field("storage_instructions", data.storage_instructions)
+        sale_restrict_field = _map_field("sale_restrictions", data.sale_restrictions)
+        
+        # Merge with inspection metadata if not found
+        if not brand_field.value and inspection_brand:
+            brand_field = ExtractedField(field_name="brand_name", value=inspection_brand, detection_status="UNCERTAIN")
+        
+        product_name_value = prod_field.value or inspection_product_name
+        product_name_status = "DETECTED" if product_name_value else "NOT_DETECTED"
+        prod_field.value = product_name_value
+        prod_field.detection_status = product_name_status
+
+        all_fields = [
+            prod_field, brand_field, mfr_field, qty_field, mrp_field,
+            mfg_date_field, exp_date_field, batch_field, origin_field,
+            ingredients_field, license_field, care_field, warnings_field,
+            email_field, usp_field, pkg_date_field, commodity_field,
+            storage_field, sale_restrict_field,
+        ]
+        
+        return StructuredProductData(
+            product_name=product_name_value,
+            brand_name=brand_field.value,
+            manufacturer=mfr_field.value,
+            net_quantity=qty_field.value,
+            mrp=mrp_field.value,
+            manufacturing_date=mfg_date_field.value,
+            expiry_date=exp_date_field.value,
+            batch_number=batch_field.value,
+            country_of_origin=origin_field.value,
+            ingredients=ingredients_field.value,
+            license_number=license_field.value,
+            customer_care=care_field.value,
+            warnings=warnings_field.value,
+            email=email_field.value,
+            unit_sale_price=usp_field.value,
+            packaging_date=pkg_date_field.value,
+            commodity=commodity_field.value,
+            storage_instructions=storage_field.value,
+            sale_restrictions=sale_restrict_field.value,
+            fields=all_fields,
+            total_blocks_processed=len(blocks),
+            extraction_version="2.0-gemini",
+        )
+    except Exception as e:
+        logger.error(f"Gemini extraction failed: {e}")
+        return None
+
+
 
 
 # ── Evidence dataclass ───────────────────────────────────────────────────────
@@ -66,6 +291,14 @@ class StructuredProductData:
     customer_care: Optional[str] = None
     warnings: Optional[str] = None
 
+    # New fields from real-package analysis — semantically distinct
+    email: Optional[str] = None
+    unit_sale_price: Optional[str] = None
+    packaging_date: Optional[str] = None
+    commodity: Optional[str] = None
+    storage_instructions: Optional[str] = None
+    sale_restrictions: Optional[str] = None
+
     # Evidence for each field (field_name → ExtractedField)
     fields: List[ExtractedField] = field(default_factory=list)
 
@@ -89,6 +322,12 @@ class StructuredProductData:
             "license_number": self.license_number,
             "customer_care": self.customer_care,
             "warnings": self.warnings,
+            "email": self.email,
+            "unit_sale_price": self.unit_sale_price,
+            "packaging_date": self.packaging_date,
+            "commodity": self.commodity,
+            "storage_instructions": self.storage_instructions,
+            "sale_restrictions": self.sale_restrictions,
             "fields": [
                 {
                     "field_name": f.field_name,
@@ -137,24 +376,24 @@ def _clean_value(raw: str) -> str:
 
 # Date patterns — handles DD/MM/YYYY, MM/YYYY, Month YYYY, etc.
 _DATE_PATTERNS = [
-    r"\b(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})\b",          # DD/MM/YYYY or DD-MM-YYYY
+    r"\b(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})\b",          # DD/MM/YYYY or DD-MM-YYYY or DD/MM/YY
     r"\b(\d{1,2}[\/\-]\d{4})\b",                               # MM/YYYY
     r"\b((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*[\s\-\.]\d{4})\b",  # Month YYYY
     r"\b(\d{4}[\/\-]\d{1,2}[\/\-]\d{1,2})\b",                 # YYYY/MM/DD
 ]
 _DATE_RE = re.compile("|".join(_DATE_PATTERNS), re.IGNORECASE)
 
-# MRP: Rs/INR followed by number
+# MRP: Rs/INR followed by number — handles ₹. (with dot) variant from real packages
 _MRP_RE = re.compile(
-    r"(?:MRP|M\.R\.P\.?|Maximum Retail Price)[:\s]*(?:Rs\.?|INR|₹)?[\s]*(\d[\d,\.]+)",
+    r"(?:MRP|M\.R\.P\.?|Maximum Retail Price)[:\s]*(?:Rs\.?|INR|₹\.?)?[\s]*([\d][\d,\.]+)",
     re.IGNORECASE,
 )
 # Also catch "Rs 420" patterns even if keyword is on adjacent line
-_PRICE_RE = re.compile(r"(?:Rs\.?|INR|₹)\s*(\d[\d,\.]+)", re.IGNORECASE)
+_PRICE_RE = re.compile(r"(?:Rs\.?|INR|₹\.?)\s*(\d[\d,\.]+)", re.IGNORECASE)
 
 # Net quantity: number + unit
 _NET_QTY_RE = re.compile(
-    r"(?:Net[\s\-]*(?:Weight|Wt\.?|Qty|Quantity|Contents?|Volume|Vol\.?))[\s:\-]*([0-9][0-9\s,\.]*\s*(?:g|gm|gram|kg|kilogram|ml|l|litre|liter|piece|pieces|pcs|units?|count|nos?)\b)",
+    r"(?:Net[\s\-]*(?:Weight|Wt\.?|Qty|Quantity|Contents?|Volume|Vol\.?))[:\s\-]*([0-9][0-9\s,\.]*\s*(?:g|gm|gram|kg|kilogram|ml|l|litre|liter|piece|pieces|pcs|units?|count|nos?)\b)",
     re.IGNORECASE,
 )
 # Catch standalone "500 g", "1 kg", "100 ml" patterns
@@ -163,41 +402,74 @@ _QTY_ONLY_RE = re.compile(
     re.IGNORECASE,
 )
 
-# Batch/Lot number
+# Batch/Lot number — added BN, B.No, B No from Tata Chakra Gold
 _BATCH_RE = re.compile(
-    r"(?:Batch[\s\-]*(?:No|Number|Code|#)\.?|Lot[\s\-]*(?:No|Number|Code)?\.?|Batch|LOT)[:\s\-]*([A-Z0-9][A-Z0-9\-\/]+)",
+    r"(?:Batch[\s\-]*(?:No|Number|Code|#)\.?|Lot[\s\-]*(?:No|Number|Code)?\.?|Batch|LOT|B\.?\s*N\.?(?:o\.?)?)[:\s\-]*([A-Z0-9][A-Z0-9\-\/]+)",
     re.IGNORECASE,
 )
 
-# Country of origin
+# Country of origin — added "Product of", "A Product of" from Gulas/Moksh
 _ORIGIN_RE = re.compile(
-    r"(?:Country[\s\-]*of[\s\-]*Origin|Made[\s\-]*in|Manufactured[\s\-]*in)[:\s]*([A-Za-z\s]+)",
+    r"(?:Country[\s\-]*of[\s\-]*Origin|Made[\s\-]*in|Manufactured[\s\-]*in|(?:A\s+)?Product[\s\-]*of)[:\s]*([A-Za-z\s]+)",
     re.IGNORECASE,
 )
 
-# FSSAI / License number
+# FSSAI / License number — FSSAI-specific patterns ONLY, NOT generic Reg No.
+# Per review: Registration No / Regd. No must NOT auto-classify as FSSAI.
 _LICENSE_RE = re.compile(
-    r"(?:FSSAI[:\s\-]*(?:Lic(?:ense)?\.?[\s\-]*(?:No|Number)?\.?)?|Lic(?:ense)?[\s\-]*(?:No|Number)\.?)[:\s\-]*([0-9A-Z][0-9A-Z\-\/]{3,})",
+    r"(?:FSSAI[\s:\-]*(?:Lic(?:ense|\.)?[\s\-]*(?:No|Number)?\.?)?|[Ff]ssai[\s\-]*(?:No|Number)?\.?|Lic(?:ense)?\.?[\s\-]*(?:No|Number)\.?)[:\s\-]*([0-9A-Z][0-9A-Z\-\/]{3,})",
     re.IGNORECASE,
 )
 
-# Customer care phone
+# Customer care phone — added Consumer Care, Consumer Complaint, Toll Free Number/No
 _CUSTOMER_CARE_RE = re.compile(
-    r"(?:Customer[\s\-]*(?:Care|Service|Helpline)|Toll[\s\-]*Free|Helpline)[:\s\-]*([0-9\-\s\+]{6,20})",
+    r"(?:(?:Customer|Consumer)[\s\-]*(?:Care|Service|Helpline|Complaint)|Toll[\s\-]*Free|Helpline)(?:[\s\-]*(?:No|Number)\.?)?[:\s\-]*([0-9\-\s\+]{6,20})",
     re.IGNORECASE,
 )
 
-# Ingredients section keywords
+# Email — generic email extractor for package contact info
+_EMAIL_RE = re.compile(r"[\w\.\-]+@[\w\.\-]+\.\w{2,}", re.IGNORECASE)
+
+# Unit Selling Price (USP) — legally required on Indian packages
+_USP_RE = re.compile(
+    r"(?:Unit[\s\-]*(?:Sell(?:ing)?|Sale)[\s\-]*Price|USP)[\s:]*(?:per\s+\w+\s+)?(?:Rs\.?|INR|₹\.?)?\s*(\d[\d,\.]+)",
+    re.IGNORECASE,
+)
+
+# Commodity / Product Name keywords
+_COMMODITY_KEYWORDS = ["commodity", "name of commodity", "name of the commodity", "product description"]
+
+# Ingredients section keywords — deliberately NO "content" to avoid "Net content" false positives
 _INGREDIENTS_KEYWORDS = ["ingredient", "contains", "composition"]
 
-# Warning keywords
-_WARNING_KEYWORDS = ["warning", "caution", "allergen", "allergy", "keep out of reach", "keep away"]
+# Warning keywords — "caution" and "non-edible" added, but NOT "store in" (that's storage)
+_WARNING_KEYWORDS = [
+    "warning", "caution", "allergen", "allergy",
+    "keep out of reach", "keep away",
+    "non-edible", "not for human consumption", "do not buy",
+]
 
-# Manufacturer keywords
+# Storage instruction keywords — semantically distinct from warnings
+_STORAGE_KEYWORDS = [
+    "storage instruction", "store in", "store at",
+    "keep in a cool", "keep in a dry", "keep away from direct sunlight",
+    "keep refrigerated", "once opened",
+]
+
+# Sale restriction keywords — semantically distinct from warnings
+_SALE_RESTRICTION_KEYWORDS = [
+    "for sale in india only", "not for export",
+    "for sale in", "not for resale",
+]
+
+# Manufacturer keywords — added Mkt by, Mktd by, For Marketing, Manufactured Packed
+# Per review: Regd. Office and Pkg Material Mfd by are NOT manufacturer signals
 _MANUFACTURER_KEYWORDS = [
     "manufactured by", "mfg by", "mfg.", "manufactured for",
     "marketed by", "packed by", "packed for", "distributed by",
     "imported by", "importer",
+    "mkt by", "mktd by", "for marketing",
+    "manufactured, packed",
 ]
 
 # Brand keywords
@@ -292,20 +564,26 @@ def _extract_net_quantity(blocks: List[_Block]) -> ExtractedField:
 
 def _extract_dates(blocks: List[_Block]) -> dict:
     """
-    Extract manufacturing and expiry dates from OCR blocks.
-    Returns dict with keys 'manufacturing_date' and 'expiry_date'.
+    Extract manufacturing, packaging, and expiry dates from OCR blocks.
+    Returns dict with keys 'manufacturing_date', 'packaging_date', and 'expiry_date'.
+    Packaging date is semantically distinct from manufacturing date.
     """
     mfg_patterns = re.compile(
-        r"(?:Mfg\.?|Manufactured|Manufacturing|Date of Mfg|DOM)[:\s\.\-]*",
+        r"(?:Mfg\.?|Manufactured|Manufacturing|Date of Mfg|MFD|DOM|Mfg[\s\-]*Date)[:\s\.\-]*",
+        re.IGNORECASE,
+    )
+    pkg_patterns = re.compile(
+        r"(?:Date of Packaging|Packed[\s\-]*On|Packing[\s\-]*Date|Pkd[\s\-]*(?:On|Date))[:\s\.\-]*",
         re.IGNORECASE,
     )
     exp_patterns = re.compile(
-        r"(?:Exp(?:iry)?\.?|Best Before|Use Before|Best By|Expiration|BB|Use By)[:\s\.\-]*",
+        r"(?:Exp(?:iry)?\.?|Best Before|Use Before|Best By|Expiration|BB|Use[\s\-]*By(?:[\s\-]*Date)?|Valid[\s\-]*(?:Till|Until)|Validity)[:\s\.\-]*",
         re.IGNORECASE,
     )
 
     result = {
         "manufacturing_date": ExtractedField(field_name="manufacturing_date", value=None, detection_status="NOT_DETECTED"),
+        "packaging_date": ExtractedField(field_name="packaging_date", value=None, detection_status="NOT_DETECTED"),
         "expiry_date": ExtractedField(field_name="expiry_date", value=None, detection_status="NOT_DETECTED"),
     }
 
@@ -317,6 +595,20 @@ def _extract_dates(blocks: List[_Block]) -> dict:
             if date:
                 result["manufacturing_date"] = ExtractedField(
                     field_name="manufacturing_date",
+                    value=date,
+                    detection_status="DETECTED",
+                    evidence=FieldEvidence(
+                        source_text=block.text,
+                        confidence=block.confidence,
+                        bbox=block.bbox,
+                    ),
+                )
+
+        if pkg_patterns.search(text) and result["packaging_date"].value is None:
+            date = _extract_date(text)
+            if date:
+                result["packaging_date"] = ExtractedField(
+                    field_name="packaging_date",
                     value=date,
                     detection_status="DETECTED",
                     evidence=FieldEvidence(
@@ -514,11 +806,16 @@ def _extract_ingredients(blocks: List[_Block]) -> ExtractedField:
 
 
 def _extract_warnings(blocks: List[_Block]) -> ExtractedField:
-    """Extract warning/caution text."""
+    """Extract warning/caution text. Does NOT include storage instructions or sale restrictions."""
     warning_blocks = []
     for block in blocks:
         text_lower = block.text.lower()
         if any(kw in text_lower for kw in _WARNING_KEYWORDS):
+            # Exclude lines that are actually storage instructions or sale restrictions
+            if any(sk in text_lower for sk in _STORAGE_KEYWORDS):
+                continue
+            if any(sr in text_lower for sr in _SALE_RESTRICTION_KEYWORDS):
+                continue
             warning_blocks.append(_clean(block.text))
 
     if warning_blocks:
@@ -536,6 +833,96 @@ def _extract_warnings(blocks: List[_Block]) -> ExtractedField:
     return ExtractedField(field_name="warnings", value=None, detection_status="NOT_DETECTED")
 
 
+def _extract_email(blocks: List[_Block]) -> ExtractedField:
+    """Extract email addresses from OCR blocks."""
+    for block in blocks:
+        m = _EMAIL_RE.search(block.text)
+        if m:
+            value = m.group(0)
+            return ExtractedField(
+                field_name="email",
+                value=value,
+                detection_status="DETECTED",
+                evidence=FieldEvidence(
+                    source_text=block.text,
+                    confidence=block.confidence,
+                    bbox=block.bbox,
+                ),
+            )
+    return ExtractedField(field_name="email", value=None, detection_status="NOT_DETECTED")
+
+
+def _extract_unit_sale_price(blocks: List[_Block]) -> ExtractedField:
+    """Extract Unit Selling Price (USP) — legally required on Indian packages."""
+    for block in blocks:
+        text = _clean(block.text)
+        m = _USP_RE.search(text)
+        if m:
+            value = m.group(1).replace(",", "").strip()
+            return ExtractedField(
+                field_name="unit_sale_price",
+                value=value,
+                detection_status="DETECTED",
+                evidence=FieldEvidence(
+                    source_text=block.text,
+                    confidence=block.confidence,
+                    bbox=block.bbox,
+                ),
+            )
+    return ExtractedField(field_name="unit_sale_price", value=None, detection_status="NOT_DETECTED")
+
+
+def _extract_commodity(blocks: List[_Block]) -> ExtractedField:
+    """Extract commodity/product description from package keywords."""
+    return _extract_keyword_line(blocks, _COMMODITY_KEYWORDS, "commodity")
+
+
+def _extract_storage_instructions(blocks: List[_Block]) -> ExtractedField:
+    """Extract storage instruction text — semantically distinct from warnings."""
+    storage_blocks = []
+    for block in blocks:
+        text_lower = block.text.lower()
+        if any(kw in text_lower for kw in _STORAGE_KEYWORDS):
+            storage_blocks.append(_clean(block.text))
+
+    if storage_blocks:
+        value = " | ".join(storage_blocks)
+        return ExtractedField(
+            field_name="storage_instructions",
+            value=value,
+            detection_status="DETECTED",
+            evidence=FieldEvidence(
+                source_text=storage_blocks[0],
+                confidence=0.9,
+                bbox=None,
+            ),
+        )
+    return ExtractedField(field_name="storage_instructions", value=None, detection_status="NOT_DETECTED")
+
+
+def _extract_sale_restrictions(blocks: List[_Block]) -> ExtractedField:
+    """Extract sale restriction declarations — semantically distinct from warnings."""
+    restriction_blocks = []
+    for block in blocks:
+        text_lower = block.text.lower()
+        if any(kw in text_lower for kw in _SALE_RESTRICTION_KEYWORDS):
+            restriction_blocks.append(_clean(block.text))
+
+    if restriction_blocks:
+        value = " | ".join(restriction_blocks)
+        return ExtractedField(
+            field_name="sale_restrictions",
+            value=value,
+            detection_status="DETECTED",
+            evidence=FieldEvidence(
+                source_text=restriction_blocks[0],
+                confidence=0.9,
+                bbox=None,
+            ),
+        )
+    return ExtractedField(field_name="sale_restrictions", value=None, detection_status="NOT_DETECTED")
+
+
 # ── Public API ────────────────────────────────────────────────────────────────
 
 def extract_product_info(
@@ -543,23 +930,9 @@ def extract_product_info(
     inspection_product_name: Optional[str] = None,
     inspection_brand: Optional[str] = None,
 ) -> StructuredProductData:
-    """
-    Main entry point: given a list of OCR block dicts, return StructuredProductData.
-
-    Args:
-        ocr_blocks: List of dicts with keys: text, confidence, bbox (optional).
-        inspection_product_name: Pre-filled from the Inspection record (used as fallback).
-        inspection_brand: Pre-filled from the Inspection record (used as fallback).
-
-    Returns:
-        StructuredProductData with all extractable fields populated.
-
-    Guarantee: if a field cannot be found in OCR text, its value is None.
-    No values are invented.
-    """
     logger.info(f"EXTRACTION | processing {len(ocr_blocks)} OCR blocks")
 
-    # Convert to internal _Block list
+    pass
     blocks = [
         _Block(
             text=b.get("text", b.get("normalized_text", "")),
@@ -569,8 +942,16 @@ def extract_product_info(
         for b in ocr_blocks
         if b.get("text") or b.get("normalized_text")
     ]
-
-    # Run all extractors
+    
+    # 1. Attempt LLM extraction first
+    llm_result = _extract_with_gemini(blocks, inspection_product_name, inspection_brand)
+    if llm_result:
+        logger.info("EXTRACTION | Gemini extraction successful.")
+        return llm_result
+        
+    logger.warning("EXTRACTION | Gemini extraction failed or skipped. Falling back to regex extractors.")
+    
+    # 2. Fallback to deterministic regex extraction
     mrp_field = _extract_mrp(blocks)
     qty_field = _extract_net_quantity(blocks)
     date_fields = _extract_dates(blocks)
@@ -582,9 +963,14 @@ def extract_product_info(
     ingredients_field = _extract_ingredients(blocks)
     warnings_field = _extract_warnings(blocks)
     brand_field = _extract_keyword_line(blocks, _BRAND_KEYWORDS, "brand_name")
+    # New extractors
+    email_field = _extract_email(blocks)
+    usp_field = _extract_unit_sale_price(blocks)
+    commodity_field = _extract_commodity(blocks)
+    storage_field = _extract_storage_instructions(blocks)
+    sale_restrict_field = _extract_sale_restrictions(blocks)
 
-    # Product name: use inspection metadata as initial value, OCR may refine it
-    product_name_value = inspection_product_name  # Use from inspection metadata
+    product_name_value = inspection_product_name
     product_name_status = "DETECTED" if product_name_value else "NOT_DETECTED"
 
     brand_value = brand_field.value or inspection_brand
@@ -592,7 +978,6 @@ def extract_product_info(
         "UNCERTAIN" if inspection_brand else "NOT_DETECTED"
     )
     if brand_value and brand_field.value is None:
-        # Using inspection metadata as fallback
         brand_field = ExtractedField(
             field_name="brand_name",
             value=brand_value,
@@ -606,6 +991,7 @@ def extract_product_info(
         qty_field,
         mrp_field,
         date_fields["manufacturing_date"],
+        date_fields["packaging_date"],
         date_fields["expiry_date"],
         batch_field,
         origin_field,
@@ -613,12 +999,17 @@ def extract_product_info(
         license_field,
         care_field,
         warnings_field,
+        email_field,
+        usp_field,
+        commodity_field,
+        storage_field,
+        sale_restrict_field,
     ]
 
     detected = sum(1 for f in all_fields if f.detection_status == "DETECTED")
     logger.info(
         f"EXTRACTION | done | {detected}/{len(all_fields)} fields detected "
-        f"from {len(blocks)} blocks"
+        f"from {len(blocks)} blocks (fallback mode)"
     )
 
     return StructuredProductData(
@@ -628,6 +1019,7 @@ def extract_product_info(
         net_quantity=qty_field.value,
         mrp=mrp_field.value,
         manufacturing_date=date_fields["manufacturing_date"].value,
+        packaging_date=date_fields["packaging_date"].value,
         expiry_date=date_fields["expiry_date"].value,
         batch_number=batch_field.value,
         country_of_origin=origin_field.value,
@@ -635,7 +1027,12 @@ def extract_product_info(
         license_number=license_field.value,
         customer_care=care_field.value,
         warnings=warnings_field.value,
+        email=email_field.value,
+        unit_sale_price=usp_field.value,
+        commodity=commodity_field.value,
+        storage_instructions=storage_field.value,
+        sale_restrictions=sale_restrict_field.value,
         fields=all_fields,
         total_blocks_processed=len(blocks),
-        extraction_version="1.0",
+        extraction_version="1.0-fallback",
     )

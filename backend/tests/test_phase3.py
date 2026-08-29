@@ -3,12 +3,20 @@ Phase 3 tests — extraction engine, evidence linking, API endpoint, persistence
 
 All tests run without PaddleOCR (OCR is mocked where needed).
 Target: 0 failures.
+
+NOTE: These tests exercise the deterministic regex-fallback extraction path on
+purpose (fast, offline, reproducible). The autouse fixture below forces
+app.ai.extraction.genai to None for every test in this file, so a real
+GEMINI_API_KEY in the environment doesn't route these through the live
+Gemini API (slow + non-deterministic + costs quota). Live/LLM extraction is
+covered separately in test_live_extraction.py and test_gulas_extraction.py.
 """
 
 import io
 import json
 import pytest
 
+import app.ai.extraction as extraction_module
 from app.ai.extraction import (
     extract_product_info,
     _extract_date,
@@ -22,6 +30,13 @@ from app.ai.extraction import (
     StructuredProductData,
     ExtractedField,
 )
+
+
+@pytest.fixture(autouse=True)
+def _force_regex_fallback(monkeypatch):
+    """Keep this file's extraction tests fast/offline regardless of a real API key."""
+    monkeypatch.setattr(extraction_module, "genai", None)
+
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────

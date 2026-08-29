@@ -6,7 +6,15 @@ Loads settings from environment variables / .env file.
 """
 
 from pydantic_settings import BaseSettings
-from typing import List
+from typing import List, Optional
+from dotenv import load_dotenv
+
+# Ensure .env (repo root) is loaded into the real process environment.
+# pydantic-settings only feeds .env values into THIS Settings object; it does
+# NOT set os.environ. Modules that call os.getenv(...) directly (e.g. Gemini
+# extraction in app/ai/extraction.py) need this explicit load or they silently
+# see None and fall back to regex-only extraction.
+load_dotenv()
 
 
 class Settings(BaseSettings):
@@ -26,6 +34,9 @@ class Settings(BaseSettings):
 
     # CORS
     CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
+
+    # AI extraction (Gemini) — optional, falls back to regex extraction if unset
+    GEMINI_API_KEY: Optional[str] = None
 
     @property
     def cors_origins_list(self) -> List[str]:

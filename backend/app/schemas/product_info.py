@@ -42,6 +42,13 @@ class ProductInfoSchema(BaseModel):
     license_number: Optional[str] = None
     customer_care: Optional[str] = None
     warnings: Optional[str] = None
+    # New fields from real-package analysis
+    email: Optional[str] = None
+    unit_sale_price: Optional[str] = None
+    packaging_date: Optional[str] = None
+    commodity: Optional[str] = None
+    storage_instructions: Optional[str] = None
+    sale_restrictions: Optional[str] = None
 
     # Evidence-linked fields list (for Phase 4 rules engine)
     fields: List[ExtractedFieldSchema] = []

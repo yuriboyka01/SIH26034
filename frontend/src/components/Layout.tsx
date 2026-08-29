@@ -1,6 +1,6 @@
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { ClipboardList, LayoutDashboard, LogOut, Menu, Plus, ShieldCheck, X } from 'lucide-react';
+import { ClipboardList, LayoutDashboard, LogOut, Menu, Plus, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const navigation = [

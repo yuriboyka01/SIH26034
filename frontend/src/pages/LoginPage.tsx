@@ -66,8 +66,11 @@ export default function LoginPage() {
     <main className="auth-page">
       <section className="auth-aside" aria-label="SIH26034 product overview">
         <div className="auth-brand">
-          <span className="auth-brand-mark" aria-hidden="true"><ShieldCheck size={20} /></span>
-          SIH26034
+          <img className="auth-brand-logo" src="/logo.jpeg" alt="" />
+          <span>
+            <strong>COMPLIQ</strong>
+            <small>Compliance Workspace</small>
+          </span>
         </div>
 
         <div className="auth-positioning">
@@ -91,6 +94,14 @@ export default function LoginPage() {
 
       <section className="auth-main" aria-label={isRegister ? 'Create an account' : 'Sign in'}>
         <div className="auth-form-wrap">
+          <div className="auth-form-identity">
+            <img src="/logo.jpeg" alt="CompliQ" />
+            <div>
+              <span>SIH26034</span>
+              <small>Inspector access</small>
+            </div>
+            <span className="auth-secure-badge"><ShieldCheck size={14} aria-hidden="true" /> Secure</span>
+          </div>
           <header className="auth-form-header">
             <p className="app-kicker">Secure access</p>
             <h2>{isRegister ? 'Create your inspector account' : 'Sign in to your workspace'}</h2>
