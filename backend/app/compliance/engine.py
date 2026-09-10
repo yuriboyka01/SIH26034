@@ -9,7 +9,9 @@ from app.schemas.compliance import (
     ComplianceStatus,
     ComplianceReportSchema,
     RuleResultSchema,
-    RuleSeverity
+    RuleSeverity,
+    CategorySummarySchema,
+    RULE_CATEGORY_LABELS
 )
 from app.compliance.rules import REGISTERED_RULES
 
@@ -40,20 +42,42 @@ class ComplianceRuleEngine:
         
         has_high_critical_fail = False
         
+        category_breakdown_dict = {}
+        
         for rule in self.rules:
             result = rule.evaluate(extracted_fields)
             results.append(result)
             
+            cat = result.category
+            if cat not in category_breakdown_dict:
+                category_breakdown_dict[cat] = {
+                    "category": cat,
+                    "label": RULE_CATEGORY_LABELS.get(cat, cat.value),
+                    "passed_count": 0,
+                    "failed_count": 0,
+                    "review_count": 0,
+                    "not_applicable_count": 0,
+                    "total": 0
+                }
+            
+            category_breakdown_dict[cat]["total"] += 1
+            
             if result.status == ComplianceStatus.PASS:
                 passed += 1
+                category_breakdown_dict[cat]["passed_count"] += 1
             elif result.status == ComplianceStatus.FAIL:
                 failed += 1
+                category_breakdown_dict[cat]["failed_count"] += 1
                 if result.severity in [RuleSeverity.CRITICAL, RuleSeverity.HIGH]:
                     has_high_critical_fail = True
             elif result.status == ComplianceStatus.REVIEW:
                 review += 1
+                category_breakdown_dict[cat]["review_count"] += 1
             elif result.status == ComplianceStatus.NOT_APPLICABLE:
                 not_applicable += 1
+                category_breakdown_dict[cat]["not_applicable_count"] += 1
+
+        category_breakdown = [CategorySummarySchema(**stats) for stats in category_breakdown_dict.values()]
 
         # Determine overall status
         if has_high_critical_fail:
@@ -74,5 +98,6 @@ class ComplianceRuleEngine:
             failed_count=failed,
             review_count=review,
             not_applicable_count=not_applicable,
-            rule_results=results
+            rule_results=results,
+            category_breakdown=category_breakdown
         )

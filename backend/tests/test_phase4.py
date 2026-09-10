@@ -5,8 +5,8 @@ Phase 4 tests — compliance rules engine, evaluation, and API.
 import io
 import pytest
 
-from app.schemas.compliance import ComplianceStatus, RuleSeverity
-from app.compliance.rules import PresenceRule, ContextualReviewRule, AlwaysReviewRule
+from app.schemas.compliance import ComplianceStatus, RuleSeverity, RuleCategory
+from app.compliance.rules import PresenceRule, ContextualReviewRule, AlwaysReviewRule, REGISTERED_RULES
 from app.compliance.engine import ComplianceRuleEngine
 
 
@@ -15,42 +15,53 @@ from app.compliance.engine import ComplianceRuleEngine
 class TestComplianceRules:
     
     def test_presence_rule_pass(self):
-        rule = PresenceRule("R1", "Test", "Src", RuleSeverity.HIGH, "Expected", "mrp")
+        rule = PresenceRule("R1", "Test", "Src", RuleSeverity.HIGH, RuleCategory.MANDATORY_DECLARATIONS, "Expected", "mrp")
         fields = [{"field_name": "mrp", "value": "100", "detection_status": "DETECTED"}]
         res = rule.evaluate(fields)
         assert res.status == ComplianceStatus.PASS
         assert res.actual == "100"
 
     def test_presence_rule_fail(self):
-        rule = PresenceRule("R1", "Test", "Src", RuleSeverity.HIGH, "Expected", "mrp")
+        rule = PresenceRule("R1", "Test", "Src", RuleSeverity.HIGH, RuleCategory.MANDATORY_DECLARATIONS, "Expected", "mrp")
         fields = [{"field_name": "mrp", "value": None, "detection_status": "NOT_DETECTED"}]
         res = rule.evaluate(fields)
         assert res.status == ComplianceStatus.FAIL
 
     def test_presence_rule_uncertain(self):
-        rule = PresenceRule("R1", "Test", "Src", RuleSeverity.HIGH, "Expected", "mrp")
+        rule = PresenceRule("R1", "Test", "Src", RuleSeverity.HIGH, RuleCategory.MANDATORY_DECLARATIONS, "Expected", "mrp")
         fields = [{"field_name": "mrp", "value": "100", "detection_status": "UNCERTAIN"}]
         res = rule.evaluate(fields)
         assert res.status == ComplianceStatus.REVIEW
 
     def test_contextual_review_rule_pass(self):
-        rule = ContextualReviewRule("R2", "Test", "Src", RuleSeverity.MEDIUM, "Expected", "mfg_date", "Review")
+        rule = ContextualReviewRule("R2", "Test", "Src", RuleSeverity.MEDIUM, RuleCategory.MANDATORY_DECLARATIONS, "Expected", "mfg_date", "Review")
         fields = [{"field_name": "mfg_date", "value": "Jan", "detection_status": "DETECTED"}]
         res = rule.evaluate(fields)
         assert res.status == ComplianceStatus.PASS
         
     def test_contextual_review_rule_missing(self):
-        rule = ContextualReviewRule("R2", "Test", "Src", RuleSeverity.MEDIUM, "Expected", "mfg_date", "Review")
+        rule = ContextualReviewRule("R2", "Test", "Src", RuleSeverity.MEDIUM, RuleCategory.MANDATORY_DECLARATIONS, "Expected", "mfg_date", "Review")
         fields = [{"field_name": "mfg_date", "value": None, "detection_status": "NOT_DETECTED"}]
         res = rule.evaluate(fields)
         # Should be REVIEW, not FAIL
         assert res.status == ComplianceStatus.REVIEW
 
     def test_always_review_rule(self):
-        rule = AlwaysReviewRule("R3", "Test", "Src", RuleSeverity.LOW, "Expected", "Review")
+        rule = AlwaysReviewRule("R3", "Test", "Src", RuleSeverity.LOW, RuleCategory.CONDITIONAL_ADDITIONAL, "Expected", "Review")
         res = rule.evaluate([])
         assert res.status == ComplianceStatus.REVIEW
 
+    def test_all_registered_rules(self):
+        # 24 rules in total
+        assert len(REGISTERED_RULES) == 24
+        
+        rule_ids = set()
+        for rule in REGISTERED_RULES:
+            assert rule.rule_id is not None
+            assert rule.rule_id not in rule_ids, f"Duplicate rule ID: {rule.rule_id}"
+            rule_ids.add(rule.rule_id)
+            assert rule.source_reference is not None
+            assert rule.category is not None
 
 # ── Unit: Compliance Engine ──────────────────────────────────────────────────
 
@@ -60,8 +71,8 @@ class TestComplianceEngine:
         engine = ComplianceRuleEngine()
         # Mock rules
         engine.rules = [
-            PresenceRule("R1", "Test", "Src", RuleSeverity.HIGH, "Expected", "f1"),
-            PresenceRule("R2", "Test", "Src", RuleSeverity.MEDIUM, "Expected", "f2"),
+            PresenceRule("R1", "Test", "Src", RuleSeverity.HIGH, RuleCategory.MANDATORY_DECLARATIONS, "Expected", "f1"),
+            PresenceRule("R2", "Test", "Src", RuleSeverity.MEDIUM, RuleCategory.MANDATORY_DECLARATIONS, "Expected", "f2"),
         ]
         
         fields = [
@@ -79,7 +90,7 @@ class TestComplianceEngine:
     def test_engine_critical_fail(self):
         engine = ComplianceRuleEngine()
         engine.rules = [
-            PresenceRule("R1", "Test", "Src", RuleSeverity.CRITICAL, "Expected", "f1"),
+            PresenceRule("R1", "Test", "Src", RuleSeverity.CRITICAL, RuleCategory.MANDATORY_DECLARATIONS, "Expected", "f1"),
         ]
         fields = [{"field_name": "f1", "value": None, "detection_status": "NOT_DETECTED"}]
         
@@ -90,7 +101,7 @@ class TestComplianceEngine:
     def test_engine_review(self):
         engine = ComplianceRuleEngine()
         engine.rules = [
-            AlwaysReviewRule("R1", "Test", "Src", RuleSeverity.MEDIUM, "Expected", "Rev"),
+            AlwaysReviewRule("R1", "Test", "Src", RuleSeverity.MEDIUM, RuleCategory.CONDITIONAL_ADDITIONAL, "Expected", "Rev"),
         ]
         
         report = engine.evaluate("insp1", "img1", [])
@@ -171,7 +182,8 @@ class TestComplianceAPI:
         assert len(reports) == 1
         rep = reports[0]
         
-        assert rep["total_rules_checked"] == 10
+        assert rep["total_rules_checked"] == 24
+        assert len(rep["category_breakdown"]) > 0
         
         # 6. Retrieve compliance reports
         get_comp_resp = client.get(f"/api/inspections/{insp_id}/compliance", headers=auth_headers)

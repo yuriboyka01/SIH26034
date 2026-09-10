@@ -14,6 +14,9 @@ export interface RuleResult {
   actual?: string;
   evidence?: any;
   source_reference: string;
+  category?: string;
+  confidence?: number;
+  remediation?: string;
 }
 
 export interface ComplianceReport {
@@ -26,6 +29,15 @@ export interface ComplianceReport {
   review_count: number;
   not_applicable_count: number;
   rule_results: RuleResult[];
+  category_breakdown?: {
+    category: string;
+    label: string;
+    passed_count: number;
+    failed_count: number;
+    review_count: number;
+    not_applicable_count: number;
+    total: number;
+  }[];
 }
 
 export interface ComplianceResponse {

@@ -90,7 +90,10 @@ class ComplianceService:
                     field=rr.field,
                     expected=rr.expected,
                     actual=rr.actual,
-                    source_reference=rr.source_reference
+                    source_reference=rr.source_reference,
+                    category=rr.category.value if rr.category else None,
+                    confidence=rr.confidence,
+                    remediation=rr.remediation
                 )
                 if rr.evidence:
                     db_rr.set_evidence(rr.evidence)
@@ -145,6 +148,9 @@ class ComplianceService:
                 has_review = True
                 
             rule_results_dict = []
+            category_breakdown_dict = {}
+            from app.schemas.compliance import RULE_CATEGORY_LABELS, RuleCategory
+
             for rr in rep.rule_results:
                 rule_results_dict.append({
                     "rule_id": rr.rule_id,
@@ -156,8 +162,34 @@ class ComplianceService:
                     "expected": rr.expected,
                     "actual": rr.actual,
                     "evidence": rr.get_evidence(),
-                    "source_reference": rr.source_reference
+                    "source_reference": rr.source_reference,
+                    "category": rr.category,
+                    "confidence": rr.confidence,
+                    "remediation": rr.remediation
                 })
+                
+                cat = RuleCategory(rr.category) if rr.category else RuleCategory.MANDATORY_DECLARATIONS
+                if cat not in category_breakdown_dict:
+                    category_breakdown_dict[cat] = {
+                        "category": cat.value,
+                        "label": RULE_CATEGORY_LABELS.get(cat, cat.value),
+                        "passed_count": 0,
+                        "failed_count": 0,
+                        "review_count": 0,
+                        "not_applicable_count": 0,
+                        "total": 0
+                    }
+                category_breakdown_dict[cat]["total"] += 1
+                if rr.status == "PASS":
+                    category_breakdown_dict[cat]["passed_count"] += 1
+                elif rr.status == "FAIL":
+                    category_breakdown_dict[cat]["failed_count"] += 1
+                elif rr.status == "REVIEW":
+                    category_breakdown_dict[cat]["review_count"] += 1
+                elif rr.status == "NOT_APPLICABLE":
+                    category_breakdown_dict[cat]["not_applicable_count"] += 1
+
+            category_breakdown = list(category_breakdown_dict.values())
             
             reports_dict.append({
                 "inspection_id": str(inspection_id),
@@ -168,7 +200,8 @@ class ComplianceService:
                 "failed_count": rep.failed_count,
                 "review_count": rep.review_count,
                 "not_applicable_count": rep.not_applicable_count,
-                "rule_results": rule_results_dict
+                "rule_results": rule_results_dict,
+                "category_breakdown": category_breakdown
             })
             
         overall_inspection_status = "PASS"

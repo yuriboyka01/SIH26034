@@ -8,7 +8,7 @@ import uuid
 import json
 from datetime import datetime, timezone
 
-from sqlalchemy import Column, String, Text, DateTime, Integer, ForeignKey
+from sqlalchemy import Column, String, Text, DateTime, Integer, Float, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -73,7 +73,13 @@ class ComplianceRuleResult(Base):
     expected = Column(Text, nullable=False)
     actual = Column(Text, nullable=True)
     source_reference = Column(String(255), nullable=False)
-    
+
+    # Rule engine v2: category grouping for the report UI, confidence of the
+    # automated verdict, and remediation guidance shown on FAIL/REVIEW findings.
+    category = Column(String(50), nullable=True)
+    confidence = Column(Float, nullable=True)
+    remediation = Column(Text, nullable=True)
+
     # Evidence JSON payload
     evidence_json = Column(Text, nullable=True)
     

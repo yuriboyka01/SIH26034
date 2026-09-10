@@ -127,7 +127,7 @@ export default function InspectionDetailPage() {
   const completeThrough = analysing ? phaseCompleteThrough[analysisPhase] : hasReports ? 4 : hasSuccessfulAnalysis ? 2 : hasImages ? 0 : -1;
 
   return (
-    <div className="space-y-6 max-w-[1920px] mx-auto">
+    <div className="space-y-8 max-w-5xl mx-auto pb-12">
       <Link to="/inspections" className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--text-muted)] hover:text-[var(--brand)] transition-colors">
         <ArrowLeft size={16} /> Back to inspection register
       </Link>
@@ -186,91 +186,181 @@ export default function InspectionDetailPage() {
       
       {analysing && <AnalysisProgress phase={analysisPhase} progress={analysisProgress} imageCount={inspection.images.length} processedImageCount={processedImageCount} />}
       
-      {/* 3-Column Layout */}
-      <section className="grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
-        {/* LEFT COLUMN: EVIDENCE */}
-        <div className="space-y-6 flex flex-col">
-          <section className="depth-2 overflow-hidden">
-            <SectionHeader eyebrow="01 / Evidence" title="Evidence capture" description="Upload package images to establish the inspection record." />
-            <div className="p-5">
-              <div 
-                onDragOver={(e) => { e.preventDefault(); setDragOver(true); }} 
-                onDragLeave={() => setDragOver(false)} 
-                onDrop={(e) => { e.preventDefault(); setDragOver(false); handleFileUpload(e.dataTransfer.files); }} 
-                onClick={() => fileInputRef.current?.click()} 
-                className={`cursor-pointer border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200 ${
-                  dragOver ? 'border-[var(--brand)] bg-[var(--brand-soft)] scale-[1.02]' : 'border-[var(--line-strong)] bg-[var(--surface-raised)] hover:border-[var(--brand)]'
-                }`}
-              >
-                {uploading ? (
-                  <div>
-                    <Loader2 size={32} className="mx-auto animate-spin text-[var(--brand)]" />
-                    <p className="mt-4 text-sm font-semibold text-[var(--text)]">Uploading evidence · {uploadProgress}%</p>
-                    <div className="mx-auto mt-4 h-1.5 w-48 overflow-hidden rounded-full bg-[var(--line)]">
-                      <div className="h-full bg-[var(--brand)] transition-all duration-300" style={{ width: `${uploadProgress}%` }} />
-                    </div>
+      {/* EXECUTIVE SUMMARY */}
+      {hasReports && (
+        <section className="depth-2 overflow-hidden bg-[var(--surface)] border border-[var(--line)] rounded-xl">
+          <div className="bg-[var(--surface-raised)] px-6 py-4 border-b border-[var(--line)]">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-[var(--text-faint)]">Executive Summary</h3>
+          </div>
+          <div className="p-6">
+            {complianceReports.map(report => (
+              <div key={`exec-${report.inspection_id}`} className="flex flex-wrap gap-6 items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className={`w-16 h-16 rounded-full flex items-center justify-center ${report.overall_status === 'PASS' ? 'bg-[var(--success-soft)] text-[var(--success)]' : report.overall_status === 'FAIL' ? 'bg-[var(--danger-soft)] text-[var(--danger)]' : 'bg-[var(--warning-soft)] text-[var(--warning)]'}`}>
+                    <ShieldCheck size={32} />
                   </div>
-                ) : (
-                  <>
-                    <div className="w-14 h-14 bg-[var(--surface)] border border-[var(--line-strong)] rounded-2xl mx-auto flex items-center justify-center shadow-sm">
-                      <Upload size={24} className="text-[var(--brand)]" />
-                    </div>
-                    <p className="mt-4 text-sm font-bold text-[var(--text)]">Add package evidence</p>
-                    <p className="mt-1 text-xs text-[var(--text-muted)]">Drop JPG, PNG, or WEBP files here<br/>Max 10 MB per image</p>
-                  </>
-                )}
-                <input ref={fileInputRef} type="file" accept=".jpg,.jpeg,.png,.webp" multiple className="hidden" onChange={(e) => handleFileUpload(e.target.files)} />
+                  <div>
+                    <p className="text-2xl font-bold text-[var(--text)]">{report.overall_status}</p>
+                    <p className="text-sm text-[var(--text-muted)]">Overall Compliance Status</p>
+                  </div>
+                </div>
+                <div className="flex gap-4 text-center">
+                  <div className="bg-[var(--surface-raised)] px-4 py-2 rounded-lg border border-[var(--line)]">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-faint)]">Total Checks</p>
+                    <p className="text-xl font-bold text-[var(--text)]">{report.total_rules_checked}</p>
+                  </div>
+                  <div className="bg-[var(--surface-raised)] px-4 py-2 rounded-lg border border-[var(--danger-soft)]">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--danger)]">Failed</p>
+                    <p className="text-xl font-bold text-[var(--danger)]">{report.failed_count}</p>
+                  </div>
+                  <div className="bg-[var(--surface-raised)] px-4 py-2 rounded-lg border border-[var(--warning-soft)]">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--warning)]">Needs Review</p>
+                    <p className="text-xl font-bold text-[var(--warning)]">{report.review_count}</p>
+                  </div>
+                  <div className="bg-[var(--surface-raised)] px-4 py-2 rounded-lg border border-[var(--success-soft)]">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--success)]">Passed</p>
+                    <p className="text-xl font-bold text-[var(--success)]">{report.passed_count}</p>
+                  </div>
+                  <div className="bg-[var(--surface-raised)] px-4 py-2 rounded-lg border border-[var(--line)]">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-faint)]">N/A</p>
+                    <p className="text-xl font-bold text-[var(--text-muted)]">{report.not_applicable_count}</p>
+                  </div>
+                </div>
               </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* PRODUCT SNAPSHOT */}
+      <ProductInfoPanel productInfo={productInfo} />
+
+      {/* ATTENTION REQUIRED */}
+      {hasReports && (() => {
+        const attentionItems = complianceReports.flatMap(r => r.rule_results.filter(rr => rr.status === 'FAIL' || rr.status === 'REVIEW'));
+        if (attentionItems.length === 0) return null;
+        return (
+          <section className="depth-2 overflow-hidden border-[var(--danger-soft)] border-2">
+            <SectionHeader eyebrow="Action Needed" title="Attention Required" description={`${attentionItems.length} items require immediate attention or manual review.`} />
+            <div className="p-4 grid gap-4 bg-[var(--danger-soft)]/10">
+               {attentionItems.slice(0, 5).map(item => (
+                 <div key={`attn-${item.rule_id}`} className={`bg-[var(--surface)] border p-4 rounded-lg shadow-sm ${item.status === 'FAIL' ? 'border-[var(--danger-soft)]' : 'border-[var(--warning-soft)]'}`}>
+                    <div className="flex items-center gap-3 mb-2">
+                      <StatusBadge value={item.status} />
+                      <p className="font-bold text-[var(--text)]">{item.rule_name}</p>
+                    </div>
+                    <p className="text-sm text-[var(--text-muted)] font-mono text-[11px] mb-2">{item.rule_id}</p>
+                    {item.status === 'REVIEW' && item.message && (
+                      <p className="text-sm text-[var(--text)] bg-[var(--warning-soft)]/20 p-2 rounded border border-[var(--warning-soft)] mb-2">
+                        <span className="font-bold text-[var(--warning)] block text-[10px] uppercase mb-1">Reason</span>
+                        {item.message}
+                      </p>
+                    )}
+                    {item.remediation && (
+                      <p className="text-sm text-[var(--text)] bg-[var(--danger-soft)]/10 p-2 rounded border border-[var(--danger-soft)]">
+                        <span className="font-bold text-[var(--danger)] block text-[10px] uppercase mb-1">Recommendation</span>
+                        {item.remediation}
+                      </p>
+                    )}
+                 </div>
+               ))}
+               {attentionItems.length > 5 && <p className="text-sm font-bold text-[var(--text-faint)] px-2">+ {attentionItems.length - 5} more items requiring attention</p>}
             </div>
           </section>
-          
-          {hasImages ? (
-            <div className="space-y-6 flex-1">
-              {inspection.images.map((image) => (
-                <EvidenceItem 
-                  key={image.id} 
-                  image={image} 
-                  result={analysisResult?.images.find((r) => r.image_id === image.id) || null} 
-                  pendingDelete={deleteCandidate === image.id} 
-                  onAskDelete={() => setDeleteCandidate(image.id)} 
-                  onCancelDelete={() => setDeleteCandidate(null)} 
-                  onConfirmDelete={confirmDelete} 
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="flex-1">
-              <EmptyState icon={<ImageIcon size={32} />} title="No evidence attached" description="Upload a package image to begin OCR extraction and compliance analysis." />
-            </div>
-          )}
-        </div>
+        );
+      })()}
 
-        {/* CENTER COLUMN: EXTRACTION */}
-        <div className="space-y-6 flex flex-col">
-          <ProductInfoPanel productInfo={productInfo} />
-        </div>
+      {/* GROUPED COMPLIANCE FINDINGS */}
+      <ComplianceResultsPanel reports={complianceReports} isAnalyzing={analysing} images={inspection.images.map((image) => ({ id: image.id, url: image.url }))} />
 
-        {/* RIGHT COLUMN: RULES */}
-        <div className="space-y-6 flex flex-col">
-          <ComplianceResultsPanel reports={complianceReports} isAnalyzing={analysing} images={inspection.images.map((image) => ({ id: image.id, url: image.url }))} />
-          
-          {hasReports && (
-            <section className="depth-2 overflow-hidden">
-              <SectionHeader eyebrow="04 / Report" title="Official report ready" description="Download the official evidence-linked report." />
-              <div className="flex flex-col gap-3 p-5">
-                <button onClick={() => downloadReport(id!, 'pdf')} className="neo-button-secondary w-full justify-between">
-                  <span className="flex items-center gap-2"><FileText size={16} className="text-[var(--danger)]" /> Download PDF</span>
-                  <Download size={16} className="text-[var(--text-faint)]" />
-                </button>
-                <button onClick={() => downloadReport(id!, 'docx')} className="neo-button-secondary w-full justify-between">
-                  <span className="flex items-center gap-2"><FileText size={16} className="text-[var(--brand)]" /> Download DOCX</span>
-                  <Download size={16} className="text-[var(--text-faint)]" />
-                </button>
+      {/* EVIDENCE */}
+      <section className="depth-2 overflow-hidden flex flex-col">
+        <SectionHeader eyebrow="06" title="Evidence" description="Package images establishing the inspection record." />
+        <div className="p-5">
+          <div 
+            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }} 
+            onDragLeave={() => setDragOver(false)} 
+            onDrop={(e) => { e.preventDefault(); setDragOver(false); handleFileUpload(e.dataTransfer.files); }} 
+            onClick={() => fileInputRef.current?.click()} 
+            className={`cursor-pointer border-2 border-dashed rounded-xl p-6 text-center transition-all duration-200 ${
+              dragOver ? 'border-[var(--brand)] bg-[var(--brand-soft)] scale-[1.02]' : 'border-[var(--line-strong)] bg-[var(--surface-raised)] hover:border-[var(--brand)]'
+            }`}
+          >
+            {uploading ? (
+              <div>
+                <Loader2 size={24} className="mx-auto animate-spin text-[var(--brand)]" />
+                <p className="mt-2 text-sm font-semibold text-[var(--text)]">Uploading evidence · {uploadProgress}%</p>
+                <div className="mx-auto mt-3 h-1.5 w-48 overflow-hidden rounded-full bg-[var(--line)]">
+                  <div className="h-full bg-[var(--brand)] transition-all duration-300" style={{ width: `${uploadProgress}%` }} />
+                </div>
               </div>
-            </section>
-          )}
+            ) : (
+              <div className="flex items-center justify-center gap-4">
+                <div className="w-10 h-10 bg-[var(--surface)] border border-[var(--line-strong)] rounded-full flex items-center justify-center shadow-sm">
+                  <Upload size={18} className="text-[var(--brand)]" />
+                </div>
+                <div className="text-left">
+                  <p className="text-sm font-bold text-[var(--text)]">Add package evidence</p>
+                  <p className="text-xs text-[var(--text-muted)]">Drop JPG, PNG, or WEBP files here (Max 10 MB)</p>
+                </div>
+              </div>
+            )}
+            <input ref={fileInputRef} type="file" accept=".jpg,.jpeg,.png,.webp" multiple className="hidden" onChange={(e) => handleFileUpload(e.target.files)} />
+          </div>
         </div>
+        
+        {hasImages ? (
+          <div className="grid gap-4 p-5 pt-0 sm:grid-cols-2">
+            {inspection.images.map((image) => (
+              <EvidenceItem 
+                key={image.id} 
+                image={image} 
+                result={analysisResult?.images.find((r) => r.image_id === image.id) || null} 
+                pendingDelete={deleteCandidate === image.id} 
+                onAskDelete={() => setDeleteCandidate(image.id)} 
+                onCancelDelete={() => setDeleteCandidate(null)} 
+                onConfirmDelete={confirmDelete} 
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="p-5 pt-0">
+            <EmptyState icon={<ImageIcon size={32} />} title="No evidence attached" description="Upload a package image to begin OCR extraction and compliance analysis." />
+          </div>
+        )}
       </section>
+
+      {/* TECHNICAL DETAILS */}
+      {hasSuccessfulAnalysis && analysisResult && (
+        <section className="depth-2 overflow-hidden flex flex-col">
+          <SectionHeader eyebrow="07" title="Technical Details" description="Raw OCR extraction and AI analysis results." />
+          <div className="p-5 space-y-6">
+            {inspection.images.map((image) => {
+              const result = analysisResult.images.find(r => r.image_id === image.id);
+              if (!result) return null;
+              return <OCRResultsPanel key={`ocr-${image.id}`} imageUrl={image.url} result={result} />;
+            })}
+          </div>
+        </section>
+      )}
+
+      {hasReports && (
+        <section className="depth-2 overflow-hidden flex flex-col items-center justify-center p-8 bg-[var(--surface-raised)] text-center">
+          <div className="w-16 h-16 bg-[var(--surface)] border border-[var(--line)] rounded-full flex items-center justify-center mb-4">
+            <FileText size={24} className="text-[var(--text-faint)]" />
+          </div>
+          <h3 className="text-lg font-bold text-[var(--text)]">Official report ready</h3>
+          <p className="text-sm text-[var(--text-muted)] mb-6">Download the comprehensive evidence-linked report.</p>
+          <div className="flex gap-4">
+            <button onClick={() => downloadReport(id!, 'pdf')} className="neo-button-secondary">
+              <FileText size={16} className="text-[var(--danger)]" /> Download PDF
+            </button>
+            <button onClick={() => downloadReport(id!, 'docx')} className="neo-button-secondary">
+              <Download size={16} className="text-[var(--brand)]" /> Download DOCX
+            </button>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
@@ -343,18 +433,18 @@ function EvidenceItem({ image, result, pendingDelete, onAskDelete, onCancelDelet
           </button>
         )}
       </header>
-      <div className="p-5 flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col">
         {result ? (
-          <OCRResultsPanel imageUrl={image.url} result={result} />
-        ) : (
-          <div className="overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--surface-raised)] flex-1 flex flex-col group relative">
-            {/* Soft inner shadow for premium image feel */}
-            <div className="absolute inset-0 shadow-[inset_0_0_20px_rgba(0,0,0,0.02)] pointer-events-none z-10 rounded-xl"></div>
-            <img src={image.url} alt={image.original_filename} className="w-full h-auto object-contain flex-1 max-h-[400px]" loading="lazy" />
-            <div className="border-t border-[var(--line)] bg-[var(--surface)]/80 backdrop-blur-sm px-5 py-4 z-20">
-              <p className="text-sm font-bold text-[var(--text)]">Evidence ready</p>
-              <p className="mt-1 text-xs text-[var(--text-muted)]">Run analysis to extract declarations.</p>
+          <div className="p-4 bg-[var(--surface-raised)] border-t border-[var(--line)]">
+            <div className="flex justify-between items-center text-xs text-[var(--text-muted)] font-mono mb-2">
+              <span>{result.text_blocks?.length || 0} blocks extracted</span>
+              <span className="text-[var(--success)]">OCR OK</span>
             </div>
+            <img src={image.url} alt={image.original_filename} className="w-full h-auto object-contain max-h-[300px] rounded border border-[var(--line-strong)]" loading="lazy" />
+          </div>
+        ) : (
+          <div className="p-5 overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--surface-raised)] flex-1 flex flex-col group relative">
+            <img src={image.url} alt={image.original_filename} className="w-full h-auto object-contain flex-1 max-h-[300px]" loading="lazy" />
           </div>
         )}
       </div>
