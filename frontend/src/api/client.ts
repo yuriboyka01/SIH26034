@@ -9,6 +9,7 @@ const API_BASE_URL = envApiUrl ? `${envApiUrl.replace(/\/$/, '')}/api` : '/api';
 
 const client = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 45000,
   headers: {
     'Content-Type': 'application/json',
   },
