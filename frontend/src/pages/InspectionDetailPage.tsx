@@ -437,7 +437,7 @@ function EvidenceItem({ image, result, pendingDelete, onAskDelete, onCancelDelet
         {result ? (
           <div className="p-4 bg-[var(--surface-raised)] border-t border-[var(--line)]">
             <div className="flex justify-between items-center text-xs text-[var(--text-muted)] font-mono mb-2">
-              <span>{result.text_blocks?.length || 0} blocks extracted</span>
+              <span>{result.ocr?.blocks?.length || 0} blocks extracted</span>
               <span className="text-[var(--success)]">OCR OK</span>
             </div>
             <img src={image.url} alt={image.original_filename} className="w-full h-auto object-contain max-h-[300px] rounded border border-[var(--line-strong)]" loading="lazy" />

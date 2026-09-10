@@ -1,6 +1,6 @@
 import { Box } from 'lucide-react';
 import type { ProductInfo } from '../api/product_info';
-import { SectionHeader, StatusBadge } from './ui';
+import { SectionHeader } from './ui';
 
 const priorityFields: Record<string, { label: string; required: boolean }> = {
   product_name: { label: 'Product name', required: true }, 

@@ -1,4 +1,4 @@
-import { AlertTriangle, CheckCircle2, FileSearch, Scale, Info, ChevronDown, ChevronRight, Check } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, FileSearch, Scale, Info, ChevronDown, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 import type { ComplianceReport, RuleResult } from '../api/compliance';
 import { EvidenceViewer } from './EvidenceViewer';

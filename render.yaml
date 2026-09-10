@@ -11,7 +11,7 @@ services:
       - key: PYTHON_VERSION
         value: 3.11.9
       - key: CORS_ORIGINS
-        value: "https://sih26034-frontend.onrender.com"
+        value: "https://sih26034-frontend-aygy.onrender.com,https://sih26034-frontend.onrender.com"
       - key: JWT_SECRET
         generateValue: true
       - key: GROQ_API_KEY
