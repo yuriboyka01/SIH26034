@@ -2,36 +2,20 @@ services:
   - type: web
     name: sih26034-backend
     env: python
+    plan: free
     buildCommand: "cd backend && pip install -r requirements.txt"
     startCommand: "cd backend && alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
     envVars:
       - key: DATABASE_URL
-        fromDatabase:
-          name: sih26034-db
-          property: connectionString
+        sync: false
       - key: PYTHON_VERSION
         value: 3.11.9
       - key: CORS_ORIGINS
-        # Update to match the actual frontend URL from the Render dashboard if different
         value: "https://sih26034-frontend.onrender.com"
       - key: JWT_SECRET
         generateValue: true
       - key: GROQ_API_KEY
         sync: false
-      # S3-compatible persistent storage (AWS S3, Cloudflare R2, Backblaze B2)
-      # Render disks are ephemeral; uncomment & set these in Render dashboard to persist uploads:
-      # - key: STORAGE_BACKEND
-      #   sync: false
-      # - key: S3_BUCKET
-      #   sync: false
-      # - key: S3_REGION
-      #   sync: false
-      # - key: S3_ENDPOINT_URL
-      #   sync: false
-      # - key: S3_ACCESS_KEY_ID
-      #   sync: false
-      # - key: S3_SECRET_ACCESS_KEY
-      #   sync: false
 
   - type: web
     name: sih26034-frontend
@@ -43,8 +27,3 @@ services:
         value: 20.0.0
       - key: VITE_API_URL
         value: "https://sih26034-backend.onrender.com"
-
-databases:
-  - name: sih26034-db
-    databaseName: sih26034
-    user: sih26034
