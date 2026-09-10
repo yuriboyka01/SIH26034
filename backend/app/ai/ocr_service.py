@@ -136,7 +136,25 @@ def extract(image_path: str) -> OCRResult:
     original, preprocessed, preprocessing_steps, quality_dict = preprocess_image_path(image_path)
 
     # --- Get engine ---
-    engine, version, engine_name = _get_ocr()
+    try:
+        engine, version, engine_name = _get_ocr()
+    except OCREngineUnavailableError as e:
+        logger.warning(f"OCR | engine unavailable, skipping OCR: {e}")
+        return OCRResult(
+            image_path=image_path,
+            engine="none",
+            engine_version="0.0.0",
+            blocks=[],
+            full_text="",
+            processing_time_ms=int((time.monotonic() - start) * 1000),
+            preprocessing_applied=preprocessing_steps,
+            quality=ImageQuality(
+                status=quality_dict["status"],
+                blur_score=quality_dict["blur_score"],
+                brightness_score=quality_dict["brightness_score"],
+                issues=quality_dict["issues"],
+            )
+        )
 
     # --- OCR on original ---
     logger.info(f"OCR | running {engine_name} on original image: {image_path}")

@@ -98,16 +98,14 @@ def startup_event():
     except Exception as e:
         error_msg = (
             f"\n==================================================\n"
-            f"COMPLIQ OCR ENGINE ERROR\n"
+            f"COMPLIQ OCR ENGINE WARNING\n"
             f"==================================================\n\n"
-            f"ERROR: PaddleOCR initialization failed: {e}\n\n"
-            f"COMPLIQ requires:\n"
-            f"    Python 3.11.x\n"
-            f"    PaddlePaddle compatible with the project\n"
-            f"    PaddleOCR compatible with the project\n\n"
-            f"Backend startup aborted.\n\n"
+            f"WARNING: PaddleOCR initialization failed: {e}\n\n"
+            f"OCR features will be disabled. The system will fall back to AI extraction.\n"
+            f"To enable OCR, ensure you are running Python 3.11 and have installed \n"
+            f"paddlepaddle and paddleocr via the setup script.\n\n"
             f"==================================================\n"
         )
         print(error_msg, file=sys.stderr, flush=True)
-        sys.exit(1)
+        logger.warning("PaddleOCR is unavailable. OCR features disabled.")
 
