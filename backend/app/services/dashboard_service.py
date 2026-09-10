@@ -36,15 +36,13 @@ class DashboardService:
     def __init__(self, db: Session):
         self.db = db
 
-    def get_dashboard_analytics(self) -> DashboardAnalyticsResponse:
+    def get_dashboard_analytics(self, user_id: UUID) -> DashboardAnalyticsResponse:
         """
-        Calculates compliance KPIs, top violations, and recent inspections across all users.
-        NOTE: In a multi-tenant system this might be filtered by user_id, but the enforcement
-        dashboard usually sees all data or department data. We will query all for the demo.
+        Calculates compliance KPIs, top violations, and recent inspections for the user.
         """
         
         # 1. Fetch all inspections and their compliance reports to calculate overall status
-        inspections = self.db.query(Inspection).order_by(Inspection.created_at.desc()).all()
+        inspections = self.db.query(Inspection).filter(Inspection.created_by == user_id).order_by(Inspection.created_at.desc()).all()
         
         total_inspections = len(inspections)
         compliant_count = 0
@@ -64,6 +62,7 @@ class DashboardService:
                 Inspection.id.label('inspection_id'),
                 ComplianceReport.overall_status
             )
+            .filter(Inspection.created_by == user_id)
             .join(InspectionImage, Inspection.id == InspectionImage.inspection_id)
             .join(OCRResult, InspectionImage.id == OCRResult.image_id)
             .join(ComplianceReport, OCRResult.id == ComplianceReport.ocr_result_id)
@@ -132,7 +131,12 @@ class DashboardService:
                 ComplianceRuleResult.rule_name,
                 func.count(ComplianceRuleResult.id).label('count')
             )
+            .join(ComplianceReport, ComplianceRuleResult.report_id == ComplianceReport.id)
+            .join(OCRResult, ComplianceReport.ocr_result_id == OCRResult.id)
+            .join(InspectionImage, OCRResult.image_id == InspectionImage.id)
+            .join(Inspection, InspectionImage.inspection_id == Inspection.id)
             .filter(ComplianceRuleResult.status == 'FAIL')
+            .filter(Inspection.created_by == user_id)
             .group_by(ComplianceRuleResult.rule_id, ComplianceRuleResult.rule_name)
             .order_by(desc('count'))
             .limit(10)

@@ -36,4 +36,4 @@ def get_compliance_analytics(
 ):
     """Get Phase 5 compliance analytics (KPIs, violations, recent)."""
     service = DashboardService(db)
-    return service.get_dashboard_analytics()
+    return service.get_dashboard_analytics(current_user.id)
