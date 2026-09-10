@@ -9,10 +9,12 @@ const API_BASE_URL = envApiUrl ? `${envApiUrl.replace(/\/$/, '')}/api` : '/api';
 
 const client = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 45000,
   headers: {
     'Content-Type': 'application/json',
   },
+  // Increased to 90 seconds to accommodate Render Free tier cold starts
+  // and PaddleOCR long-running analysis requests
+  timeout: 90000,
 });
 
 // Request interceptor: attach JWT token

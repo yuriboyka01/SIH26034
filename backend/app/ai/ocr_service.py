@@ -47,9 +47,30 @@ def _get_ocr():
     try:
         from paddleocr import PaddleOCR
         import paddleocr
+        import paddle
+        import os
+
+        # Optimize PaddlePaddle for low-memory environments (Render Free Tier 512MB limit)
+        paddle.set_flags({
+            "FLAGS_fraction_of_cpu_memory_to_use": 0.1,  # Limit memory usage
+            "FLAGS_allocator_strategy": "naive_best_fit",
+            "FLAGS_eager_delete_scope": True,            # Clean up memory immediately
+            "FLAGS_eager_delete_tensor_gb": 0.0,         # Force garbage collection
+            "FLAGS_use_pinned_memory": False             # Save RAM
+        })
+
         _ocr_version = getattr(paddleocr, "__version__", "unknown")
-        logger.info(f"Initialising PaddleOCR (CPU) version={_ocr_version}")
-        _ocr_instance = PaddleOCR(use_angle_cls=True, lang="en", show_log=False)
+        logger.info(f"Initialising PaddleOCR (CPU) version={_ocr_version} with memory optimizations")
+        
+        # Explicitly configure a lightweight mobile model
+        _ocr_instance = PaddleOCR(
+            use_angle_cls=True, 
+            lang="en", 
+            show_log=False,
+            ocr_version="PP-OCRv4", # Ensure v4 mobile model is used
+            use_gpu=False,
+            enable_mkldnn=False # Disable MKL-DNN to save memory
+        )
         _ocr_engine = "paddle"
         return _ocr_instance, _ocr_version, _ocr_engine
     except ImportError as e:
@@ -156,26 +177,13 @@ def extract(image_path: str) -> OCRResult:
             )
         )
 
-    # --- OCR on original ---
-    logger.info(f"OCR | running {engine_name} on original image: {image_path}")
-    blocks_original = _run_paddle_on_image(engine, original)
-
     # --- OCR on preprocessed ---
     logger.info(f"OCR | running {engine_name} on preprocessed image: {image_path}")
     blocks_preprocessed = _run_paddle_on_image(engine, preprocessed)
 
-    # --- Choose better result ---
-    score_orig = _score_blocks(blocks_original)
-    score_prep = _score_blocks(blocks_preprocessed)
-
-    if score_prep > score_orig:
-        chosen_blocks = blocks_preprocessed
-        used_steps = preprocessing_steps
-        logger.info(f"OCR | using preprocessed result (score {score_prep:.2f} vs {score_orig:.2f})")
-    else:
-        chosen_blocks = blocks_original
-        used_steps = []
-        logger.info(f"OCR | using original result (score {score_orig:.2f} vs {score_prep:.2f})")
+    # --- Use preprocessed result ---
+    chosen_blocks = blocks_preprocessed
+    used_steps = preprocessing_steps
 
     full_text = "\n".join(b.normalized_text for b in chosen_blocks)
     processing_ms = int((time.monotonic() - start) * 1000)
