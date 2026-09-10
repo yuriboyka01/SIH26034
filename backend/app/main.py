@@ -78,34 +78,8 @@ def startup_event():
     else:
         logger.warning("Groq API config: GROQ_API_KEY is not set. Falling back to Regex extraction only.")
 
-    # PaddleOCR Startup Health Check
-    try:
-        from app.ai.ocr_service import _get_ocr
-        instance, version, engine_name = _get_ocr()
-        
-        success_msg = (
-            f"\n==================================================\n"
-            f"COMPLIQ OCR ENGINE\n"
-            f"==================================================\n"
-            f"Python:       3.11.x\n"
-            f"Engine:       PaddleOCR\n"
-            f"Version:      {version}\n\n"
-            f"OCR engine initialized successfully.\n"
-            f"==================================================\n"
-        )
-        print(success_msg, flush=True)
-        logger.info(f"OCR engine initialized: {engine_name} version {version}")
-    except Exception as e:
-        error_msg = (
-            f"\n==================================================\n"
-            f"COMPLIQ OCR ENGINE WARNING\n"
-            f"==================================================\n\n"
-            f"WARNING: PaddleOCR initialization failed: {e}\n\n"
-            f"OCR features will be disabled. The system will fall back to AI extraction.\n"
-            f"To enable OCR, ensure you are running Python 3.11 and have installed \n"
-            f"paddlepaddle and paddleocr via the setup script.\n\n"
-            f"==================================================\n"
-        )
-        print(error_msg, file=sys.stderr, flush=True)
-        logger.warning("PaddleOCR is unavailable. OCR features disabled.")
+    # PaddleOCR is now lazily initialized during the first analysis request.
+    # Preloading on startup in constrained environments (like Render Free Tier with 512MB RAM)
+    # caused OOM kills before the server could pass health checks.
+    logger.info("PaddleOCR initialization deferred to first analysis request (lazy loading).")
 
