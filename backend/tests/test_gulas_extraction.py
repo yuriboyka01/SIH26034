@@ -72,18 +72,24 @@ def test_gulas_extraction_llm_success(mock_groq, gulas_blocks):
 
 @patch.dict(os.environ, {}, clear=True)
 def test_gulas_extraction_fallback(gulas_blocks):
-    """
-    Test that if GROQ_API_KEY is missing, it gracefully falls back
-    to the legacy regex extractors and does not crash.
-    """
-    # Run extraction with no API key
-    result = extract_product_info(gulas_blocks, inspection_product_name="Gulas Sugar")
-    
-    # Assert fallback was used
-    assert result is not None
-    assert result.extraction_version == "1.0-fallback"
-    
-    # Assert deterministic logic still extracted what it could (even if limited)
-    assert result.net_quantity == "500g"
-    assert result.batch_number == "No" # Brittle regex logic gets "No" instead of "C0584"
-    assert result.ingredients == "Sugarcane Extract"
+    from app.ai.extraction import settings
+    old_key = settings.GROQ_API_KEY
+    settings.GROQ_API_KEY = None
+    try:
+        """
+        Test that if GROQ_API_KEY is missing, it gracefully falls back
+        to the legacy regex extractors and does not crash.
+        """
+        # Run extraction with no API key
+        result = extract_product_info(gulas_blocks, inspection_product_name="Gulas Sugar")
+        
+        # Assert fallback was used
+        assert result is not None
+        assert result.extraction_version == "1.0-fallback"
+    finally:
+        settings.GROQ_API_KEY = old_key
+        
+        # Assert deterministic logic still extracted what it could (even if limited)
+        assert result.net_quantity == "500g"
+        assert result.batch_number == "No" # Brittle regex logic gets "No" instead of "C0584"
+        assert result.ingredients == "Sugarcane Extract"

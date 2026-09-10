@@ -10,14 +10,10 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 from reportlab.lib.pagesizes import A4
+from reportlab.lib.units import inch
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
-from reportlab.lib.units import inch
-import docx
-from docx.shared import Inches, Pt
-from docx.enum.text import WD_ALIGN_PARAGRAPH
-
 from app.core.exceptions import NotFoundError, BadRequestError
 from app.repositories.inspection_repository import InspectionRepository
 from app.repositories.compliance_repository import ComplianceRepository
@@ -317,6 +313,16 @@ class ReportService:
 
     def render_docx(self, report_data: InspectionReportData) -> bytes:
         """Generates a DOCX report using python-docx."""
+        try:
+            import docx
+            from docx.shared import Inches, Pt
+            from docx.enum.text import WD_ALIGN_PARAGRAPH
+        except Exception as exc:
+            raise BadRequestError(
+                code="DOCX_UNAVAILABLE",
+                message="DOCX generation library (python-docx) is not installed or available."
+            ) from exc
+
         doc = docx.Document()
         
         # Title

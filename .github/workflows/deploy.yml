@@ -1,8 +1,11 @@
 name: Deploy Frontend to GitHub Pages
 
+# NOTE: auto-deploy-on-push disabled. Frontend is deployed via Render
+# (see render.yaml) which needs vite base '/', but this job builds for
+# GH Pages subpath '/SIH26034/' -> asset paths would mismatch and the
+# page would render blank. Run manually only if you actually want a
+# GH Pages build (and set vite base back to '/SIH26034/' first).
 on:
-  push:
-    branches: ["main"]
   workflow_dispatch:
 
 permissions:

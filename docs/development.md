@@ -70,9 +70,16 @@ npm run dev
 | JWT_SECRET | (see .env.example) | Secret key for JWT signing |
 | JWT_ALGORITHM | HS256 | JWT signing algorithm |
 | ACCESS_TOKEN_EXPIRE_MINUTES | 60 | Token expiry in minutes |
-| UPLOAD_DIR | ../data/uploads | File upload directory |
+| UPLOAD_DIR | ../data/uploads | Local file upload directory (used when STORAGE_BACKEND=local) |
 | MAX_UPLOAD_SIZE | 10485760 | Max upload size in bytes (10MB) |
+| STORAGE_BACKEND | local | Storage provider (`local` or `s3` for AWS/R2/B2) |
+| S3_BUCKET | None | S3 bucket name (required if STORAGE_BACKEND=s3) |
+| S3_REGION | None | AWS/S3 region (e.g. us-east-1) |
+| S3_ENDPOINT_URL | None | Custom S3 endpoint URL (for Cloudflare R2, Backblaze B2, MinIO) |
+| S3_ACCESS_KEY_ID | None | S3 access key ID |
+| S3_SECRET_ACCESS_KEY | None | S3 secret access key |
 | CORS_ORIGINS | http://localhost:5173 | Comma-separated allowed origins |
+| GROQ_API_KEY | None | Groq API key for LLM-assisted declaration extraction |
 
 ## Database Migrations
 

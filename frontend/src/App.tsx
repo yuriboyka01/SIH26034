@@ -11,6 +11,8 @@ import DashboardPage from './pages/DashboardPage';
 import InspectionsPage from './pages/InspectionsPage';
 import NewInspectionPage from './pages/NewInspectionPage';
 import InspectionDetailPage from './pages/InspectionDetailPage';
+import ProfilePage from './pages/ProfilePage';
+import SettingsPage from './pages/SettingsPage';
 
 export default function App() {
   return (
@@ -32,6 +34,8 @@ export default function App() {
             <Route path="/inspections" element={<InspectionsPage />} />
             <Route path="/inspections/new" element={<NewInspectionPage />} />
             <Route path="/inspections/:id" element={<InspectionDetailPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/settings" element={<SettingsPage />} />
           </Route>
 
           {/* Default redirect */}

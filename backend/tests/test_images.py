@@ -131,4 +131,4 @@ def test_upload_unauthorized(client, upload_dir):
         "/api/inspections/00000000-0000-0000-0000-000000000000/images",
         files={"file": ("test.jpg", io.BytesIO(b"\xff\xd8"), "image/jpeg")},
     )
-    assert response.status_code == 403
+    assert response.status_code in (401, 403)

@@ -23,7 +23,7 @@ def test_create_inspection_unauthorized(client):
         "/api/inspections",
         json={"product_name": "Test", "brand": "Brand"},
     )
-    assert response.status_code == 403
+    assert response.status_code in (401, 403)
 
 
 def test_list_inspections(client, auth_headers):

@@ -32,18 +32,28 @@ class Settings(BaseSettings):
     UPLOAD_DIR: str = "../data/uploads"
     MAX_UPLOAD_SIZE: int = 10 * 1024 * 1024  # 10MB
 
+    # Storage backend: "local" (default, ephemeral on Render) or "s3"
+    # (AWS S3 / Cloudflare R2 / Backblaze B2 — persists across restarts/redeploys)
+    STORAGE_BACKEND: str = "local"
+    S3_BUCKET: Optional[str] = None
+    S3_REGION: Optional[str] = None
+    S3_ENDPOINT_URL: Optional[str] = None  # set for R2/B2/MinIO; leave unset for AWS S3
+    S3_ACCESS_KEY_ID: Optional[str] = None
+    S3_SECRET_ACCESS_KEY: Optional[str] = None
+
     # CORS
     CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
 
     # AI extraction (Groq) — optional, falls back to regex extraction if unset
     GROQ_API_KEY: Optional[str] = None
+    GROQ_MODEL: str = "qwen/qwen3.8-27b"
 
     @property
     def cors_origins_list(self) -> List[str]:
         return [origin.strip() for origin in self.CORS_ORIGINS.split(",")]
 
     model_config = {
-        "env_file": "../.env",
+        "env_file": [".env", "../.env"],
         "env_file_encoding": "utf-8",
         "extra": "ignore",
     }

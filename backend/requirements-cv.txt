@@ -1,0 +1,10 @@
+# ── Optional: Computer Vision (OpenCV) ───────────────────────────────────────
+#
+# OpenCV is used for image preprocessing before OCR.
+# It's a large download (~40MB) and optional for basic functionality.
+# The app works without it — AI extraction via Groq still functions.
+#
+# Install with:
+#   pip install -r requirements-cv.txt
+#
+opencv-python-headless>=4.9.0

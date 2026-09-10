@@ -177,7 +177,7 @@ class TestAnalysisAPI:
         """Analysis without auth should fail with 403."""
         import uuid
         response = client.post(f"/api/inspections/{uuid.uuid4()}/analyze")
-        assert response.status_code == 403
+        assert response.status_code in (401, 403)
 
     def test_analyze_nonexistent_inspection(self, client, auth_headers):
         """Analysis on nonexistent inspection should return 404."""
@@ -210,7 +210,7 @@ class TestAnalysisAPI:
         """GET analysis without auth should fail."""
         import uuid
         response = client.get(f"/api/inspections/{uuid.uuid4()}/analysis")
-        assert response.status_code == 403
+        assert response.status_code in (401, 403)
 
     def test_get_analysis_not_found(self, client, auth_headers):
         """GET analysis for nonexistent inspection should 404."""

@@ -13,7 +13,7 @@ from app.models.inspection_image import InspectionImage, ImageType
 from app.models.inspection import InspectionStatus
 from app.repositories.image_repository import ImageRepository
 from app.repositories.inspection_repository import InspectionRepository
-from app.storage.local import LocalStorageService
+from app.storage.factory import get_storage_service
 from app.core.config import settings
 from app.core.exceptions import BadRequestError, NotFoundError
 from app.core.logging import log_image_event
@@ -35,7 +35,7 @@ class ImageService:
     def __init__(self, db: Session):
         self.image_repo = ImageRepository(db)
         self.inspection_repo = InspectionRepository(db)
-        self.storage = LocalStorageService(settings.UPLOAD_DIR)
+        self.storage = get_storage_service()
 
     def _validate_file(self, file: UploadFile) -> tuple[str, str]:
         """

@@ -213,6 +213,37 @@ rule_lm008 = AlwaysReviewRule(
     review_message="Automated pixel-based bounding boxes cannot verify physical millimetre requirements. Human review required."
 )
 
+# LM009: Country of Origin
+# Mandatory for imported packages (Rule 6) and for e-commerce listings under the
+# Consumer Protection (E-Commerce) Rules, 2020. Not every domestically-made,
+# non-e-commerce package needs this, so we default to REVIEW rather than FAIL
+# when absent — same pattern as LM001/LM004 for fields with legal exemptions.
+rule_lm009 = ContextualReviewRule(
+    rule_id="LM009",
+    rule_name="Country of Origin Declaration",
+    source_reference="Rule 6(1), Consumer Protection (E-Commerce) Rules 2020",
+    severity=RuleSeverity.HIGH,
+    expected="Imported packages / e-commerce listings must declare country of origin.",
+    target_field="country_of_origin",
+    review_message="Country of origin not detected. Review if this package is domestically manufactured (exempt) or imported/e-commerce (required)."
+)
+
+# LM010: License / Registration Number
+# Covers FSSAI/BIS/other statutory license numbers commonly printed alongside
+# Legal Metrology declarations. Requirement source varies by commodity category
+# (FSS Act 2006 for food, BIS Act for ISI-marked goods) rather than the Legal
+# Metrology Rules 2011 directly — flagged for REVIEW so a human confirms which
+# statute applies to this specific product category before treating it as FAIL.
+rule_lm010 = ContextualReviewRule(
+    rule_id="LM010",
+    rule_name="Statutory License / Registration Number",
+    source_reference="Category-specific (e.g. FSSAI under FSS Act 2006, BIS Act) — verify applicable statute",
+    severity=RuleSeverity.MEDIUM,
+    expected="Applicable license/registration number (e.g. FSSAI, BIS) must be declared if the commodity category requires one.",
+    target_field="license_number",
+    review_message="License number not detected. Review whether this commodity category requires a statutory license number."
+)
+
 REGISTERED_RULES = [
     rule_lm001,
     rule_lm002,
@@ -222,4 +253,6 @@ REGISTERED_RULES = [
     rule_lm006,
     rule_lm007,
     rule_lm008,
+    rule_lm009,
+    rule_lm010,
 ]

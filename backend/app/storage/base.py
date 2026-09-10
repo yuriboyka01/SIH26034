@@ -65,3 +65,18 @@ class StorageService(ABC):
             The absolute path to the file.
         """
         ...
+
+    @abstractmethod
+    def download_to_temp_file(self, file_path: str, suffix: str = "") -> Optional[str]:
+        """
+        Download or obtain a temporary local file path for a stored file.
+        Caller is responsible for deleting the temp file if created.
+
+        Args:
+            file_path: The stored file path/key.
+            suffix: Optional file extension suffix (e.g. '.jpg').
+
+        Returns:
+            The path to the local temporary file, or None if the file was not found.
+        """
+        ...

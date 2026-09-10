@@ -112,7 +112,7 @@ class TestComplianceAPI:
     def test_compliance_unauthenticated(self, client):
         import uuid
         response = client.get(f"/api/inspections/{uuid.uuid4()}/compliance")
-        assert response.status_code == 403
+        assert response.status_code in (401, 403)
 
     def test_compliance_not_found(self, client, auth_headers):
         import uuid
@@ -171,7 +171,7 @@ class TestComplianceAPI:
         assert len(reports) == 1
         rep = reports[0]
         
-        assert rep["total_rules_checked"] == 8
+        assert rep["total_rules_checked"] == 10
         
         # 6. Retrieve compliance reports
         get_comp_resp = client.get(f"/api/inspections/{insp_id}/compliance", headers=auth_headers)

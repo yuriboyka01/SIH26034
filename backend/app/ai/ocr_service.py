@@ -1,14 +1,14 @@
 """
-PaddleOCR service — wraps PaddleOCR and returns normalized OCRResult dataclasses.
+OCR service — wraps PaddleOCR and returns normalized OCRResult dataclasses.
 
 Phase 3 (declaration extraction) must depend only on app.ai.models, never on
-PaddleOCR internals directly.
+OCR engine internals directly.
 
 Design:
-  - Singleton PaddleOCR instance (lazy initialized) to avoid reloading models per request.
+  - Singleton OCR instance (lazy initialized) to avoid reloading models per request.
   - Two-track strategy: run on original AND preprocessed image, keep the better result
     (more blocks with higher average confidence wins).
-  - Polygon bboxes from PaddleOCR are converted to axis-aligned [x1,y1,x2,y2] rectangles.
+  - PaddleOCR is strictly required (requires Python 3.11.x). No fallbacks.
 """
 
 import re
@@ -20,25 +20,50 @@ from app.ai.models import OCRTextBlock, OCRResult, ImageQuality
 from app.ai.preprocessing import preprocess_image_path, load_image
 from app.core.logging import logger
 
-_paddle_ocr_instance = None
-_paddle_ocr_version = "unknown"
+# ── Exceptions ───────────────────────────────────────────────────────────────
 
-def _get_paddle_ocr():
-    """Return (or create) the shared PaddleOCR instance."""
-    global _paddle_ocr_instance, _paddle_ocr_version
-    if _paddle_ocr_instance is None:
-        try:
-            from paddleocr import PaddleOCR
-            import paddleocr
-            _paddle_ocr_version = getattr(paddleocr, "__version__", "unknown")
-            logger.info(f"Initialising PaddleOCR (CPU) version={_paddle_ocr_version}")
-            # Initialize with show_log=False to reduce noise, use_angle_cls=True for rotated text
-            _paddle_ocr_instance = PaddleOCR(use_angle_cls=True, lang="en", show_log=False)
-        except ImportError as exc:
-            raise RuntimeError(
-                "PaddleOCR is not installed. Run: pip install paddleocr"
-            ) from exc
-    return _paddle_ocr_instance, _paddle_ocr_version
+class OCREngineUnavailableError(RuntimeError):
+    """Raised when the OCR engine (PaddleOCR) fails to initialize."""
+    pass
+
+# ── Engine selection ─────────────────────────────────────────────────────────
+
+_ocr_engine = None          # "paddle" | None
+_ocr_instance = None
+_ocr_version = "unknown"
+
+
+def _get_ocr():
+    """Return (or create) the shared OCR engine instance.
+
+    Returns:
+        Tuple of (instance, version_string, engine_name)
+    """
+    global _ocr_engine, _ocr_instance, _ocr_version
+
+    if _ocr_instance is not None:
+        return _ocr_instance, _ocr_version, _ocr_engine
+
+    try:
+        from paddleocr import PaddleOCR
+        import paddleocr
+        _ocr_version = getattr(paddleocr, "__version__", "unknown")
+        logger.info(f"Initialising PaddleOCR (CPU) version={_ocr_version}")
+        _ocr_instance = PaddleOCR(use_angle_cls=True, lang="en", show_log=False)
+        _ocr_engine = "paddle"
+        return _ocr_instance, _ocr_version, _ocr_engine
+    except ImportError as e:
+        logger.error(f"Failed to import PaddleOCR: {e}")
+        raise OCREngineUnavailableError(
+            "PaddleOCR is not available. Please ensure you are running Python 3.11 "
+            "and have installed paddlepaddle and paddleocr via the setup script."
+        ) from e
+    except Exception as e:
+        logger.error(f"Failed to initialize PaddleOCR: {e}")
+        raise OCREngineUnavailableError(f"PaddleOCR initialization failed: {e}") from e
+
+
+# ── Text helpers ─────────────────────────────────────────────────────────────
 
 def _normalize_text(raw: str) -> str:
     """
@@ -50,6 +75,7 @@ def _normalize_text(raw: str) -> str:
     text = re.sub(r"\n{3,}", "\n\n", text)
     return text
 
+
 def _polygon_to_bbox(polygon) -> List[float]:
     """
     Convert a PaddleOCR polygon (list of [x,y] points) to [x1, y1, x2, y2].
@@ -59,19 +85,16 @@ def _polygon_to_bbox(polygon) -> List[float]:
     ys = [pt[1] for pt in polygon]
     return [float(min(xs)), float(min(ys)), float(max(xs)), float(max(ys))]
 
-def _run_paddle_on_image(image: np.ndarray) -> List[OCRTextBlock]:
-    """
-    Run PaddleOCR on a BGR numpy array.
-    Returns a list of OCRTextBlock instances.
-    """
-    ocr, _ = _get_paddle_ocr()
-    blocks: List[OCRTextBlock] = []
 
+# ── PaddleOCR runner ────────────────────────────────────────────────────────
+
+def _run_paddle_on_image(ocr, image: np.ndarray) -> List[OCRTextBlock]:
+    """Run PaddleOCR on a BGR numpy array."""
+    blocks: List[OCRTextBlock] = []
     try:
         raw_result = ocr.ocr(image, cls=True)
         if not raw_result:
             return blocks
-
         for page in raw_result:
             if not page:
                 continue
@@ -88,36 +111,40 @@ def _run_paddle_on_image(image: np.ndarray) -> List[OCRTextBlock]:
                     confidence=float(confidence),
                     bbox=bbox,
                 ))
-        return blocks
     except Exception as e:
-        logger.error(f"OCR inference error: {e}")
-        return blocks
+        logger.error(f"PaddleOCR inference error: {e}")
+    return blocks
+
+
+# ── Scoring ─────────────────────────────────────────────────────────────────
 
 def _score_blocks(blocks: List[OCRTextBlock]) -> float:
-    """
-    Composite score: number of blocks × average confidence.
-    """
+    """Composite score: number of blocks × average confidence."""
     if not blocks:
         return 0.0
     avg_conf = sum(b.confidence for b in blocks) / len(blocks)
     return len(blocks) * avg_conf
 
+
+# ── Public API ──────────────────────────────────────────────────────────────
+
 def extract(image_path: str) -> OCRResult:
-    """
-    Run the full OCR pipeline on an image file.
-    """
+    """Run the full OCR pipeline on an image file."""
     start = time.monotonic()
 
     # --- Load and preprocess ---
     original, preprocessed, preprocessing_steps, quality_dict = preprocess_image_path(image_path)
 
+    # --- Get engine ---
+    engine, version, engine_name = _get_ocr()
+
     # --- OCR on original ---
-    logger.info(f"OCR | running on original image: {image_path}")
-    blocks_original = _run_paddle_on_image(original)
+    logger.info(f"OCR | running {engine_name} on original image: {image_path}")
+    blocks_original = _run_paddle_on_image(engine, original)
 
     # --- OCR on preprocessed ---
-    logger.info(f"OCR | running on preprocessed image: {image_path}")
-    blocks_preprocessed = _run_paddle_on_image(preprocessed)
+    logger.info(f"OCR | running {engine_name} on preprocessed image: {image_path}")
+    blocks_preprocessed = _run_paddle_on_image(engine, preprocessed)
 
     # --- Choose better result ---
     score_orig = _score_blocks(blocks_original)
@@ -135,8 +162,6 @@ def extract(image_path: str) -> OCRResult:
     full_text = "\n".join(b.normalized_text for b in chosen_blocks)
     processing_ms = int((time.monotonic() - start) * 1000)
 
-    _, version = _get_paddle_ocr()
-
     quality = ImageQuality(
         status=quality_dict["status"],
         blur_score=quality_dict["blur_score"],
@@ -145,13 +170,13 @@ def extract(image_path: str) -> OCRResult:
     )
 
     logger.info(
-        f"OCR | done | image={image_path} | blocks={len(chosen_blocks)} "
+        f"OCR | done | image={image_path} | engine={engine_name} | blocks={len(chosen_blocks)} "
         f"| quality={quality.status} | time={processing_ms}ms"
     )
 
     return OCRResult(
         image_path=image_path,
-        engine="paddleocr",
+        engine=engine_name,
         engine_version=version,
         blocks=chosen_blocks,
         full_text=full_text,

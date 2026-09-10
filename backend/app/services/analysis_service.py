@@ -93,10 +93,21 @@ class AnalysisService:
         """
         image_id = image.id
         from app.core.config import settings
+        from app.storage.factory import get_storage_service
         import os
-        image_path = os.path.join(settings.UPLOAD_DIR, image.file_path)
 
+        tmp_path = None
         try:
+            storage = get_storage_service()
+            backend = (settings.STORAGE_BACKEND or "local").lower()
+            if backend == "s3":
+                tmp_path = storage.download_to_temp_file(image.file_path)
+                if not tmp_path:
+                    raise FileNotFoundError(f"Failed to retrieve image {image.file_path} from S3 storage")
+                image_path = tmp_path
+            else:
+                image_path = os.path.join(settings.UPLOAD_DIR, image.file_path)
+
             logger.info(f"ANALYSIS | starting | image_id={image_id} | path={image_path}")
 
             # Delete any previous OCR results for this image (re-analysis replaces)
@@ -195,6 +206,12 @@ class AnalysisService:
                 "ocr": None,
                 "product_info": None,
             }
+        finally:
+            if tmp_path and os.path.exists(tmp_path):
+                try:
+                    os.remove(tmp_path)
+                except OSError as rm_err:
+                    logger.warning(f"Failed to remove temp file {tmp_path}: {rm_err}")
 
     def get_analysis_results(self, inspection_id: UUID, user_id: UUID) -> dict:
         """

@@ -8,11 +8,16 @@ Phase 2: OpenCV preprocessing + PaddleOCR analysis pipeline.
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import sys
+
+from app.core.runtime import verify_runtime
+# Verify runtime very early before doing any complex imports
+verify_runtime()
 
 from app.core.config import settings
 from app.core.exceptions import register_exception_handlers
 from app.core.logging import logger
-from app.api import auth, inspections, images, dashboard, analysis, product_info, compliance, reports
+from app.api import auth, inspections, images, dashboard, analysis, product_info, compliance, reports, users
 
 app = FastAPI(
     title="SIH26034 — Legal Metrology Compliance System",
@@ -47,6 +52,7 @@ app.include_router(analysis.router)
 app.include_router(product_info.router)
 app.include_router(compliance.router)
 app.include_router(reports.router)
+app.include_router(users.router)
 
 
 @app.get("/api/health", tags=["System"])
@@ -61,4 +67,47 @@ def startup_event():
     logger.info(f"CORS origins: {settings.cors_origins_list}")
     logger.info(f"Upload directory: {settings.UPLOAD_DIR}")
     logger.info(f"Max upload size: {settings.MAX_UPLOAD_SIZE / (1024*1024):.0f}MB")
+
+    # JWT warning
+    if settings.JWT_SECRET == "change-this-to-a-long-random-secret-key":
+        logger.warning("SECURITY WARNING: Using default JWT_SECRET. This is unsafe for production!")
+
+    # Groq status
+    if settings.GROQ_API_KEY:
+        logger.info(f"Groq API config: Key is present. Model: {settings.GROQ_MODEL}")
+    else:
+        logger.warning("Groq API config: GROQ_API_KEY is not set. Falling back to Regex extraction only.")
+
+    # PaddleOCR Startup Health Check
+    try:
+        from app.ai.ocr_service import _get_ocr
+        instance, version, engine_name = _get_ocr()
+        
+        success_msg = (
+            f"\n==================================================\n"
+            f"COMPLIQ OCR ENGINE\n"
+            f"==================================================\n"
+            f"Python:       3.11.x\n"
+            f"Engine:       PaddleOCR\n"
+            f"Version:      {version}\n\n"
+            f"OCR engine initialized successfully.\n"
+            f"==================================================\n"
+        )
+        print(success_msg, flush=True)
+        logger.info(f"OCR engine initialized: {engine_name} version {version}")
+    except Exception as e:
+        error_msg = (
+            f"\n==================================================\n"
+            f"COMPLIQ OCR ENGINE ERROR\n"
+            f"==================================================\n\n"
+            f"ERROR: PaddleOCR initialization failed: {e}\n\n"
+            f"COMPLIQ requires:\n"
+            f"    Python 3.11.x\n"
+            f"    PaddlePaddle compatible with the project\n"
+            f"    PaddleOCR compatible with the project\n\n"
+            f"Backend startup aborted.\n\n"
+            f"==================================================\n"
+        )
+        print(error_msg, file=sys.stderr, flush=True)
+        sys.exit(1)
 

@@ -1,0 +1,12 @@
+# ── Optional: PaddleOCR (Computer Vision + OCR) ──────────────────────────────
+#
+# PaddlePaddle only supports Python <= 3.12 as of 2024.
+# If you are on Python 3.13+, these packages will NOT install.
+# The app gracefully falls back to AI-based extraction (Groq) when OCR
+# is unavailable — all other features work without PaddlePaddle.
+#
+# Install with:
+#   pip install -r requirements-ocr.txt
+#
+paddlepaddle==2.6.2
+paddleocr==2.8.1

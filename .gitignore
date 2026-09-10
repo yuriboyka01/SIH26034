@@ -42,3 +42,5 @@ desktop.ini
 # Docker
 *.log
 .venv_old/
+pytest_output.txt
+scratch/

@@ -78,7 +78,7 @@ def test_get_current_user(client, auth_headers):
 def test_get_current_user_unauthorized(client):
     """Test accessing profile without authentication."""
     response = client.get("/api/auth/me")
-    assert response.status_code == 403  # HTTPBearer returns 403 when no token
+    assert response.status_code in (401, 403)  # HTTPBearer returns 401 or 403 when no token
 
 
 def test_get_current_user_invalid_token(client):

@@ -2,21 +2,29 @@
 
 FastAPI backend for the Legal Metrology Compliance System.
 
-## Quick Start
+> **Note:** COMPLIQ strictly requires **Python 3.11.x** for full compatibility with PaddleOCR and C-extensions.
 
-```bash
-# Create virtual environment
-python -m venv venv
-venv\Scripts\activate  # Windows
-# source venv/bin/activate  # Linux/Mac
+### Installation
 
-# Install dependencies
-pip install -r requirements.txt
+Use the provided setup script to automatically detect Python 3.11, create the virtual environment, and install all dependencies including PaddleOCR.
 
-# Run migrations
+```powershell
+# Open a PowerShell terminal and run:
+.\setup_environment.ps1
+```
+
+If the script fails to find Python 3.11, please install it from [python.org](https://www.python.org/downloads/windows/).
+
+### Running the Server
+
+```powershell
+# Activate the environment
+.\venv\Scripts\Activate.ps1
+
+# Run database migrations (if not already done)
 alembic upgrade head
 
-# Start server
+# Start the server
 uvicorn app.main:app --reload --port 8000
 ```
 

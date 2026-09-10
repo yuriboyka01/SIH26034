@@ -51,3 +51,8 @@ class LocalStorageService(StorageService):
     def get_full_path(self, file_path: str) -> str:
         """Get the absolute filesystem path."""
         return os.path.join(self.upload_dir, file_path)
+
+    def download_to_temp_file(self, file_path: str, suffix: str = "") -> Optional[str]:
+        """Return the local filesystem path if file exists, or None."""
+        full_path = self.get_full_path(file_path)
+        return full_path if os.path.exists(full_path) else None

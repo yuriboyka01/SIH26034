@@ -354,7 +354,7 @@ class TestProductInfoAPI:
         """Product info without auth should fail with 403."""
         import uuid
         response = client.get(f"/api/inspections/{uuid.uuid4()}/product-info")
-        assert response.status_code == 403
+        assert response.status_code in (401, 403)
 
     def test_get_product_info_not_found(self, client, auth_headers):
         """Product info for non-existent inspection should 404."""

@@ -1,46 +1,42 @@
-# FastAPI
-fastapi==0.115.0
-uvicorn[standard]==0.30.6
+# ── Core: FastAPI ─────────────────────────────────────────────────────────────
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.6
 
-# Database
-sqlalchemy==2.0.35
-alembic==1.13.3
+# ── Core: Database ────────────────────────────────────────────────────────────
+sqlalchemy>=2.0.35
+alembic>=1.13.3
 psycopg[binary]>=3.2.10
 
-# Pydantic
-pydantic==2.9.2
-pydantic-settings==2.5.2
-email-validator==2.2.0
+# ── Core: Pydantic ────────────────────────────────────────────────────────────
+pydantic>=2.9.2
+pydantic-settings>=2.5.2
+email-validator>=2.2.0
 
-# Auth
-python-jose[cryptography]==3.3.0
-passlib[bcrypt]==1.7.4
-bcrypt==4.0.1
+# ── Core: Auth ────────────────────────────────────────────────────────────────
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+bcrypt>=4.0.1
 
-# File upload
-python-multipart==0.0.12
+# ── Core: File upload & Storage ───────────────────────────────────────────────
+python-multipart>=0.0.12
+boto3>=1.34.0
 
-# Environment
-python-dotenv==1.0.1
+# ── Core: Environment ────────────────────────────────────────────────────────
+python-dotenv>=1.0.1
 
-# Testing
-pytest==8.3.3
-httpx==0.27.2
-pytest-asyncio==0.24.0
-
-# ── Phase 2: Computer Vision + OCR ──────────────────────────────────────────
-# CPU-only PaddlePaddle (no CUDA required)
-paddlepaddle==2.6.2
-paddleocr==2.8.1
-# OpenCV (headless — no GUI dependencies)
-opencv-python-headless>=4.9.0
-# Image loading/manipulation
+# ── Core: Image handling & Computer Vision ────────────────────────────────────
 Pillow>=10.0.0
-# Numerical computing (required by OpenCV and PaddlePaddle)
 numpy>=1.24.0
+opencv-python-headless>=4.9.0
 
-# ── Phase 5: Reporting ──────────────────────────────────────────────────────
+# ── Phase 5: Reporting ───────────────────────────────────────────────────────
 reportlab>=4.0.0
+python-docx>=1.1.0
 
-# ── Phase 3: AI Extraction ──────────────────────────────────────────────────
+# ── Phase 3: AI Extraction ───────────────────────────────────────────────────
 groq>=0.9.0
+
+# ── Testing ──────────────────────────────────────────────────────────────────
+pytest>=8.3.3
+httpx>=0.27.2
+pytest-asyncio>=0.24.0

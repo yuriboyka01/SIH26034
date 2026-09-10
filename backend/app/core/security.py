@@ -4,28 +4,34 @@ Security utilities: password hashing and JWT token management.
 
 from datetime import datetime, timedelta, timezone
 from typing import Optional
+import bcrypt
 
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.database import get_db
+from app.models.user import User, UserRole
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security_scheme = HTTPBearer()
-
 
 def hash_password(password: str) -> str:
     """Hash a password using bcrypt."""
-    return pwd_context.hash(password)
-
+    pwd_bytes = password.encode('utf-8')
+    # Use bcrypt directly to avoid passlib bugs with bcrypt>=4.0.0
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(pwd_bytes, salt).decode('utf-8')
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify a password against its hash."""
-    return pwd_context.verify(plain_password, hashed_password)
+    pwd_bytes = plain_password.encode('utf-8')
+    hash_bytes = hashed_password.encode('utf-8')
+    try:
+        return bcrypt.checkpw(pwd_bytes, hash_bytes)
+    except ValueError:
+        return False
 
 
 def create_access_token(subject: str, expires_delta: Optional[timedelta] = None) -> str:
@@ -61,7 +67,6 @@ def get_current_user(
     db: Session = Depends(get_db),
 ):
     """FastAPI dependency that extracts and validates the current user from JWT."""
-    from app.models.user import User
 
     token = credentials.credentials
     user_id_str = decode_access_token(token)
@@ -89,3 +94,18 @@ def get_current_user(
         )
 
     return user
+
+
+def require_role(required_role: UserRole):
+    """
+    Dependency factory to enforce role-based access control (RBAC).
+    Returns a dependency function that checks if the current user has the required role.
+    """
+    def role_checker(current_user: User = Depends(get_current_user)) -> User:
+        if current_user.role != required_role:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail={"error": {"code": "INSUFFICIENT_PERMISSIONS", "message": f"Requires {required_role.value} privileges."}},
+            )
+        return current_user
+    return role_checker

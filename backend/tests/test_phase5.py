@@ -80,7 +80,7 @@ class TestPhase5Reporting:
     def test_report_unauthorized(self, client):
         import uuid
         response = client.get(f"/api/inspections/{uuid.uuid4()}/compliance/report.pdf")
-        assert response.status_code == 403
+        assert response.status_code in (401, 403)
 
 
 class TestPhase5Dashboard:

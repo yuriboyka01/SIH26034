@@ -69,26 +69,30 @@ def _extract_with_groq(blocks: List[Any], inspection_product_name: Optional[str]
     text_content = "\n".join([b.text for b in blocks])
     if not text_content.strip():
         return None
-
+    schema_json = json.dumps(LLMProductData.model_json_schema(), indent=2)
     prompt = f"""
 You are an expert compliance extraction engine. Extract structured product data from the following OCR text of a product package.
 For each field, if the information is present, provide the extracted 'value' and the exact 'source_text' from the OCR output used to derive it.
 If a field is missing, return null for both value and evidence. DO NOT hallucinate or guess missing values.
 The OCR text may be noisy.
-Return ONLY a valid JSON object matching the requested schema. Do not return markdown blocks or any other text.
+Return ONLY a valid JSON object matching the following schema. Do not return markdown blocks or any other text.
+
+JSON Schema:
+{schema_json}
 
 OCR Text:
 {text_content}
 """
 
     try:
+        model_name = getattr(settings, "GROQ_MODEL", "qwen/qwen3.8-27b")
         client = Groq(api_key=api_key)
         response = None
         last_error = None
         for attempt in range(3):
             try:
                 response = client.chat.completions.create(
-                    model='llama3-70b-8192',
+                    model=model_name,
                     messages=[
                         {"role": "system", "content": "You are a JSON generating assistant. Always return raw JSON."},
                         {"role": "user", "content": prompt}
@@ -99,7 +103,12 @@ OCR Text:
                 break
             except Exception as retry_err:
                 last_error = retry_err
-                if "503" in str(retry_err) or "rate limit" in str(retry_err).lower():
+                error_msg = str(retry_err).lower()
+                # Do not retry on 400 Bad Request or model not found
+                if "400" in error_msg or "model_not_found" in error_msg:
+                    logger.error(f"Groq non-retryable error: {retry_err}")
+                    raise
+                if "503" in error_msg or "rate limit" in error_msg:
                     logger.warning(f"Groq Rate Limit/503 (attempt {attempt + 1}/3), retrying...")
                     time.sleep(2 * (attempt + 1))
                     continue
@@ -1031,7 +1040,7 @@ def extract_product_info(
     storage_field = _extract_storage_instructions(blocks)
     sale_restrict_field = _extract_sale_restrictions(blocks)
 
-    product_name_value = inspection_product_name
+    product_name_value = inspection_product_name or (blocks[0].text if blocks else None)
     product_name_status = "DETECTED" if product_name_value else "NOT_DETECTED"
 
     brand_value = brand_field.value or inspection_brand
