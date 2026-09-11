@@ -1,4 +1,4 @@
-﻿# COMPLIQ — SIH Demo Procedure
+# COMPLIQ — SIH Demo Procedure
 
 > **CRITICAL WARNING**: Your local PC must remain powered ON and connected to the internet
 > for the entire duration of the demo. Disable sleep/hibernate before the demo.
@@ -95,7 +95,7 @@ Open: https://sih26034-frontend-aygy.onrender.com
 
 ## Current Tunnel URL (active this session)
 
-    https://exempt-runtime-undefined-wallet.trycloudflare.com
+    https://providing-reserve-sao-demonstrate.trycloudflare.com
 
 This URL is valid until cloudflared is restarted.
 
