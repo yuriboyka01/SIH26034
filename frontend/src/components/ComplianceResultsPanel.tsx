@@ -7,14 +7,14 @@ import { EmptyState, SectionHeader, StatusBadge } from './ui';
 export function ComplianceResultsPanel({ reports, isAnalyzing, images = [] }: { reports: ComplianceReport[]; isAnalyzing: boolean; images?: { id: string; url: string }[] }) {
   if (isAnalyzing) {
     return (
-      <section className="depth-2 overflow-hidden flex flex-col">
+      <section className="depth-2 overflow-hidden flex flex-col rounded-xl">
         <SectionHeader eyebrow="05" title="Compliance Findings" description="Awaiting rule checks against the legal framework." />
-        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-[var(--canvas)] m-4 rounded-xl border border-dashed border-[var(--line-strong)]">
-          <div className="w-14 h-14 bg-[var(--surface)] rounded-full shadow-sm border border-[var(--line)] flex items-center justify-center mb-4">
+        <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-8 text-center bg-[var(--canvas)] m-3 sm:m-4 rounded-xl border border-dashed border-[var(--line-strong)]">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[var(--surface)] rounded-full shadow-sm border border-[var(--line)] flex items-center justify-center mb-3 sm:mb-4">
             <Scale size={24} className="text-[var(--text-faint)]" />
           </div>
-          <p className="text-base font-bold text-[var(--text)]">Evaluating rules</p>
-          <p className="mt-2 max-w-xs text-sm leading-relaxed text-[var(--text-muted)]">Comparing extracted declarations against Legal Metrology frameworks...</p>
+          <p className="text-sm sm:text-base font-bold text-[var(--text)]">Evaluating rules</p>
+          <p className="mt-1.5 max-w-xs text-xs sm:text-sm leading-relaxed text-[var(--text-muted)]">Comparing extracted declarations against Legal Metrology frameworks...</p>
         </div>
       </section>
     );
@@ -22,7 +22,7 @@ export function ComplianceResultsPanel({ reports, isAnalyzing, images = [] }: { 
 
   if (!reports.length) {
     return (
-      <section className="depth-2 overflow-hidden flex flex-col">
+      <section className="depth-2 overflow-hidden flex flex-col rounded-xl">
         <SectionHeader eyebrow="05" title="Compliance Findings" description="Awaiting evidence to assess compliance." />
         <div className="flex-1">
           <EmptyState icon={<Scale size={32} />} title="Rule evaluation pending" description="Upload package evidence and run analysis to create an evidence-linked compliance assessment." />
@@ -45,14 +45,14 @@ export function ComplianceResultsPanel({ reports, isAnalyzing, images = [] }: { 
         });
 
         return (
-          <section key={report.image_id} className="depth-2 overflow-hidden flex flex-col">
+          <section key={report.image_id} className="depth-2 overflow-hidden flex flex-col rounded-xl">
             <SectionHeader 
               eyebrow="05" 
               title="Grouped Compliance Findings" 
               description={`${report.total_rules_checked} rules evaluated against extracted declarations.`} 
             />
             
-            <div className="flex-1 bg-[var(--canvas)] p-4 space-y-6">
+            <div className="flex-1 bg-[var(--canvas)] p-3 sm:p-4 space-y-4 sm:space-y-6">
               {sortedBreakdowns.map((cat) => (
                 <CategoryGroup key={cat.category} category={cat} results={report.rule_results.filter(r => r.category === cat.category)} imageUrl={imageUrl} />
               ))}
@@ -76,32 +76,32 @@ function CategoryGroup({ category, results, imageUrl }: { category: any; results
   return (
     <div className="border border-[var(--line)] rounded-xl overflow-hidden bg-[var(--surface)] shadow-sm">
       <div 
-        className="flex flex-wrap items-center justify-between p-4 cursor-pointer hover:bg-[var(--surface-raised)] transition-colors"
+        className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 sm:p-4 cursor-pointer hover:bg-[var(--surface-raised)] transition-colors gap-2 sm:gap-4"
         onClick={() => setExpanded(!expanded)}
       >
-        <div className="flex items-center gap-3">
-          {expanded ? <ChevronDown size={18} className="text-[var(--text-faint)]" /> : <ChevronRight size={18} className="text-[var(--text-faint)]" />}
-          <div>
-            <h3 className="text-base font-bold text-[var(--text)]">{category.label}</h3>
-            <p className="text-xs text-[var(--text-muted)] mt-0.5">{category.total} rules checked</p>
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+          {expanded ? <ChevronDown size={18} className="text-[var(--text-faint)] shrink-0" /> : <ChevronRight size={18} className="text-[var(--text-faint)] shrink-0" />}
+          <div className="min-w-0">
+            <h3 className="text-sm sm:text-base font-bold text-[var(--text)] truncate">{category.label}</h3>
+            <p className="text-[11px] sm:text-xs text-[var(--text-muted)] mt-0.5">{category.total} rules checked</p>
           </div>
         </div>
         
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 pl-7 sm:pl-0">
           {category.failed_count > 0 && <StatusBadge value="FAIL" />}
           {category.failed_count === 0 && category.review_count > 0 && <StatusBadge value="REVIEW" />}
           {category.failed_count === 0 && category.review_count === 0 && category.passed_count > 0 && <StatusBadge value="PASS" />}
-          <div className="flex gap-2 text-xs font-semibold ml-2">
-            {category.passed_count > 0 && <span className="text-[var(--success)]">{category.passed_count} Pass</span>}
-            {category.failed_count > 0 && <span className="text-[var(--danger)]">{category.failed_count} Fail</span>}
-            {category.review_count > 0 && <span className="text-[var(--warning)]">{category.review_count} Review</span>}
-            {category.not_applicable_count > 0 && <span className="text-[var(--text-faint)]">{category.not_applicable_count} N/A</span>}
+          <div className="flex flex-wrap gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-semibold">
+            {category.passed_count > 0 && <span className="text-[var(--success)] px-1.5 py-0.5 bg-[var(--success-soft)] rounded">{category.passed_count} Pass</span>}
+            {category.failed_count > 0 && <span className="text-[var(--danger)] px-1.5 py-0.5 bg-[var(--danger-soft)] rounded">{category.failed_count} Fail</span>}
+            {category.review_count > 0 && <span className="text-[var(--warning)] px-1.5 py-0.5 bg-[var(--warning-soft)] rounded">{category.review_count} Review</span>}
+            {category.not_applicable_count > 0 && <span className="text-[var(--text-faint)] px-1.5 py-0.5 bg-[var(--surface-raised)] rounded">{category.not_applicable_count} N/A</span>}
           </div>
         </div>
       </div>
       
       {expanded && (
-        <div className="border-t border-[var(--line)] p-4 bg-[var(--canvas)] space-y-4">
+        <div className="border-t border-[var(--line)] p-3 sm:p-4 bg-[var(--canvas)] space-y-3 sm:space-y-4">
           {sortedResults.map(result => (
             <RuleFinding key={result.rule_id} result={result} imageUrl={imageUrl} />
           ))}
@@ -123,7 +123,7 @@ function RuleFinding({ result, imageUrl }: { result: RuleResult; imageUrl?: stri
       bg: 'bg-[var(--danger-soft)]/30 border-[var(--danger-soft)]',
       iconBg: 'bg-[var(--danger)] text-white',
       bar: 'bg-[var(--danger)]',
-      title: 'text-[var(--danger-strong)]'
+      title: 'text-[var(--danger)]'
     },
     PASS: {
       bg: 'bg-[var(--surface)] border-[var(--success-soft)]',
@@ -135,7 +135,7 @@ function RuleFinding({ result, imageUrl }: { result: RuleResult; imageUrl?: stri
       bg: 'bg-[var(--warning-soft)]/30 border-[var(--warning-soft)]',
       iconBg: 'bg-[var(--warning)] text-white',
       bar: 'bg-[var(--warning)]',
-      title: 'text-[var(--warning-strong)]'
+      title: 'text-[var(--warning)]'
     },
     NOT_APPLICABLE: {
       bg: 'bg-[var(--surface-raised)] border-[var(--line)] opacity-80',
@@ -149,21 +149,21 @@ function RuleFinding({ result, imageUrl }: { result: RuleResult; imageUrl?: stri
   const confPercent = result.confidence != null ? Math.round(result.confidence * 100) : null;
 
   return (
-    <article className={`rounded-xl border ${theme.bg} overflow-hidden relative`}>
+    <article className={`rounded-xl border ${theme.bg} overflow-hidden relative shadow-sm`}>
       <div className={`absolute left-0 top-0 bottom-0 w-1 ${theme.bar}`}></div>
       
-      {/* Compact Header */}
+      {/* Header */}
       <div 
-        className="p-3 pl-4 flex flex-wrap items-center justify-between cursor-pointer hover:bg-black/5 transition-colors gap-3"
+        className="p-3 sm:p-3.5 pl-3.5 sm:pl-4 flex items-center justify-between cursor-pointer hover:bg-black/5 transition-colors gap-2 sm:gap-3"
         onClick={() => setDetailsOpen(!detailsOpen)}
       >
-        <div className="flex items-center gap-3 min-w-0 flex-1">
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
           <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${theme.iconBg}`}>
             <Icon size={14} />
           </div>
-          <div className="truncate">
-            <h4 className={`text-sm font-bold truncate ${theme.title}`}>{result.rule_name}</h4>
-            <div className="flex items-center gap-2 mt-0.5 text-[10px] text-[var(--text-muted)] font-mono">
+          <div className="min-w-0 flex-1">
+            <h4 className={`text-xs sm:text-sm font-bold truncate ${theme.title}`}>{result.rule_name}</h4>
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5 text-[10px] text-[var(--text-muted)] font-mono">
               <span>{result.rule_id}</span>
               {confPercent !== null && result.status !== 'NOT_APPLICABLE' && (
                 <>
@@ -174,7 +174,7 @@ function RuleFinding({ result, imageUrl }: { result: RuleResult; imageUrl?: stri
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <StatusBadge value={result.status} />
           {detailsOpen ? <ChevronDown size={16} className="text-[var(--text-faint)]" /> : <ChevronRight size={16} className="text-[var(--text-faint)]" />}
         </div>
@@ -182,9 +182,8 @@ function RuleFinding({ result, imageUrl }: { result: RuleResult; imageUrl?: stri
       
       {/* Expandable Details */}
       {detailsOpen && (
-        <div className="p-4 pl-5 border-t border-[var(--line)] space-y-4 text-sm">
-          
-          <div className="grid gap-4 sm:grid-cols-2">
+        <div className="p-3.5 sm:p-4 pl-4 sm:pl-5 border-t border-[var(--line)] space-y-3 sm:space-y-4 text-xs sm:text-sm">
+          <div className="grid gap-2.5 sm:gap-4 grid-cols-1 sm:grid-cols-2">
             <div className="bg-[var(--surface)] border border-[var(--line)] p-3 rounded-lg shadow-sm">
               <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-faint)] mb-1">Requirement</p>
               <p className="font-medium text-[var(--text)]">{result.expected}</p>
@@ -198,13 +197,13 @@ function RuleFinding({ result, imageUrl }: { result: RuleResult; imageUrl?: stri
           </div>
           
           <p className="text-[var(--text)] leading-relaxed bg-[var(--surface-raised)] p-3 rounded-lg border border-[var(--line)]">
-            <span className="font-semibold block mb-1 text-[11px] uppercase tracking-wider text-[var(--text-muted)]">Explanation</span>
+            <span className="font-semibold block mb-1 text-[10px] sm:text-[11px] uppercase tracking-wider text-[var(--text-muted)]">Explanation</span>
             {result.message}
           </p>
 
           {result.remediation && (
             <div className={`p-3 rounded-lg border ${isFailure ? 'bg-[var(--danger-soft)]/20 border-[var(--danger-soft)]' : 'bg-[var(--warning-soft)]/20 border-[var(--warning-soft)]'}`}>
-              <p className={`font-semibold mb-1 flex items-center gap-1.5 text-[11px] uppercase tracking-wider ${isFailure ? 'text-[var(--danger)]' : 'text-[var(--warning)]'}`}>
+              <p className={`font-semibold mb-1 flex items-center gap-1.5 text-[10px] sm:text-[11px] uppercase tracking-wider ${isFailure ? 'text-[var(--danger)]' : 'text-[var(--warning)]'}`}>
                  Recommendation
               </p>
               <p className="text-[var(--text)]">{result.remediation}</p>

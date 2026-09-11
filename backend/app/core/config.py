@@ -46,7 +46,7 @@ class Settings(BaseSettings):
 
     # AI extraction (Groq) — optional, falls back to regex extraction if unset
     GROQ_API_KEY: Optional[str] = None
-    GROQ_MODEL: str = "qwen/qwen3.8-27b"
+    GROQ_MODEL: str = "llama-3.1-8b-instant"
 
     @property
     def cors_origins_list(self) -> List[str]:

@@ -30,4 +30,4 @@ services:
       - key: NODE_VERSION
         value: "20"
       - key: VITE_API_URL
-        value: "https://sih26034-backend.onrender.com"
+        value: "https://exempt-runtime-undefined-wallet.trycloudflare.com"

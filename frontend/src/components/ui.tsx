@@ -22,13 +22,13 @@ export function StatusBadge({ value, label }: { value?: string | null; label?: s
 
 export function SectionHeader({ eyebrow, title, description, action }: { eyebrow?: string; title: string; description?: string; action?: ReactNode }) {
   return (
-    <header className="flex flex-wrap items-start justify-between gap-4 border-b border-[var(--line)] px-6 py-5">
+    <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[var(--line)] px-5 py-4 sm:px-6 sm:py-5">
       <div>
-        {eyebrow && <p className="text-kicker mb-1.5">{eyebrow}</p>}
+        {eyebrow && <p className="text-kicker mb-1">{eyebrow}</p>}
         <h3 className="heading-section">{title}</h3>
-        {description && <p className="mt-1.5 text-sm leading-relaxed text-[var(--text-muted)]">{description}</p>}
+        {description && <p className="mt-1 text-xs sm:text-sm leading-relaxed text-[var(--text-muted)]">{description}</p>}
       </div>
-      {action && <div className="mt-1">{action}</div>}
+      {action && <div className="shrink-0">{action}</div>}
     </header>
   );
 }
@@ -42,10 +42,10 @@ export function Metric({ label, value, detail, tone = 'neutral' }: { label: stri
     info: 'text-[var(--brand)]' 
   };
   return (
-    <article className="bg-[var(--surface)] px-6 py-6 border-r border-[var(--line)] last:border-r-0">
+    <article className="depth-2 p-5 sm:p-6 flex flex-col justify-between rounded-xl">
       <p className="text-kicker">{label}</p>
-      <p className={`heading-page mt-3 ${tones[tone]}`}>{value}</p>
-      {detail && <p className="mt-2 text-sm text-[var(--text-faint)]">{detail}</p>}
+      <p className={`heading-page mt-2 sm:mt-3 ${tones[tone]}`}>{value}</p>
+      {detail && <p className="mt-2 text-xs sm:text-sm text-[var(--text-faint)] leading-relaxed">{detail}</p>}
     </article>
   );
 }
@@ -60,20 +60,20 @@ export function Alert({ tone = 'info', children }: { tone?: 'info' | 'error' | '
   return (
     <div className={`flex items-start gap-3 p-4 rounded-xl border ${classes[tone]}`} role="alert">
       <Icon size={18} className="mt-0.5 shrink-0" />
-      <div className="text-sm font-medium leading-relaxed">{children}</div>
+      <div className="text-sm font-medium leading-relaxed flex-1 min-w-0">{children}</div>
     </div>
   );
 }
 
 export function EmptyState({ icon, title, description, action }: { icon: ReactNode; title: string; description: string; action?: ReactNode }) {
   return (
-    <div className="flex min-h-[300px] flex-col items-center justify-center p-10 text-center bg-[var(--surface-raised)] rounded-2xl border border-dashed border-[var(--line-strong)]">
-      <div className="text-[var(--text-faint)] bg-[var(--surface)] p-4 rounded-full shadow-sm border border-[var(--line)] mb-5">
+    <div className="flex min-h-[260px] sm:min-h-[300px] flex-col items-center justify-center p-6 sm:p-10 text-center bg-[var(--surface-raised)] rounded-2xl border border-dashed border-[var(--line-strong)]">
+      <div className="text-[var(--text-faint)] bg-[var(--surface)] p-3.5 sm:p-4 rounded-full shadow-sm border border-[var(--line)] mb-4 sm:mb-5">
         {icon}
       </div>
-      <p className="text-lg font-semibold text-[var(--text)]">{title}</p>
-      <p className="mt-2 max-w-md text-sm leading-relaxed text-[var(--text-muted)]">{description}</p>
-      {action && <div className="mt-6">{action}</div>}
+      <p className="text-base sm:text-lg font-semibold text-[var(--text)]">{title}</p>
+      <p className="mt-1.5 sm:mt-2 max-w-md text-xs sm:text-sm leading-relaxed text-[var(--text-muted)]">{description}</p>
+      {action && <div className="mt-5 sm:mt-6 w-full sm:w-auto">{action}</div>}
     </div>
   );
 }
@@ -84,34 +84,36 @@ export function Skeleton({ className = '' }: { className?: string }) {
 
 export function ProgressStages({ stages, activeIndex = 0, completeThrough = -1 }: { stages: string[]; activeIndex?: number; completeThrough?: number }) {
   return (
-    <div className="evidence-timeline w-full">
-      {stages.map((stage, index) => {
-        const isComplete = index <= completeThrough;
-        const isActive = index === activeIndex;
-        let status = 'pending';
-        if (isComplete) status = 'complete';
-        if (isActive && !isComplete) status = 'active';
-        
-        return (
-          <div key={stage} className="timeline-node" data-status={status}>
-            <div className="timeline-dot">
-              {isComplete ? <CheckCircle2 size={14} className="text-white" strokeWidth={3} /> : <span className="text-[10px] font-bold">{index + 1}</span>}
+    <div className="w-full overflow-x-auto no-scrollbar py-1">
+      <div className="evidence-timeline min-w-[320px] sm:min-w-0">
+        {stages.map((stage, index) => {
+          const isComplete = index <= completeThrough;
+          const isActive = index === activeIndex;
+          let status = 'pending';
+          if (isComplete) status = 'complete';
+          if (isActive && !isComplete) status = 'active';
+          
+          return (
+            <div key={stage} className="timeline-node" data-status={status}>
+              <div className="timeline-dot">
+                {isComplete ? <CheckCircle2 size={14} className="text-white" strokeWidth={3} /> : <span className="text-[10px] font-bold">{index + 1}</span>}
+              </div>
+              <span className="timeline-label">{stage}</span>
             </div>
-            <span className="timeline-label">{stage}</span>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 }
 
 export function LoadingState({ label = 'Loading workspace data' }: { label?: string }) {
   return (
-    <div className="flex min-h-[400px] flex-col items-center justify-center p-8 text-[var(--text-muted)] bg-[var(--canvas)]">
-      <div className="relative mb-6">
+    <div className="flex min-h-[300px] sm:min-h-[400px] flex-col items-center justify-center p-6 sm:p-8 text-[var(--text-muted)] bg-[var(--canvas)]">
+      <div className="relative mb-4 sm:mb-6">
         <Loader2 size={32} className="animate-spin text-[var(--brand)]" />
       </div>
-      <p className="text-sm font-medium tracking-wide">{label}</p>
+      <p className="text-sm font-medium tracking-wide text-center">{label}</p>
     </div>
   );
 }
