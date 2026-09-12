@@ -33,8 +33,7 @@ export function ComplianceResultsPanel({ reports, isAnalyzing, images = [] }: { 
 
   return (
     <div className="space-y-6 flex flex-col">
-      {reports.map((report) => { 
-        const imageUrl = images.find((image) => image.id === report.image_id)?.url;
+      {reports.map((report, idx) => { 
         const breakdowns = report.category_breakdown || [];
         
         // Ensure we prioritize categories with FAIL or REVIEW
@@ -45,7 +44,7 @@ export function ComplianceResultsPanel({ reports, isAnalyzing, images = [] }: { 
         });
 
         return (
-          <section key={report.image_id} className="depth-2 overflow-hidden flex flex-col rounded-xl">
+          <section key={report.image_id || idx} className="depth-2 overflow-hidden flex flex-col rounded-xl">
             <SectionHeader 
               eyebrow="05" 
               title="Grouped Compliance Findings" 
@@ -54,7 +53,7 @@ export function ComplianceResultsPanel({ reports, isAnalyzing, images = [] }: { 
             
             <div className="flex-1 bg-[var(--canvas)] p-3 sm:p-4 space-y-4 sm:space-y-6">
               {sortedBreakdowns.map((cat) => (
-                <CategoryGroup key={cat.category} category={cat} results={report.rule_results.filter(r => r.category === cat.category)} imageUrl={imageUrl} />
+                <CategoryGroup key={cat.category} category={cat} results={report.rule_results.filter(r => r.category === cat.category)} images={images} />
               ))}
             </div>
           </section>
@@ -64,7 +63,7 @@ export function ComplianceResultsPanel({ reports, isAnalyzing, images = [] }: { 
   );
 }
 
-function CategoryGroup({ category, results, imageUrl }: { category: any; results: RuleResult[]; imageUrl?: string }) {
+function CategoryGroup({ category, results, images }: { category: any; results: RuleResult[]; images: { id: string; url: string }[] }) {
   const [expanded, setExpanded] = useState(category.failed_count > 0 || category.review_count > 0);
   
   // Sort results within category: FAIL -> REVIEW -> PASS -> NOT_APPLICABLE
@@ -103,7 +102,7 @@ function CategoryGroup({ category, results, imageUrl }: { category: any; results
       {expanded && (
         <div className="border-t border-[var(--line)] p-3 sm:p-4 bg-[var(--canvas)] space-y-3 sm:space-y-4">
           {sortedResults.map(result => (
-            <RuleFinding key={result.rule_id} result={result} imageUrl={imageUrl} />
+            <RuleFinding key={result.rule_id} result={result} imageUrl={images.find((img) => img.id === result.image_id)?.url} />
           ))}
         </div>
       )}

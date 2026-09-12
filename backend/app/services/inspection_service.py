@@ -29,7 +29,13 @@ class InspectionService:
         return f"INS-{date_part}-{random_part}"
 
     def create_inspection(
-        self, product_name: str, brand: str, user_id: UUID
+        self,
+        product_name: str,
+        brand: str,
+        user_id: UUID,
+        establishment_name: Optional[str] = None,
+        latitude: Optional[float] = None,
+        longitude: Optional[float] = None,
     ) -> Inspection:
         """Create a new inspection with auto-generated inspection number."""
         inspection = Inspection(
@@ -38,6 +44,9 @@ class InspectionService:
             brand=brand,
             created_by=user_id,
             status=InspectionStatus.CREATED,
+            establishment_name=establishment_name,
+            latitude=latitude,
+            longitude=longitude,
         )
         inspection = self.repo.create(inspection)
         log_inspection_event("CREATED", str(inspection.id), str(user_id))

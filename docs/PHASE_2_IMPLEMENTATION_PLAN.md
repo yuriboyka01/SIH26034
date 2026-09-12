@@ -4,14 +4,14 @@
 The system utilizes a FastAPI backend and a React frontend. The analysis pipeline correctly flows from Image Upload -> PaddleOCR -> Extraction (LLM + Regex) -> Compliance Engine. 
 
 ## 2. Current Verified LLM Behavior
-The LLM integration is structurally sound and effectively uses Pydantic JSON mode alongside a deterministic evidence-matcher to prevent hallucinations. However, **it is broken at runtime** because it targets `llama3-70b-8192`, which has been decommissioned by Groq. It currently silently fails and relies entirely on the regex fallback.
+The LLM integration is structurally sound and effectively uses Pydantic JSON mode alongside a deterministic evidence-matcher to prevent hallucinations. However, **it is broken at runtime** because it targets `qwen/qwen3.8-27b`, which has been decommissioned by Groq. It currently silently fails and relies entirely on the regex fallback.
 
 ## 3. Current Verified Rule Engine
 There are exactly **10 rules**. They are exclusively built on presence checks (`PresenceRule`, `ContextualReviewRule`). There is zero semantic, cross-field, or format validation currently implemented. Rule LM007 (Quantity Format) is currently redundant with LM003 (Quantity Presence). Rule LM008 (Readability) is a static placeholder returning REVIEW.
 
 ## 4. Problems That Must Be Fixed (Phase A & B)
 * **Security [CRITICAL]**: API keys and DB strings are in `.env`. Needs immediate rotation and `.gitignore` enforcement.
-* **LLM Model**: Update the Groq model string to an active model (e.g., `llama-3.1-70b-versatile` or `llama-3.3-70b-versatile`).
+* **LLM Model**: Update the Groq model string to an active model (e.g., `llama-3.1-70b-versatile` or `qwen/qwen3.8-27b`).
 * **Rule Engine Redundancy**: LM007 must be upgraded to actually perform Regex format validation on the `net_quantity` string (e.g., ensuring standard units like 'g', 'kg', 'ml' are used properly), rather than just checking if the field exists.
 
 ## 5. Problems That Should NOT Be Fixed Yet
@@ -38,7 +38,7 @@ Introduce a `ProductCategory` enum (e.g., `FOOD`, `COSMETICS`, `ELECTRONICS`, `G
 * Update the engine to filter out rules that do not apply to the extracted category.
 
 ## 9. LLM Improvements
-* Change model to `llama-3.3-70b-versatile`.
+* Change model to `qwen/qwen3.8-27b`.
 * Inject the `ProductCategory` classification requirement into the prompt.
 * Provide the LLM with a brief legal metrology context in the system prompt to improve extraction of edge-case formats.
 

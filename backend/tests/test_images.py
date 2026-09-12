@@ -87,7 +87,7 @@ def test_reject_oversized_file(client, auth_headers, upload_dir):
     settings.MAX_UPLOAD_SIZE = original_max
 
 
-def test_delete_image(client, auth_headers, upload_dir):
+def test_delete_image(client, auth_headers, admin_auth_headers, upload_dir):
     """Test deleting an uploaded image."""
     inspection_id = _create_inspection(client, auth_headers)
 
@@ -103,7 +103,7 @@ def test_delete_image(client, auth_headers, upload_dir):
     # Delete
     response = client.delete(
         f"/api/inspections/{inspection_id}/images/{image_id}",
-        headers=auth_headers,
+        headers=admin_auth_headers,
     )
     assert response.status_code == 204
 
@@ -114,13 +114,13 @@ def test_delete_image(client, auth_headers, upload_dir):
     assert len(inspection_resp.json()["images"]) == 0
 
 
-def test_delete_image_not_found(client, auth_headers, upload_dir):
+def test_delete_image_not_found(client, auth_headers, admin_auth_headers, upload_dir):
     """Test deleting a non-existent image."""
     inspection_id = _create_inspection(client, auth_headers)
 
     response = client.delete(
         f"/api/inspections/{inspection_id}/images/00000000-0000-0000-0000-000000000000",
-        headers=auth_headers,
+        headers=admin_auth_headers,
     )
     assert response.status_code == 404
 

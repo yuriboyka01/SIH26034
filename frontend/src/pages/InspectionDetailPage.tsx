@@ -14,13 +14,14 @@ import {
   Upload, 
   X, 
   ShieldCheck, 
-  Box 
+  Box,
+  MapPin
 } from 'lucide-react';
 import { deleteInspectionImage, getInspection, uploadInspectionImage, type Inspection, type InspectionImage } from '../api/inspections';
 import { analyzeInspection, getAnalysisResults, type AnalysisResponse } from '../api/analysis';
-import { getProductInfo, type ProductInfo } from '../api/product_info';
-import { getComplianceReports, runComplianceAnalysis, type ComplianceReport } from '../api/compliance';
-import { downloadReport } from '../api/reports';
+import { getProductInfo, mergeProductInfoList, type ProductInfo } from '../api/product_info';
+import { getComplianceReports, mergeComplianceReports, runComplianceAnalysis, type ComplianceReport } from '../api/compliance';
+import { downloadReport, downloadShowCause } from '../api/reports';
 import OCRResultsPanel from '../components/OCRResultsPanel';
 import ProductInfoPanel from '../components/ProductInfoPanel';
 import { ComplianceResultsPanel } from '../components/ComplianceResultsPanel';
@@ -59,7 +60,7 @@ export default function InspectionDetailPage() {
         getComplianceReports(id).catch(() => null)
       ]); 
       setInspection(record); 
-      setProductInfo(info?.product_info_list?.[0] || null); 
+      setProductInfo(mergeProductInfoList(info?.product_info_list || [])); 
       setComplianceReports(compliance?.reports || []); 
     } catch { 
       setError('The inspection record could not be loaded. Please return to the register and try again.'); 
@@ -142,7 +143,7 @@ export default function InspectionDetailPage() {
       setAnalysisProgress(74);
       
       const info = await getProductInfo(id);
-      setProductInfo(info.product_info_list?.[0] || null); 
+      setProductInfo(mergeProductInfoList(info.product_info_list || [])); 
       setAnalysisPhase('rules'); 
       setAnalysisProgress(88);
       
@@ -167,6 +168,10 @@ export default function InspectionDetailPage() {
   const hasImages = inspection.images.length > 0;
   const hasSuccessfulAnalysis = analysisResult?.images.some((result) => result.status === 'OK') || false;
   const hasReports = complianceReports.length > 0;
+  // One product can have several evidence photos (front/back), each evaluated on its own
+  // by the backend. Consolidate them into a single product-level verdict before rendering,
+  // rather than showing one contradictory-looking summary per photo.
+  const mergedReport = hasReports ? mergeComplianceReports(complianceReports) : null;
 
   const stages = ['Evidence Upload', 'OCR Extraction', 'AI Intelligence', 'Rule Evaluation', 'Inspector Decision'];
   const phaseActiveIndex: Record<AnalysisPhase, number> = { idle: 0, ocr: 1, extraction: 2, rules: 3 };
@@ -197,6 +202,22 @@ export default function InspectionDetailPage() {
               <span className="flex items-center gap-1"><Box size={14} className="text-[var(--text-faint)]" /> {inspection.brand}</span>
               <span className="text-[var(--line-strong)] hidden sm:inline">•</span> 
               <span className="font-mono text-xs text-[var(--text-faint)]">Opened {new Date(inspection.created_at).toLocaleDateString()}</span>
+              {inspection.establishment_name && (
+                <>
+                  <span className="text-[var(--line-strong)] hidden sm:inline">•</span>
+                  <span className="flex items-center gap-1"><MapPin size={14} className="text-[var(--text-faint)]" /> {inspection.establishment_name}</span>
+                </>
+              )}
+              {inspection.latitude != null && inspection.longitude != null && (
+                <a
+                  href={`https://www.google.com/maps?q=${inspection.latitude},${inspection.longitude}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-[var(--brand)] hover:text-[var(--brand-hover)] underline decoration-dotted"
+                >
+                  View on map
+                </a>
+              )}
             </p>
           </div>
           
@@ -241,48 +262,49 @@ export default function InspectionDetailPage() {
       {analysing && <AnalysisProgress phase={analysisPhase} progress={analysisProgress} imageCount={inspection.images.length} processedImageCount={processedImageCount} />}
       
       {/* EXECUTIVE SUMMARY */}
-      {hasReports && (
+      {mergedReport && (
         <section className="depth-2 overflow-hidden bg-[var(--surface)] border border-[var(--line)] rounded-xl">
           <div className="bg-[var(--surface-raised)] px-5 py-3.5 sm:px-6 sm:py-4 border-b border-[var(--line)]">
             <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-faint)]">Executive Summary</h3>
+            {complianceReports.length > 1 && (
+              <p className="mt-1 text-[11px] text-[var(--text-faint)]">Consolidated across {complianceReports.length} evidence photos.</p>
+            )}
           </div>
           <div className="p-4 sm:p-6 space-y-6">
-            {complianceReports.map(report => (
-              <div key={`exec-${report.inspection_id}`} className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-5">
-                <div className="flex items-center gap-4">
-                  <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center shrink-0 ${report.overall_status === 'PASS' ? 'bg-[var(--success-soft)] text-[var(--success)]' : report.overall_status === 'FAIL' ? 'bg-[var(--danger-soft)] text-[var(--danger)]' : 'bg-[var(--warning-soft)] text-[var(--warning)]'}`}>
-                    <ShieldCheck size={30} />
-                  </div>
-                  <div>
-                    <p className="text-xl sm:text-2xl font-bold text-[var(--text)]">{report.overall_status}</p>
-                    <p className="text-xs sm:text-sm text-[var(--text-muted)]">Overall Compliance Status</p>
-                  </div>
+            <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-5">
+              <div className="flex items-center gap-4">
+                <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center shrink-0 ${mergedReport.overall_status === 'PASS' ? 'bg-[var(--success-soft)] text-[var(--success)]' : mergedReport.overall_status === 'FAIL' ? 'bg-[var(--danger-soft)] text-[var(--danger)]' : 'bg-[var(--warning-soft)] text-[var(--warning)]'}`}>
+                  <ShieldCheck size={30} />
                 </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3 w-full lg:max-w-2xl">
-                  <div className="bg-[var(--surface-raised)] p-2.5 sm:p-3 rounded-lg border border-[var(--line)] text-center">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-faint)]">Total Checks</p>
-                    <p className="text-lg sm:text-xl font-bold text-[var(--text)] mt-0.5">{report.total_rules_checked}</p>
-                  </div>
-                  <div className="bg-[var(--surface-raised)] p-2.5 sm:p-3 rounded-lg border border-[var(--danger-soft)] text-center">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--danger)]">Failed</p>
-                    <p className="text-lg sm:text-xl font-bold text-[var(--danger)] mt-0.5">{report.failed_count}</p>
-                  </div>
-                  <div className="bg-[var(--surface-raised)] p-2.5 sm:p-3 rounded-lg border border-[var(--warning-soft)] text-center">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--warning)]">Needs Review</p>
-                    <p className="text-lg sm:text-xl font-bold text-[var(--warning)] mt-0.5">{report.review_count}</p>
-                  </div>
-                  <div className="bg-[var(--surface-raised)] p-2.5 sm:p-3 rounded-lg border border-[var(--success-soft)] text-center">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--success)]">Passed</p>
-                    <p className="text-lg sm:text-xl font-bold text-[var(--success)] mt-0.5">{report.passed_count}</p>
-                  </div>
-                  <div className="bg-[var(--surface-raised)] p-2.5 sm:p-3 rounded-lg border border-[var(--line)] text-center col-span-2 sm:col-span-1">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-faint)]">N/A</p>
-                    <p className="text-lg sm:text-xl font-bold text-[var(--text-muted)] mt-0.5">{report.not_applicable_count}</p>
-                  </div>
+                <div>
+                  <p className="text-xl sm:text-2xl font-bold text-[var(--text)]">{mergedReport.overall_status}</p>
+                  <p className="text-xs sm:text-sm text-[var(--text-muted)]">Overall Compliance Status</p>
                 </div>
               </div>
-            ))}
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3 w-full lg:max-w-2xl">
+                <div className="bg-[var(--surface-raised)] p-2.5 sm:p-3 rounded-lg border border-[var(--line)] text-center">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-faint)]">Total Checks</p>
+                  <p className="text-lg sm:text-xl font-bold text-[var(--text)] mt-0.5">{mergedReport.total_rules_checked}</p>
+                </div>
+                <div className="bg-[var(--surface-raised)] p-2.5 sm:p-3 rounded-lg border border-[var(--danger-soft)] text-center">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--danger)]">Failed</p>
+                  <p className="text-lg sm:text-xl font-bold text-[var(--danger)] mt-0.5">{mergedReport.failed_count}</p>
+                </div>
+                <div className="bg-[var(--surface-raised)] p-2.5 sm:p-3 rounded-lg border border-[var(--warning-soft)] text-center">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--warning)]">Needs Review</p>
+                  <p className="text-lg sm:text-xl font-bold text-[var(--warning)] mt-0.5">{mergedReport.review_count}</p>
+                </div>
+                <div className="bg-[var(--surface-raised)] p-2.5 sm:p-3 rounded-lg border border-[var(--success-soft)] text-center">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--success)]">Passed</p>
+                  <p className="text-lg sm:text-xl font-bold text-[var(--success)] mt-0.5">{mergedReport.passed_count}</p>
+                </div>
+                <div className="bg-[var(--surface-raised)] p-2.5 sm:p-3 rounded-lg border border-[var(--line)] text-center col-span-2 sm:col-span-1">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-faint)]">N/A</p>
+                  <p className="text-lg sm:text-xl font-bold text-[var(--text-muted)] mt-0.5">{mergedReport.not_applicable_count}</p>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
       )}
@@ -291,8 +313,8 @@ export default function InspectionDetailPage() {
       <ProductInfoPanel productInfo={productInfo} />
 
       {/* ATTENTION REQUIRED */}
-      {hasReports && (() => {
-        const attentionItems = complianceReports.flatMap(r => r.rule_results.filter(rr => rr.status === 'FAIL' || rr.status === 'REVIEW'));
+      {mergedReport && (() => {
+        const attentionItems = mergedReport.rule_results.filter(rr => rr.status === 'FAIL' || rr.status === 'REVIEW');
         if (attentionItems.length === 0) return null;
         return (
           <section className="depth-2 overflow-hidden border-[var(--danger-soft)] border-2 rounded-xl">
@@ -326,7 +348,7 @@ export default function InspectionDetailPage() {
       })()}
 
       {/* GROUPED COMPLIANCE FINDINGS */}
-      <ComplianceResultsPanel reports={complianceReports} isAnalyzing={analysing} images={inspection.images.map((image) => ({ id: image.id, url: image.url }))} />
+      <ComplianceResultsPanel reports={mergedReport ? [mergedReport] : []} isAnalyzing={analysing} images={inspection.images.map((image) => ({ id: image.id, url: image.url }))} />
 
       {/* EVIDENCE UPLOAD SECTION */}
       <section className="depth-2 overflow-hidden flex flex-col rounded-xl">
@@ -426,21 +448,49 @@ export default function InspectionDetailPage() {
       )}
 
       {hasReports && (
-        <section className="depth-2 overflow-hidden flex flex-col items-center justify-center p-6 sm:p-8 bg-[var(--surface-raised)] text-center rounded-xl">
-          <div className="w-14 h-14 sm:w-16 sm:h-16 bg-[var(--surface)] border border-[var(--line)] rounded-full flex items-center justify-center mb-3 sm:mb-4">
-            <FileText size={24} className="text-[var(--text-faint)]" />
-          </div>
-          <h3 className="text-base sm:text-lg font-bold text-[var(--text)]">Official report ready</h3>
-          <p className="text-xs sm:text-sm text-[var(--text-muted)] mb-5">Download the comprehensive evidence-linked report.</p>
-          <div className="flex flex-wrap justify-center gap-3 w-full sm:w-auto">
-            <button onClick={() => downloadReport(id!, 'pdf')} className="neo-button-secondary flex-1 sm:flex-initial">
-              <FileText size={16} className="text-[var(--danger)]" /> Download PDF
-            </button>
-            <button onClick={() => downloadReport(id!, 'docx')} className="neo-button-secondary flex-1 sm:flex-initial">
-              <Download size={16} className="text-[var(--brand)]" /> Download DOCX
-            </button>
-          </div>
-        </section>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <section className="depth-2 overflow-hidden flex flex-col items-center justify-center p-6 sm:p-8 bg-[var(--surface-raised)] text-center rounded-xl">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-[var(--surface)] border border-[var(--line)] rounded-full flex items-center justify-center mb-3 sm:mb-4">
+              <FileText size={24} className="text-[var(--text-faint)]" />
+            </div>
+            <h3 className="text-base sm:text-lg font-bold text-[var(--text)]">Official Report</h3>
+            <p className="text-xs sm:text-sm text-[var(--text-muted)] mb-5">Download the comprehensive evidence-linked report.</p>
+            <div className="flex flex-wrap justify-center gap-3 w-full sm:w-auto">
+              <button onClick={() => downloadReport(id!, 'pdf')} className="neo-button-secondary flex-1 sm:flex-initial">
+                <FileText size={16} className="text-[var(--danger)]" /> PDF
+              </button>
+              <button onClick={() => downloadReport(id!, 'docx')} className="neo-button-secondary flex-1 sm:flex-initial">
+                <Download size={16} className="text-[var(--brand)]" /> DOCX
+              </button>
+            </div>
+          </section>
+
+          {(mergedReport?.failed_count ?? 0) > 0 ? (
+            <section className="depth-2 overflow-hidden flex flex-col items-center justify-center p-6 sm:p-8 bg-[var(--danger-soft)] text-center rounded-xl">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-[var(--surface)] border border-[var(--danger)]/30 rounded-full flex items-center justify-center mb-3 sm:mb-4">
+                <AlertCircle size={24} className="text-[var(--danger)]" />
+              </div>
+              <h3 className="text-base sm:text-lg font-bold text-[var(--danger-strong)]">Legal Action: Show-Cause</h3>
+              <p className="text-xs sm:text-sm text-[var(--danger)] mb-5">Auto-draft a statutory notice for observed contraventions.</p>
+              <div className="flex flex-wrap justify-center gap-3 w-full sm:w-auto">
+                <button onClick={() => downloadShowCause(id!, 'pdf')} className="neo-button-primary bg-[var(--danger)] text-white hover:bg-[var(--danger-strong)] flex-1 sm:flex-initial border-transparent">
+                  <FileText size={16} /> Notice PDF
+                </button>
+                <button onClick={() => downloadShowCause(id!, 'docx')} className="neo-button-secondary border-[var(--danger)]/30 text-[var(--danger-strong)] hover:bg-[var(--danger)]/10 flex-1 sm:flex-initial">
+                  <Download size={16} /> Editable DOCX
+                </button>
+              </div>
+            </section>
+          ) : (
+            <section className="depth-2 overflow-hidden flex flex-col items-center justify-center p-6 sm:p-8 bg-[var(--surface-raised)] text-center rounded-xl opacity-70">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-[var(--surface)] border border-[var(--line)] rounded-full flex items-center justify-center mb-3 sm:mb-4">
+                <ShieldCheck size={24} className="text-[var(--success)]" />
+              </div>
+              <h3 className="text-base sm:text-lg font-bold text-[var(--text)]">No Legal Actions Required</h3>
+              <p className="text-xs sm:text-sm text-[var(--text-muted)] mb-5">This inspection has no failed rules.</p>
+            </section>
+          )}
+        </div>
       )}
     </div>
   );

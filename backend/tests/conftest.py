@@ -91,3 +91,33 @@ def auth_headers(registered_user):
     """Return authorization headers for the registered test user."""
     _, token = registered_user
     return {"Authorization": f"Bearer {token}"}
+
+@pytest.fixture
+def admin_auth_headers(client):
+    """Return authorization headers for an admin user."""
+    from app.models.user import User, UserRole
+    # Register
+    response = client.post(
+        "/api/auth/register",
+        json={
+            "name": "Admin User",
+            "email": "admin@example.com",
+            "password": "testpassword123",
+        },
+    )
+    data = response.json()
+    user_id = data["user"]["id"]
+    token = data["access_token"]
+    
+    import uuid
+    user_id_uuid = uuid.UUID(user_id)
+    # Make admin
+    db = TestingSessionLocal()
+    try:
+        user = db.query(User).filter(User.id == user_id_uuid).first()
+        user.role = UserRole.ADMIN
+        db.commit()
+    finally:
+        db.close()
+        
+    return {"Authorization": f"Bearer {token}"}

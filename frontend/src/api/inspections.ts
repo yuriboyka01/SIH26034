@@ -24,6 +24,9 @@ export interface Inspection {
   created_by: string;
   created_at: string;
   updated_at: string;
+  establishment_name?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   images: InspectionImage[];
 }
 
@@ -41,6 +44,9 @@ export interface InspectionListItem {
 export interface CreateInspectionRequest {
   product_name: string;
   brand: string;
+  establishment_name?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface DashboardStats {

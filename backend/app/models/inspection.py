@@ -6,7 +6,7 @@ import uuid
 import enum
 from datetime import datetime, timezone
 
-from sqlalchemy import Column, String, DateTime, ForeignKey, Enum as SAEnum
+from sqlalchemy import Column, String, DateTime, ForeignKey, Enum as SAEnum, Float
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -35,6 +35,13 @@ class Inspection(Base):
         nullable=False,
         default=InspectionStatus.CREATED,
     )
+    # Geo-tagging: captured client-side via the browser Geolocation API at
+    # inspection creation. All nullable — an inspector without GPS access
+    # (or who declines the permission prompt) must still be able to create
+    # an inspection.
+    establishment_name = Column(String(500), nullable=True)
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     updated_at = Column(
         DateTime(timezone=True),

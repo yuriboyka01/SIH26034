@@ -38,25 +38,25 @@ SIH26034 is a **Legal Metrology (Packaged Commodities) Rules, 2011 compliance ch
 
 | Component | Status | Location | Notes |
 |-----------|--------|----------|-------|
-| FastAPI Backend | ✅ Working | [`backend/app/main.py`](file:///d:/SIH26034/backend/app/main.py) | 8 route modules mounted |
-| PostgreSQL + SQLAlchemy | ✅ Working | [`backend/app/core/database.py`](file:///d:/SIH26034/backend/app/core/database.py) | Neon DB configured |
-| Alembic Migrations | ✅ Working | [`backend/migrations/`](file:///d:/SIH26034/backend/migrations) | Schema management |
-| JWT Authentication | ✅ Working | [`backend/app/core/security.py`](file:///d:/SIH26034/backend/app/core/security.py) | bcrypt + python-jose |
-| Role-Based Access | 🟡 Partial | [`backend/app/models/user.py`](file:///d:/SIH26034/backend/app/models/user.py) | ADMIN/INSPECTOR enum exists but **never enforced** |
-| Image Upload | ✅ Working | [`backend/app/services/image_service.py`](file:///d:/SIH26034/backend/app/services/image_service.py) | Local + S3 storage |
-| Image Preprocessing | ✅ Working | [`backend/app/ai/preprocessing.py`](file:///d:/SIH26034/backend/app/ai/preprocessing.py) | OpenCV pipeline |
-| PaddleOCR | ✅ Working | [`backend/app/ai/ocr_service.py`](file:///d:/SIH26034/backend/app/ai/ocr_service.py) | Dual-track (original + preprocessed) |
-| LLM Extraction (Groq) | ✅ Working | [`backend/app/ai/extraction.py`](file:///d:/SIH26034/backend/app/ai/extraction.py#L60-L240) | Llama 3 70B with regex fallback |
-| Regex Extraction | ✅ Working | [`backend/app/ai/extraction.py`](file:///d:/SIH26034/backend/app/ai/extraction.py#L375-L1100) | 15+ regex extractors |
-| Compliance Engine | ✅ Working | [`backend/app/compliance/engine.py`](file:///d:/SIH26034/backend/app/compliance/engine.py) | 10 rules |
-| PDF Report Generation | ✅ Working | [`backend/app/services/report_service.py`](file:///d:/SIH26034/backend/app/services/report_service.py#L156-L316) | ReportLab |
-| DOCX Report Generation | ✅ Working | [`backend/app/services/report_service.py`](file:///d:/SIH26034/backend/app/services/report_service.py#L318-L394) | python-docx |
-| Dashboard Analytics | ✅ Working | [`backend/app/services/dashboard_service.py`](file:///d:/SIH26034/backend/app/services/dashboard_service.py) | KPIs, top violations, recent inspections |
-| React Frontend | ✅ Working | [`frontend/src/`](file:///d:/SIH26034/frontend/src) | 5 pages, 8 components |
-| Render Deployment | 🟡 Partial | [`render.yaml`](file:///d:/SIH26034/render.yaml) | Blueprint exists, not confirmed deployed |
-| `rules/` Directory | ⚪ Placeholder | [`rules/README.md`](file:///d:/SIH26034/rules/README.md) | README says "Phase 1: Directory placeholder only" — **outdated**, rules are in code |
-| `compliance/base.py` | ⚪ Unused | [`backend/app/compliance/base.py`](file:///d:/SIH26034/backend/app/compliance/base.py) | ABC interfaces never used — actual implementation uses `engine.py` + `rules.py` |
-| `ai/base.py` | ⚪ Unused | [`backend/app/ai/base.py`](file:///d:/SIH26034/backend/app/ai/base.py) | ABC interfaces never used — actual implementation uses concrete classes |
+| FastAPI Backend | ✅ Working | [`backend/app/main.py`](file:///d:/CompliQ/backend/app/main.py) | 8 route modules mounted |
+| PostgreSQL + SQLAlchemy | ✅ Working | [`backend/app/core/database.py`](file:///d:/CompliQ/backend/app/core/database.py) | Neon DB configured |
+| Alembic Migrations | ✅ Working | [`backend/migrations/`](file:///d:/CompliQ/backend/migrations) | Schema management |
+| JWT Authentication | ✅ Working | [`backend/app/core/security.py`](file:///d:/CompliQ/backend/app/core/security.py) | bcrypt + python-jose |
+| Role-Based Access | 🟡 Partial | [`backend/app/models/user.py`](file:///d:/CompliQ/backend/app/models/user.py) | ADMIN/INSPECTOR enum exists but **never enforced** |
+| Image Upload | ✅ Working | [`backend/app/services/image_service.py`](file:///d:/CompliQ/backend/app/services/image_service.py) | Local + S3 storage |
+| Image Preprocessing | ✅ Working | [`backend/app/ai/preprocessing.py`](file:///d:/CompliQ/backend/app/ai/preprocessing.py) | OpenCV pipeline |
+| PaddleOCR | ✅ Working | [`backend/app/ai/ocr_service.py`](file:///d:/CompliQ/backend/app/ai/ocr_service.py) | Dual-track (original + preprocessed) |
+| LLM Extraction (Groq) | ✅ Working | [`backend/app/ai/extraction.py`](file:///d:/CompliQ/backend/app/ai/extraction.py#L60-L240) | Llama 3 70B with regex fallback |
+| Regex Extraction | ✅ Working | [`backend/app/ai/extraction.py`](file:///d:/CompliQ/backend/app/ai/extraction.py#L375-L1100) | 15+ regex extractors |
+| Compliance Engine | ✅ Working | [`backend/app/compliance/engine.py`](file:///d:/CompliQ/backend/app/compliance/engine.py) | 10 rules |
+| PDF Report Generation | ✅ Working | [`backend/app/services/report_service.py`](file:///d:/CompliQ/backend/app/services/report_service.py#L156-L316) | ReportLab |
+| DOCX Report Generation | ✅ Working | [`backend/app/services/report_service.py`](file:///d:/CompliQ/backend/app/services/report_service.py#L318-L394) | python-docx |
+| Dashboard Analytics | ✅ Working | [`backend/app/services/dashboard_service.py`](file:///d:/CompliQ/backend/app/services/dashboard_service.py) | KPIs, top violations, recent inspections |
+| React Frontend | ✅ Working | [`frontend/src/`](file:///d:/CompliQ/frontend/src) | 5 pages, 8 components |
+| Render Deployment | 🟡 Partial | [`render.yaml`](file:///d:/CompliQ/render.yaml) | Blueprint exists, not confirmed deployed |
+| `rules/` Directory | ⚪ Placeholder | [`rules/README.md`](file:///d:/CompliQ/rules/README.md) | README says "Phase 1: Directory placeholder only" — **outdated**, rules are in code |
+| `compliance/base.py` | ⚪ Unused | [`backend/app/compliance/base.py`](file:///d:/CompliQ/backend/app/compliance/base.py) | ABC interfaces never used — actual implementation uses `engine.py` + `rules.py` |
+| `ai/base.py` | ⚪ Unused | [`backend/app/ai/base.py`](file:///d:/CompliQ/backend/app/ai/base.py) | ABC interfaces never used — actual implementation uses concrete classes |
 
 ---
 
@@ -161,18 +161,18 @@ User downloads report → ReportService → PDF/DOCX generation
 
 | Attribute | Value | Source |
 |-----------|-------|--------|
-| **Provider** | Groq (hosted inference) | [`extraction.py:85`](file:///d:/SIH26034/backend/app/ai/extraction.py#L85) |
-| **Model** | `llama3-70b-8192` | [`extraction.py:91`](file:///d:/SIH26034/backend/app/ai/extraction.py#L91) |
-| **SDK** | `groq` Python package ≥ 0.9.0 | [`requirements.txt:47`](file:///d:/SIH26034/backend/requirements.txt#L47) |
-| **Import handling** | Graceful — `try/except ImportError` | [`extraction.py:24-27`](file:///d:/SIH26034/backend/app/ai/extraction.py#L24-L27) |
-| **API key source** | `settings.GROQ_API_KEY` or `os.getenv("GROQ_API_KEY")` | [`extraction.py:64`](file:///d:/SIH26034/backend/app/ai/extraction.py#L64) |
-| **Response format** | `json_object` (structured JSON) | [`extraction.py:97`](file:///d:/SIH26034/backend/app/ai/extraction.py#L97) |
-| **Temperature** | 0.0 (deterministic) | [`extraction.py:98`](file:///d:/SIH26034/backend/app/ai/extraction.py#L98) |
-| **System prompt** | "You are a JSON generating assistant. Always return raw JSON." | [`extraction.py:93`](file:///d:/SIH26034/backend/app/ai/extraction.py#L93) |
-| **Retry logic** | 3 attempts with exponential backoff (2s, 4s, 6s) on 503/rate-limit | [`extraction.py:88-106`](file:///d:/SIH26034/backend/app/ai/extraction.py#L88-L106) |
-| **Output parsing** | Pydantic `model_validate_json` → `LLMProductData` | [`extraction.py:114`](file:///d:/SIH26034/backend/app/ai/extraction.py#L114) |
-| **Evidence matching** | Fuzzy match (difflib SequenceMatcher, threshold > 0.8) back to OCR blocks | [`extraction.py:130-156`](file:///d:/SIH26034/backend/app/ai/extraction.py#L130-L156) |
-| **Fallback** | Full regex extraction pipeline | [`extraction.py:1010-1099`](file:///d:/SIH26034/backend/app/ai/extraction.py#L1010-L1099) |
+| **Provider** | Groq (hosted inference) | [`extraction.py:85`](file:///d:/CompliQ/backend/app/ai/extraction.py#L85) |
+| **Model** | `qwen/qwen3.8-27b` | [`extraction.py:91`](file:///d:/CompliQ/backend/app/ai/extraction.py#L91) |
+| **SDK** | `groq` Python package ≥ 0.9.0 | [`requirements.txt:47`](file:///d:/CompliQ/backend/requirements.txt#L47) |
+| **Import handling** | Graceful — `try/except ImportError` | [`extraction.py:24-27`](file:///d:/CompliQ/backend/app/ai/extraction.py#L24-L27) |
+| **API key source** | `settings.GROQ_API_KEY` or `os.getenv("GROQ_API_KEY")` | [`extraction.py:64`](file:///d:/CompliQ/backend/app/ai/extraction.py#L64) |
+| **Response format** | `json_object` (structured JSON) | [`extraction.py:97`](file:///d:/CompliQ/backend/app/ai/extraction.py#L97) |
+| **Temperature** | 0.0 (deterministic) | [`extraction.py:98`](file:///d:/CompliQ/backend/app/ai/extraction.py#L98) |
+| **System prompt** | "You are a JSON generating assistant. Always return raw JSON." | [`extraction.py:93`](file:///d:/CompliQ/backend/app/ai/extraction.py#L93) |
+| **Retry logic** | 3 attempts with exponential backoff (2s, 4s, 6s) on 503/rate-limit | [`extraction.py:88-106`](file:///d:/CompliQ/backend/app/ai/extraction.py#L88-L106) |
+| **Output parsing** | Pydantic `model_validate_json` → `LLMProductData` | [`extraction.py:114`](file:///d:/CompliQ/backend/app/ai/extraction.py#L114) |
+| **Evidence matching** | Fuzzy match (difflib SequenceMatcher, threshold > 0.8) back to OCR blocks | [`extraction.py:130-156`](file:///d:/CompliQ/backend/app/ai/extraction.py#L130-L156) |
+| **Fallback** | Full regex extraction pipeline | [`extraction.py:1010-1099`](file:///d:/CompliQ/backend/app/ai/extraction.py#L1010-L1099) |
 | **Fallback model** | None (single model) | — |
 | **Local model** | None | — |
 | **Token/usage tracking** | None | — |
@@ -190,7 +190,7 @@ extract_product_info() [line 983]
     ↓ checks API key present
     ↓ joins all block text into single string
     ↓ constructs prompt with OCR text
-    ↓ calls Groq API (llama3-70b-8192, json_object mode, temp=0)
+    ↓ calls Groq API (qwen/qwen3.8-27b, json_object mode, temp=0)
     ↓ parses response into LLMProductData (Pydantic)
     ↓ maps each LLM field → ExtractedField with evidence matching
     ↓ returns StructuredProductData (version "2.0-groq")
@@ -202,7 +202,7 @@ extract_product_info() [line 983]
 
 ### Prompt Analysis
 
-**FACT**: The user prompt is constructed at [`extraction.py:73-82`](file:///d:/SIH26034/backend/app/ai/extraction.py#L73-L82):
+**FACT**: The user prompt is constructed at [`extraction.py:73-82`](file:///d:/CompliQ/backend/app/ai/extraction.py#L73-L82):
 
 ```python
 prompt = f"""
@@ -242,9 +242,9 @@ OCR Text:
 - The API call is structured properly with retry logic
 - The response is parsed into validated Pydantic models
 - Evidence is matched back to OCR blocks with fuzzy matching
-- A real `GROQ_API_KEY` is present in [`.env`](file:///d:/SIH26034/.env#L17)
+- A real `GROQ_API_KEY` is present in [`.env`](file:///d:/CompliQ/.env#L17)
 
-**FACT**: The code calls the LLM **first** and only falls back to regex if it fails ([`extraction.py:1003-1011`](file:///d:/SIH26034/backend/app/ai/extraction.py#L1003-L1011)).
+**FACT**: The code calls the LLM **first** and only falls back to regex if it fails ([`extraction.py:1003-1011`](file:///d:/CompliQ/backend/app/ai/extraction.py#L1003-L1011)).
 
 **INFERENCE**: The LLM likely works at runtime when:
 1. The Groq SDK is installed
@@ -295,21 +295,21 @@ The LLM performs **structured data extraction from noisy OCR text**. Specificall
 
 ### Architecture
 
-The compliance engine is located in [`backend/app/compliance/`](file:///d:/SIH26034/backend/app/compliance):
+The compliance engine is located in [`backend/app/compliance/`](file:///d:/CompliQ/backend/app/compliance):
 
-- [`rules.py`](file:///d:/SIH26034/backend/app/compliance/rules.py) — Rule definitions and registry
-- [`engine.py`](file:///d:/SIH26034/backend/app/compliance/engine.py) — Evaluation orchestrator
-- [`base.py`](file:///d:/SIH26034/backend/app/compliance/base.py) — **Unused** ABC interfaces
+- [`rules.py`](file:///d:/CompliQ/backend/app/compliance/rules.py) — Rule definitions and registry
+- [`engine.py`](file:///d:/CompliQ/backend/app/compliance/engine.py) — Evaluation orchestrator
+- [`base.py`](file:///d:/CompliQ/backend/app/compliance/base.py) — **Unused** ABC interfaces
 
 ### Rule Types
 
 | Type | Class | Logic |
 |------|-------|-------|
-| Presence Check | [`PresenceRule`](file:///d:/SIH26034/backend/app/compliance/rules.py#L25-L62) | Checks if a field has `detection_status == "DETECTED"` → PASS; `"UNCERTAIN"` → REVIEW; else → FAIL |
-| Contextual Review | [`ContextualReviewRule`](file:///d:/SIH26034/backend/app/compliance/rules.py#L65-L105) | If DETECTED → PASS; else → REVIEW (because legal exemptions may apply) |
-| Always Review | [`AlwaysReviewRule`](file:///d:/SIH26034/backend/app/compliance/rules.py#L108-L126) | Always returns REVIEW (requires human verification) |
+| Presence Check | [`PresenceRule`](file:///d:/CompliQ/backend/app/compliance/rules.py#L25-L62) | Checks if a field has `detection_status == "DETECTED"` → PASS; `"UNCERTAIN"` → REVIEW; else → FAIL |
+| Contextual Review | [`ContextualReviewRule`](file:///d:/CompliQ/backend/app/compliance/rules.py#L65-L105) | If DETECTED → PASS; else → REVIEW (because legal exemptions may apply) |
+| Always Review | [`AlwaysReviewRule`](file:///d:/CompliQ/backend/app/compliance/rules.py#L108-L126) | Always returns REVIEW (requires human verification) |
 
-### Engine Logic ([`engine.py`](file:///d:/SIH26034/backend/app/compliance/engine.py))
+### Engine Logic ([`engine.py`](file:///d:/CompliQ/backend/app/compliance/engine.py))
 
 - Iterates all `REGISTERED_RULES`, calls `.evaluate()` on each
 - If any HIGH/CRITICAL rule FAILs → overall FAIL
@@ -325,9 +325,9 @@ The compliance engine is located in [`backend/app/compliance/`](file:///d:/SIH26
 > [!IMPORTANT]
 > **The claim of "8 rules" is FALSE. There are 10 active rules.**
 
-**FACT**: The `REGISTERED_RULES` list at [`rules.py:247-258`](file:///d:/SIH26034/backend/app/compliance/rules.py#L247-L258) contains **10 rules**: `rule_lm001` through `rule_lm010`.
+**FACT**: The `REGISTERED_RULES` list at [`rules.py:247-258`](file:///d:/CompliQ/backend/app/compliance/rules.py#L247-L258) contains **10 rules**: `rule_lm001` through `rule_lm010`.
 
-**FACT**: The Phase 4 test at [`test_phase4.py:174`](file:///d:/SIH26034/backend/tests/test_phase4.py#L174) asserts `rep["total_rules_checked"] == 10`, confirming 10 rules are evaluated.
+**FACT**: The Phase 4 test at [`test_phase4.py:174`](file:///d:/CompliQ/backend/tests/test_phase4.py#L174) asserts `rep["total_rules_checked"] == 10`, confirming 10 rules are evaluated.
 
 | Rule ID | Rule Name | Type | Target Field | Severity | Active? | Tested? | LLM-dependent? |
 |---------|-----------|------|-------------|----------|---------|---------|---------------|
@@ -388,19 +388,19 @@ All 10 rules are:
 
 | # | Finding | Evidence | Risk |
 |---|---------|----------|------|
-| 1 | **API keys committed to Git** | [`.env:17`](file:///d:/SIH26034/.env#L17) — `GROQ_API_KEY` is a real key; [`.env:2`](file:///d:/SIH26034/.env#L2) — full Neon DB connection string with password; [`.env:16`](file:///d:/SIH26034/.env#L16) — commented GEMINI key | **CRITICAL** — anyone with repo access has full DB and API access |
-| 2 | **Weak JWT secret in production** | [`.env:5`](file:///d:/SIH26034/.env#L5) — `JWT_SECRET=dev-secret-key-change-in-production-abc123xyz` | **CRITICAL** — JWT tokens can be forged |
-| 3 | **No RBAC enforcement** | `UserRole.ADMIN` / `UserRole.INSPECTOR` exist in [`user.py:16-19`](file:///d:/SIH26034/backend/app/models/user.py#L16-L19) but are **never checked** in any endpoint | **HIGH** — any user can access any inspection and admin endpoints |
+| 1 | **API keys committed to Git** | [`.env:17`](file:///d:/CompliQ/.env#L17) — `GROQ_API_KEY` is a real key; [`.env:2`](file:///d:/CompliQ/.env#L2) — full Neon DB connection string with password; [`.env:16`](file:///d:/CompliQ/.env#L16) — commented GEMINI key | **CRITICAL** — anyone with repo access has full DB and API access |
+| 2 | **Weak JWT secret in production** | [`.env:5`](file:///d:/CompliQ/.env#L5) — `JWT_SECRET=dev-secret-key-change-in-production-abc123xyz` | **CRITICAL** — JWT tokens can be forged |
+| 3 | **No RBAC enforcement** | `UserRole.ADMIN` / `UserRole.INSPECTOR` exist in [`user.py:16-19`](file:///d:/CompliQ/backend/app/models/user.py#L16-L19) but are **never checked** in any endpoint | **HIGH** — any user can access any inspection and admin endpoints |
 
 ### P1 — High Security Issues
 
 | # | Finding | Evidence | Risk |
 |---|---------|----------|------|
 | 4 | **No rate limiting** | No rate-limit middleware anywhere in codebase | Brute-force attacks on login, API abuse |
-| 5 | **No input sanitization on registration** | [`auth_service.py:38-43`](file:///d:/SIH26034/backend/app/services/auth_service.py#L38-L43) — name field stored as-is | XSS in reports if name contains HTML |
-| 6 | **CORS allows all methods/headers** | [`main.py:33-36`](file:///d:/SIH26034/backend/app/main.py#L33-L36) — `allow_methods=["*"], allow_headers=["*"]` | Overly permissive |
-| 7 | **No password complexity requirements** | [`auth_service.py:20`](file:///d:/SIH26034/backend/app/services/auth_service.py#L20) — accepts any password string | Weak passwords |
-| 8 | **OCR text injected into LLM prompt without sanitization** | [`extraction.py:69`](file:///d:/SIH26034/backend/app/ai/extraction.py#L69) — OCR text joined and placed directly in prompt | Prompt injection via crafted label images |
+| 5 | **No input sanitization on registration** | [`auth_service.py:38-43`](file:///d:/CompliQ/backend/app/services/auth_service.py#L38-L43) — name field stored as-is | XSS in reports if name contains HTML |
+| 6 | **CORS allows all methods/headers** | [`main.py:33-36`](file:///d:/CompliQ/backend/app/main.py#L33-L36) — `allow_methods=["*"], allow_headers=["*"]` | Overly permissive |
+| 7 | **No password complexity requirements** | [`auth_service.py:20`](file:///d:/CompliQ/backend/app/services/auth_service.py#L20) — accepts any password string | Weak passwords |
+| 8 | **OCR text injected into LLM prompt without sanitization** | [`extraction.py:69`](file:///d:/CompliQ/backend/app/ai/extraction.py#L69) — OCR text joined and placed directly in prompt | Prompt injection via crafted label images |
 | 9 | **No file type validation beyond extension** | Image upload likely accepts any file content | Malicious file uploads |
 
 ### P2 — Medium Issues
@@ -411,8 +411,8 @@ All 10 rules are:
 | 11 | **No audit logging** | No record of who triggered analysis/compliance checks | Compliance/forensic gap |
 | 12 | **`compliance/base.py` and `ai/base.py` are dead code** | Abstract interfaces never implemented or referenced | Code clutter |
 | 13 | **`rules/README.md` is outdated** | Says "Phase 1: Directory placeholder only" when Phase 4 is complete | Documentation drift |
-| 14 | **`python-docx` not in requirements.txt** | Used in [`report_service.py:17`](file:///d:/SIH26034/backend/app/services/report_service.py#L17) but not listed in [`requirements.txt`](file:///d:/SIH26034/backend/requirements.txt) | Import failure on fresh install |
-| 15 | **`on_event("startup")` is deprecated** | [`main.py:58`](file:///d:/SIH26034/backend/app/main.py#L58) — use `lifespan` context manager | Future FastAPI breakage |
+| 14 | **`python-docx` not in requirements.txt** | Used in [`report_service.py:17`](file:///d:/CompliQ/backend/app/services/report_service.py#L17) but not listed in [`requirements.txt`](file:///d:/CompliQ/backend/requirements.txt) | Import failure on fresh install |
+| 15 | **`on_event("startup")` is deprecated** | [`main.py:58`](file:///d:/CompliQ/backend/app/main.py#L58) — use `lifespan` context manager | Future FastAPI breakage |
 
 ---
 
@@ -512,7 +512,7 @@ All 10 rules are:
 | **Hallucination control** | Anti-hallucination instruction in prompt | Add post-extraction verification: does LLM output exist in OCR text? | P1 |
 | **Temperature** | 0.0 ✅ | Already optimal | — |
 | **Token usage** | No tracking | Add token counting and cost logging | P2 |
-| **Model choice** | `llama3-70b-8192` | Consider `llama-3.1-70b-versatile` or `llama-3.3-70b-versatile` for better extraction | P3 |
+| **Model choice** | `qwen/qwen3.8-27b` | Consider `llama-3.1-70b-versatile` or `qwen/qwen3.8-27b` for better extraction | P3 |
 | **Caching** | None | Cache LLM results by OCR text hash to avoid redundant calls | P2 |
 | **Timeout** | No explicit timeout | Add request-level timeout (30s) | P1 |
 | **Prompt injection** | OCR text injected raw into prompt | Sanitize OCR text: strip control chars, limit length, escape delimiters | P0 |
@@ -630,16 +630,16 @@ Dashboard Analytics ← EXISTING ✅
 | Task | File(s) | Change | Risk | Complexity |
 |------|---------|--------|------|------------|
 | Rotate all API keys | External (Groq console, Neon dashboard) | Generate new keys | None | Low |
-| Add `.env` to `.gitignore` | [`.gitignore`](file:///d:/SIH26034/.gitignore) | Add `.env` entry | None | Trivial |
+| Add `.env` to `.gitignore` | [`.gitignore`](file:///d:/CompliQ/.gitignore) | Add `.env` entry | None | Trivial |
 | Remove `.env` from Git history | Git | `git filter-branch` or BFG | Low | Medium |
-| Sanitize OCR text | [`extraction.py`](file:///d:/SIH26034/backend/app/ai/extraction.py#L69) | Strip control chars, limit to 10K chars | Low | Low |
+| Sanitize OCR text | [`extraction.py`](file:///d:/CompliQ/backend/app/ai/extraction.py#L69) | Strip control chars, limit to 10K chars | Low | Low |
 | Strong JWT secret | `.env` / render.yaml | Use `generateValue: true` (already in render.yaml) | None | Trivial |
 
 ### Phase 2: Security Hardening (Week 1)
 
 | Task | File(s) | Change | Dependencies | Complexity |
 |------|---------|--------|-------------|------------|
-| Add `python-docx` to requirements | [`requirements.txt`](file:///d:/SIH26034/backend/requirements.txt) | Add `python-docx>=1.0.0` | None | Trivial |
+| Add `python-docx` to requirements | [`requirements.txt`](file:///d:/CompliQ/backend/requirements.txt) | Add `python-docx>=1.0.0` | None | Trivial |
 | RBAC middleware | `core/security.py`, API routes | Create `require_role()` dependency | None | Medium |
 | Rate limiting | `main.py`, new `core/rate_limit.py` | Add `slowapi` middleware | `slowapi` dep | Low |
 | Password policy | `schemas/user.py`, `auth_service.py` | Add Pydantic validators | None | Low |
@@ -689,18 +689,18 @@ Dashboard Analytics ← EXISTING ✅
 
 | Test File | Scope | Lines | Status |
 |-----------|-------|-------|--------|
-| [`test_auth.py`](file:///d:/SIH26034/backend/tests/test_auth.py) | Auth API (register, login, me) | 3787 | ✅ |
-| [`test_inspections.py`](file:///d:/SIH26034/backend/tests/test_inspections.py) | CRUD operations | 2981 | ✅ |
-| [`test_images.py`](file:///d:/SIH26034/backend/tests/test_images.py) | Image upload/delete | 4650 | ✅ |
-| [`test_phase2.py`](file:///d:/SIH26034/backend/tests/test_phase2.py) | OCR + preprocessing | 14996 | ✅ |
-| [`test_phase3.py`](file:///d:/SIH26034/backend/tests/test_phase3.py) | Extraction pipeline | 24141 | ✅ |
-| [`test_phase4.py`](file:///d:/SIH26034/backend/tests/test_phase4.py) | Compliance rules + engine + API | 7787 | ✅ |
-| [`test_phase5.py`](file:///d:/SIH26034/backend/tests/test_phase5.py) | Report generation | 5866 | ✅ |
-| [`test_generic_extraction.py`](file:///d:/SIH26034/backend/tests/test_generic_extraction.py) | Extraction edge cases | 6707 | ✅ |
-| [`test_gulas_extraction.py`](file:///d:/SIH26034/backend/tests/test_gulas_extraction.py) | Real product extraction | 4197 | ✅ |
-| [`test_real_package_extraction.py`](file:///d:/SIH26034/backend/tests/test_real_package_extraction.py) | Real package testing | 19342 | ✅ |
-| [`test_live_extraction.py`](file:///d:/SIH26034/backend/tests/test_live_extraction.py) | Live extraction tests | 1659 | ✅ |
-| [`test_storage.py`](file:///d:/SIH26034/backend/tests/test_storage.py) | Storage abstraction | 6088 | ✅ |
+| [`test_auth.py`](file:///d:/CompliQ/backend/tests/test_auth.py) | Auth API (register, login, me) | 3787 | ✅ |
+| [`test_inspections.py`](file:///d:/CompliQ/backend/tests/test_inspections.py) | CRUD operations | 2981 | ✅ |
+| [`test_images.py`](file:///d:/CompliQ/backend/tests/test_images.py) | Image upload/delete | 4650 | ✅ |
+| [`test_phase2.py`](file:///d:/CompliQ/backend/tests/test_phase2.py) | OCR + preprocessing | 14996 | ✅ |
+| [`test_phase3.py`](file:///d:/CompliQ/backend/tests/test_phase3.py) | Extraction pipeline | 24141 | ✅ |
+| [`test_phase4.py`](file:///d:/CompliQ/backend/tests/test_phase4.py) | Compliance rules + engine + API | 7787 | ✅ |
+| [`test_phase5.py`](file:///d:/CompliQ/backend/tests/test_phase5.py) | Report generation | 5866 | ✅ |
+| [`test_generic_extraction.py`](file:///d:/CompliQ/backend/tests/test_generic_extraction.py) | Extraction edge cases | 6707 | ✅ |
+| [`test_gulas_extraction.py`](file:///d:/CompliQ/backend/tests/test_gulas_extraction.py) | Real product extraction | 4197 | ✅ |
+| [`test_real_package_extraction.py`](file:///d:/CompliQ/backend/tests/test_real_package_extraction.py) | Real package testing | 19342 | ✅ |
+| [`test_live_extraction.py`](file:///d:/CompliQ/backend/tests/test_live_extraction.py) | Live extraction tests | 1659 | ✅ |
+| [`test_storage.py`](file:///d:/CompliQ/backend/tests/test_storage.py) | Storage abstraction | 6088 | ✅ |
 
 ### Missing Tests
 
@@ -751,7 +751,7 @@ Dashboard Analytics ← EXISTING ✅
 |------|-----------|--------|------------|
 | **Groq API key compromised** (committed to Git) | HIGH | Critical — unauthorized usage, cost | Rotate keys immediately |
 | **Neon DB credentials compromised** | HIGH | Critical — data breach | Rotate credentials, restrict IP access |
-| **Groq API deprecates llama3-70b-8192** | Medium | High — extraction breaks | Pin model version, add fallback model |
+| **Groq API deprecates qwen/qwen3.8-27b** | Medium | High — extraction breaks | Pin model version, add fallback model |
 | **PaddleOCR version incompatibility** | Low | Medium — OCR breaks | Pin version in requirements |
 | **Groq rate limits in production** | Medium | Medium — degrades to regex | Implement caching, retry with backoff |
 | **Large image uploads causing OOM** | Medium | Medium — server crash | Enforce server-side image size limits before OCR |

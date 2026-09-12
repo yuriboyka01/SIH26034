@@ -12,7 +12,7 @@
 
 ## Incorrect Findings
 * **Rule Count**: The previous claim of "8 rules" is **FALSE**. There are exactly **10 registered rules** (LM001–LM010).
-* **LLM Runtime Status**: While the LLM integration code is technically sound and the API key is valid, **the LLM pipeline is currently BROKEN at runtime**. The model specified (`llama3-70b-8192`) has been decommissioned by Groq. All runtime extraction currently falls back to regex.
+* **LLM Runtime Status**: While the LLM integration code is technically sound and the API key is valid, **the LLM pipeline is currently BROKEN at runtime**. The model specified (`qwen/qwen3.8-27b`) has been decommissioned by Groq. All runtime extraction currently falls back to regex.
 * **Rule Quality**: While 10 rules exist, they do not perform deep validation. They are purely "presence checks". LM007 claims to check quantity format but actually only checks presence (redundantly with LM003).
 
 ## Unverified Findings
@@ -39,7 +39,7 @@
 **BROKEN (At Runtime)**
 * **Is the LLM actually called?** Yes, it is the primary extraction method.
 * **Conditions to skip:** Missing `groq` module or missing API key.
-* **When does regex fallback occur?** When the Groq API throws an error. Currently, this happens 100% of the time because the model `llama3-70b-8192` is decommissioned, returning a 400 Bad Request.
+* **When does regex fallback occur?** When the Groq API throws an error. Currently, this happens 100% of the time because the model `qwen/qwen3.8-27b` is decommissioned, returning a 400 Bad Request.
 * **Evidence Matching:** The LLM architecture is excellent at evidence matching. It extracts a value and `source_text`, which is deterministically fuzzy-matched back to the OCR bounding boxes to prevent hallucinations.
 * **Hallucination Risks:** Mitigated by the diff-based evidence matcher. If the LLM invents a value, it won't map to a bounding box, resulting in an `UNCERTAIN` detection status.
 

@@ -31,14 +31,14 @@
 
 ### Terminal 1 - Start the Backend
 
-    cd d:\SIH26034\backend
+    cd d:\CompliQ\backend
     python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
 
 Wait for: `INFO: Uvicorn running on http://0.0.0.0:8000`
 
 ### Terminal 2 - Start the Cloudflare Tunnel
 
-    d:\SIH26034\cloudflared.exe tunnel --url http://localhost:8000
+    d:\CompliQ\cloudflared.exe tunnel --url http://localhost:8000
 
 Wait for:
     Your quick Tunnel has been created! Visit it at:
@@ -58,7 +58,7 @@ You MUST update the Render frontend with the new URL each session.
 4. Click "Save Changes" -> then "Manual Deploy"
 
 ### Method B: render.yaml + GitHub push
-1. Open d:\SIH26034\render.yaml
+1. Open d:\CompliQ\render.yaml
 2. Update the VITE_API_URL value to the new tunnel URL
 3. Run:
     git add render.yaml
@@ -83,7 +83,7 @@ Open: https://sih26034-frontend-aygy.onrender.com
 1. Login (or register a new account)
 2. Click "New Inspection"
 3. Fill in product name + brand -> Submit
-4. Upload a real image from d:\SIH26034\Images\ (e.g. GOLD_front.jpeg)
+4. Upload a real image from d:\CompliQ\Images\ (e.g. GOLD_front.jpeg)
 5. Click "Analyze" -> Wait 15-30 seconds
    (First analysis takes longer - PaddleOCR model loads on first call)
 6. View OCR Results - real text detected from the label

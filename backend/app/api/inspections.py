@@ -35,6 +35,9 @@ def create_inspection(
         product_name=data.product_name,
         brand=data.brand,
         user_id=current_user.id,
+        establishment_name=data.establishment_name,
+        latitude=data.latitude,
+        longitude=data.longitude,
     )
     image_service = ImageService(db)
     return _build_inspection_response(inspection, image_service)
@@ -126,5 +129,8 @@ def _build_inspection_response(inspection, image_service: ImageService) -> Inspe
         created_by=inspection.created_by,
         created_at=inspection.created_at,
         updated_at=inspection.updated_at,
+        establishment_name=inspection.establishment_name,
+        latitude=inspection.latitude,
+        longitude=inspection.longitude,
         images=images,
     )

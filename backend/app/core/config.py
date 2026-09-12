@@ -6,6 +6,7 @@ Loads settings from environment variables / .env file.
 """
 
 from pydantic_settings import BaseSettings
+from pydantic import model_validator
 from typing import List, Optional
 from dotenv import load_dotenv
 
@@ -44,9 +45,18 @@ class Settings(BaseSettings):
     # CORS
     CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
 
+    # Legal Notices
+    SHOW_CAUSE_RESPONSE_DAYS: int = 15
+
     # AI extraction (Groq) — optional, falls back to regex extraction if unset
     GROQ_API_KEY: Optional[str] = None
-    GROQ_MODEL: str = "llama-3.1-8b-instant"
+    GROQ_MODEL: Optional[str] = None
+
+    @model_validator(mode='after')
+    def validate_groq_config(self) -> 'Settings':
+        if self.GROQ_API_KEY and not self.GROQ_MODEL:
+            raise ValueError("GROQ_MODEL must be configured in environment when GROQ_API_KEY is provided.")
+        return self
 
     @property
     def cors_origins_list(self) -> List[str]:

@@ -676,7 +676,7 @@ The COMPLIQ frontend is a modern single-page application built with React 19, Ty
 ## Project Structure
 
 ```
-D:\SIH26034├── backend/
+d:\CompliQ├── backend/
 │   ├── app/
 │   │   ├── ai/                      # AI, OCR, and computer vision modules
 │   │   │   ├── base.py              # Base AI interfaces

@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 from app.ai.ocr_service import extract
 from app.ai.extraction import extract_product_info
 
-IMAGES_DIR = Path(r"D:\SIH26034\Images")
+IMAGES_DIR = Path(__file__).parent.parent / "Images"
 
 images = [
     ("Moksh Agarbatti", "Agarbatti_back.jpeg"),

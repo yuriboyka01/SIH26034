@@ -85,7 +85,7 @@ OCR Text:
 """
 
     try:
-        model_name = getattr(settings, "GROQ_MODEL", "qwen/qwen3.8-27b")
+        model_name = settings.GROQ_MODEL
         client = Groq(api_key=api_key)
         response = None
         last_error = None

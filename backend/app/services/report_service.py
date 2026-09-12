@@ -397,3 +397,223 @@ class ReportService:
         buffer = io.BytesIO()
         doc.save(buffer)
         return buffer.getvalue()
+
+    def render_show_cause_pdf(self, report_data: InspectionReportData) -> bytes:
+        """Generates an Auto-Drafted Show-Cause Notice PDF."""
+        from app.core.config import settings
+        
+        inspection = self.insp_repo.get_by_id(UUID(report_data.inspection_id))
+        if not inspection:
+            raise NotFoundError(code="INSPECTION_NOT_FOUND", message="Inspection not found.")
+
+        buffer = io.BytesIO()
+        doc = SimpleDocTemplate(
+            buffer, 
+            pagesize=A4,
+            rightMargin=inch, 
+            leftMargin=inch, 
+            topMargin=inch, 
+            bottomMargin=inch
+        )
+        
+        styles = getSampleStyleSheet()
+        title_style = ParagraphStyle(
+            'NoticeTitle',
+            parent=styles['Heading1'],
+            alignment=1, # Center
+            spaceAfter=12
+        )
+        h2_style = styles['Heading2']
+        h3_style = styles['Heading3']
+        normal_style = styles['Normal']
+        bold_style = ParagraphStyle('BoldStyle', parent=normal_style, fontName='Helvetica-Bold')
+        warning_style = ParagraphStyle('WarningStyle', parent=normal_style, textColor=colors.red, alignment=1, spaceAfter=12)
+        
+        elements = []
+        
+        # Draft Warning
+        elements.append(Paragraph("DRAFT — FOR REVIEW AND AUTHORIZATION", warning_style))
+        
+        # Header
+        elements.append(Paragraph("NOTICE TO SHOW CAUSE", title_style))
+        elements.append(Paragraph("under Section 36 & 48 of Legal Metrology Act, 2009", ParagraphStyle('SubTitle', parent=normal_style, alignment=1, spaceAfter=24)))
+        
+        # Metadata
+        current_date = datetime.now().strftime("%Y-%m-%d")
+        meta_data = [
+            ["Notice Reference Number:", f"SCN-{report_data.inspection_number}"],
+            ["Notice Date:", current_date],
+            ["Inspection Number:", report_data.inspection_number],
+            ["Inspection Date:", report_data.inspection_date],
+        ]
+        meta_table = Table(meta_data, colWidths=[2.5*inch, 3.5*inch])
+        meta_table.setStyle(TableStyle([
+            ('FONTNAME', (0,0), (0,-1), 'Helvetica-Bold'),
+            ('ALIGN', (0,0), (-1,-1), 'LEFT'),
+            ('BOTTOMPADDING', (0,0), (-1,-1), 6),
+        ]))
+        elements.append(meta_table)
+        elements.append(Spacer(1, 0.25 * inch))
+        
+        # Addressee
+        elements.append(Paragraph("To:", bold_style))
+        establishment_name = inspection.establishment_name or "The Operator / Manufacturer / Packer"
+        elements.append(Paragraph(establishment_name, normal_style))
+        if inspection.latitude and inspection.longitude:
+            elements.append(Paragraph(f"GPS Location: {inspection.latitude}, {inspection.longitude}", normal_style))
+        else:
+            elements.append(Paragraph("GPS Location: Not recorded", normal_style))
+            
+        pinfo = report_data.product_info
+        manufacturer = (pinfo.manufacturer if pinfo else None) or report_data.brand or "Not recorded"
+        elements.append(Paragraph(f"Manufacturer / Brand: {manufacturer}", normal_style))
+        elements.append(Spacer(1, 0.25 * inch))
+        
+        # Subject
+        elements.append(Paragraph("Subject: Observations regarding non-compliance with Packaged Commodities Rules, 2011", bold_style))
+        elements.append(Spacer(1, 0.25 * inch))
+        
+        # Inspection Statement
+        elements.append(Paragraph(f"An inspection was conducted on {report_data.inspection_date}. The inspection records indicate the following observed non-compliances concerning the product '{report_data.product_name}':", normal_style))
+        elements.append(Spacer(1, 0.15 * inch))
+        
+        # Contraventions Table
+        violations = [v for v in report_data.violations if v.status == "FAIL"]
+        if violations:
+            table_data = [["Rule Reference", "Expected Declaration", "Actual Observation"]]
+            for v in violations:
+                rule_ref = Paragraph(f"{v.rule_name}<br/>({v.source_reference})", normal_style)
+                expected = Paragraph(str(v.expected), normal_style)
+                actual = Paragraph(str(v.actual) if v.actual else "Not established", normal_style)
+                table_data.append([rule_ref, expected, actual])
+                
+            v_table = Table(table_data, colWidths=[2.0*inch, 2.0*inch, 2.0*inch])
+            v_table.setStyle(TableStyle([
+                ('BACKGROUND', (0,0), (-1,0), colors.lightgrey),
+                ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+                ('VALIGN', (0,0), (-1,-1), 'TOP'),
+                ('GRID', (0,0), (-1,-1), 1, colors.black),
+                ('BOTTOMPADDING', (0,0), (-1,-1), 6),
+            ]))
+            elements.append(v_table)
+        else:
+            elements.append(Paragraph("No failed rules identified in the compliance report.", normal_style))
+            
+        elements.append(Spacer(1, 0.25 * inch))
+        
+        # Warning / Deadline
+        deadline_days = settings.SHOW_CAUSE_RESPONSE_DAYS
+        elements.append(Paragraph(f"You are requested to show cause within {deadline_days} days from receipt of this notice as to why appropriate action should not be taken under the applicable provisions of the Legal Metrology Act, 2009 and the rules made thereunder.", normal_style))
+        elements.append(Spacer(1, 0.5 * inch))
+        
+        # Signature block
+        elements.append(Paragraph("Authorized Signatory", normal_style))
+        elements.append(Paragraph("_______________________", normal_style))
+        elements.append(Paragraph("Legal Metrology Officer", normal_style))
+
+        doc.build(elements)
+        return buffer.getvalue()
+
+    def render_show_cause_docx(self, report_data: InspectionReportData) -> bytes:
+        """Generates an Auto-Drafted Show-Cause Notice DOCX."""
+        try:
+            import docx
+            from docx.shared import Inches, Pt, RGBColor
+            from docx.enum.text import WD_ALIGN_PARAGRAPH
+        except Exception as exc:
+            raise BadRequestError(
+                code="DOCX_UNAVAILABLE",
+                message="DOCX generation library (python-docx) is not installed or available."
+            ) from exc
+
+        from app.core.config import settings
+        
+        inspection = self.insp_repo.get_by_id(UUID(report_data.inspection_id))
+        if not inspection:
+            raise NotFoundError(code="INSPECTION_NOT_FOUND", message="Inspection not found.")
+
+        doc = docx.Document()
+        
+        # Draft Warning
+        warning_p = doc.add_paragraph()
+        warning_run = warning_p.add_run("DRAFT — FOR REVIEW AND AUTHORIZATION")
+        warning_run.bold = True
+        warning_run.font.color.rgb = RGBColor(255, 0, 0)
+        warning_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        
+        # Header
+        title = doc.add_heading('NOTICE TO SHOW CAUSE', 0)
+        title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        
+        subtitle = doc.add_paragraph('under Section 36 & 48 of Legal Metrology Act, 2009')
+        subtitle.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        
+        # Metadata
+        current_date = datetime.now().strftime("%Y-%m-%d")
+        doc.add_paragraph(f"Notice Reference Number: SCN-{report_data.inspection_number}").bold = True
+        doc.add_paragraph(f"Notice Date: {current_date}")
+        doc.add_paragraph(f"Inspection Number: {report_data.inspection_number}")
+        doc.add_paragraph(f"Inspection Date: {report_data.inspection_date}")
+        
+        doc.add_paragraph() # Spacer
+        
+        # Addressee
+        doc.add_paragraph("To:").bold = True
+        establishment_name = inspection.establishment_name or "The Operator / Manufacturer / Packer"
+        doc.add_paragraph(establishment_name)
+        if inspection.latitude and inspection.longitude:
+            doc.add_paragraph(f"GPS Location: {inspection.latitude}, {inspection.longitude}")
+        else:
+            doc.add_paragraph("GPS Location: Not recorded")
+            
+        pinfo = report_data.product_info
+        manufacturer = (pinfo.manufacturer if pinfo else None) or report_data.brand or "Not recorded"
+        doc.add_paragraph(f"Manufacturer / Brand: {manufacturer}")
+        
+        doc.add_paragraph() # Spacer
+        
+        # Subject
+        doc.add_paragraph("Subject: Observations regarding non-compliance with Packaged Commodities Rules, 2011").bold = True
+        doc.add_paragraph()
+        
+        # Body
+        doc.add_paragraph(f"An inspection was conducted on {report_data.inspection_date}. The inspection records indicate the following observed non-compliances concerning the product '{report_data.product_name}':")
+        
+        # Table
+        violations = [v for v in report_data.violations if v.status == "FAIL"]
+        if violations:
+            table = doc.add_table(rows=1, cols=3)
+            table.style = 'Table Grid'
+            hdr_cells = table.rows[0].cells
+            hdr_cells[0].text = 'Rule Reference'
+            hdr_cells[1].text = 'Expected Declaration'
+            hdr_cells[2].text = 'Actual Observation'
+            
+            # Bold headers
+            for cell in hdr_cells:
+                for paragraph in cell.paragraphs:
+                    for run in paragraph.runs:
+                        run.font.bold = True
+
+            for v in violations:
+                row_cells = table.add_row().cells
+                row_cells[0].text = f"{v.rule_name}\n({v.source_reference})"
+                row_cells[1].text = str(v.expected)
+                row_cells[2].text = str(v.actual) if v.actual else "Not established"
+        else:
+            doc.add_paragraph("No failed rules identified in the compliance report.")
+            
+        doc.add_paragraph() # Spacer
+        
+        # Deadline
+        deadline_days = settings.SHOW_CAUSE_RESPONSE_DAYS
+        doc.add_paragraph(f"You are requested to show cause within {deadline_days} days from receipt of this notice as to why appropriate action should not be taken under the applicable provisions of the Legal Metrology Act, 2009 and the rules made thereunder.")
+        
+        # Signature
+        doc.add_paragraph("\n\nAuthorized Signatory")
+        doc.add_paragraph("_______________________")
+        doc.add_paragraph("Legal Metrology Officer")
+        
+        buffer = io.BytesIO()
+        doc.save(buffer)
+        return buffer.getvalue()

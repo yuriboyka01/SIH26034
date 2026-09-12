@@ -1,0 +1,2872 @@
+{
+  "Moksh Agarbatti": {
+    "ocr_blocks_count": 30,
+    "ocr_blocks": [
+      {
+        "text": "Cut from Here",
+        "normalized_text": "Cut from Here",
+        "confidence": 0.9760585427284241,
+        "bbox": [
+          581.0,
+          56.0,
+          698.0,
+          87.0
+        ]
+      },
+      {
+        "text": "ALWAYS CLOSE THE ZIPPER TIGHTLY TOGET",
+        "normalized_text": "ALWAYS CLOSE THE ZIPPER TIGHTLY TOGET",
+        "confidence": 0.9140881896018982,
+        "bbox": [
+          55.0,
+          84.0,
+          325.0,
+          136.0
+        ]
+      },
+      {
+        "text": "THE BEST ERA",
+        "normalized_text": "THE BEST ERA",
+        "confidence": 0.8626446723937988,
+        "bbox": [
+          337.0,
+          101.0,
+          439.0,
+          125.0
+        ]
+      },
+      {
+        "text": "GRANC",
+        "normalized_text": "GRANC",
+        "confidence": 0.882342517375946,
+        "bbox": [
+          437.0,
+          100.0,
+          494.0,
+          120.0
+        ]
+      },
+      {
+        "text": "Bhakti Me Laye Shakti",
+        "normalized_text": "Bhakti Me Laye Shakti",
+        "confidence": 0.9967252016067505,
+        "bbox": [
+          183.0,
+          144.0,
+          600.0,
+          200.0
+        ]
+      },
+      {
+        "text": "R",
+        "normalized_text": "R",
+        "confidence": 0.9785109758377075,
+        "bbox": [
+          512.0,
+          223.0,
+          542.0,
+          237.0
+        ]
+      },
+      {
+        "text": "MOKSH",
+        "normalized_text": "MOKSH",
+        "confidence": 0.9965405464172363,
+        "bbox": [
+          265.0,
+          238.0,
+          525.0,
+          305.0
+        ]
+      },
+      {
+        "text": "AGARBATTI",
+        "normalized_text": "AGARBATTI",
+        "confidence": 0.9525489807128906,
+        "bbox": [
+          271.0,
+          313.0,
+          516.0,
+          352.0
+        ]
+      },
+      {
+        "text": "Pineapple incense sticks has a sweet,fruity,and",
+        "normalized_text": "Pineapple incense sticks has a sweet,fruity,and",
+        "confidence": 0.9350731372833252,
+        "bbox": [
+          190.0,
+          558.0,
+          544.0,
+          580.0
+        ]
+      },
+      {
+        "text": "tropical fragrance.The scent is bright and refreshing,",
+        "normalized_text": "tropical fragrance.The scent is bright and refreshing,",
+        "confidence": 0.9816092848777771,
+        "bbox": [
+          188.0,
+          581.0,
+          575.0,
+          606.0
+        ]
+      },
+      {
+        "text": "often evoking a sense of warmth and energy;perfect",
+        "normalized_text": "often evoking a sense of warmth and energy;perfect",
+        "confidence": 0.9537398815155029,
+        "bbox": [
+          190.0,
+          605.0,
+          577.0,
+          630.0
+        ]
+      },
+      {
+        "text": "for creating a lively,uplifting atm phere in any space.",
+        "normalized_text": "for creating a lively,uplifting atm phere in any space.",
+        "confidence": 0.9468333125114441,
+        "bbox": [
+          190.0,
+          628.0,
+          593.0,
+          653.0
+        ]
+      },
+      {
+        "text": "It's great for adding a cheerfbe to a room or simply",
+        "normalized_text": "It's great for adding a cheerfbe to a room or simply",
+        "confidence": 0.9630011916160583,
+        "bbox": [
+          192.0,
+          653.0,
+          595.0,
+          675.0
+        ]
+      },
+      {
+        "text": "making your environment",
+        "normalized_text": "making your environment",
+        "confidence": 0.9571893811225891,
+        "bbox": [
+          193.0,
+          674.0,
+          384.0,
+          700.0
+        ]
+      },
+      {
+        "text": "el more inviting.",
+        "normalized_text": "el more inviting.",
+        "confidence": 0.94677734375,
+        "bbox": [
+          396.0,
+          673.0,
+          521.0,
+          700.0
+        ]
+      },
+      {
+        "text": "MOKSH",
+        "normalized_text": "MOKSH",
+        "confidence": 0.99689120054245,
+        "bbox": [
+          203.0,
+          725.0,
+          293.0,
+          748.0
+        ]
+      },
+      {
+        "text": "ManufacturedPacked&CustomerCby",
+        "normalized_text": "ManufacturedPacked&CustomerCby",
+        "confidence": 0.934580385684967,
+        "bbox": [
+          319.0,
+          714.0,
+          560.0,
+          740.0
+        ]
+      },
+      {
+        "text": "MOKSH AGARBATTI CO.",
+        "normalized_text": "MOKSH AGARBATTI CO.",
+        "confidence": 0.9231975078582764,
+        "bbox": [
+          320.0,
+          733.0,
+          592.0,
+          761.0
+        ]
+      },
+      {
+        "text": "AGARBATT",
+        "normalized_text": "AGARBATT",
+        "confidence": 0.9905925393104553,
+        "bbox": [
+          203.0,
+          750.0,
+          291.0,
+          766.0
+        ]
+      },
+      {
+        "text": "TMNo.310602-3",
+        "normalized_text": "TMNo.310602-3",
+        "confidence": 0.9611359238624573,
+        "bbox": [
+          324.0,
+          758.0,
+          420.0,
+          775.0
+        ]
+      },
+      {
+        "text": "AnISO 9001",
+        "normalized_text": "AnISO 9001",
+        "confidence": 0.9271008372306824,
+        "bbox": [
+          205.0,
+          772.0,
+          293.0,
+          798.0
+        ]
+      },
+      {
+        "text": "Certified Company",
+        "normalized_text": "Certified Company",
+        "confidence": 0.9660626649856567,
+        "bbox": [
+          196.0,
+          789.0,
+          308.0,
+          815.0
+        ]
+      },
+      {
+        "text": "Kanakapura Tq.Ramanagar Dt Karnataka-562 112.INDIA.",
+        "normalized_text": "Kanakapura Tq.Ramanagar Dt Karnataka-562 112.INDIA.",
+        "confidence": 0.9022924900054932,
+        "bbox": [
+          324.0,
+          786.0,
+          593.0,
+          803.0
+        ]
+      },
+      {
+        "text": "Caution : Keep out of reach of children.",
+        "normalized_text": "Caution : Keep out of reach of children.",
+        "confidence": 0.9409323930740356,
+        "bbox": [
+          259.0,
+          893.0,
+          521.0,
+          921.0
+        ]
+      },
+      {
+        "text": "Directions of use:",
+        "normalized_text": "Directions of use:",
+        "confidence": 0.969781756401062,
+        "bbox": [
+          304.0,
+          939.0,
+          479.0,
+          963.0
+        ]
+      },
+      {
+        "text": "Moksh Agarbatti/",
+        "normalized_text": "Moksh Agarbatti/",
+        "confidence": 0.9742767810821533,
+        "bbox": [
+          301.0,
+          1116.0,
+          420.0,
+          1138.0
+        ]
+      },
+      {
+        "text": "7090600004",
+        "normalized_text": "7090600004",
+        "confidence": 0.9847536087036133,
+        "bbox": [
+          296.0,
+          1162.0,
+          430.0,
+          1188.0
+        ]
+      },
+      {
+        "text": "Net Quantity :150g",
+        "normalized_text": "Net Quantity :150g",
+        "confidence": 0.9161495566368103,
+        "bbox": [
+          221.0,
+          1240.0,
+          367.0,
+          1278.0
+        ]
+      },
+      {
+        "text": "8904024",
+        "normalized_text": "8904024",
+        "confidence": 0.9861068725585938,
+        "bbox": [
+          431.0,
+          1296.0,
+          502.0,
+          1308.0
+        ]
+      },
+      {
+        "text": "LEXPORT QUALITY",
+        "normalized_text": "LEXPORT QUALITY",
+        "confidence": 0.9418172836303711,
+        "bbox": [
+          370.0,
+          1329.0,
+          527.0,
+          1354.0
+        ]
+      }
+    ],
+    "extracted_fields": [
+      {
+        "field_name": "product_name",
+        "value": "Moksh Agarbatti",
+        "detection_status": "DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "brand_name",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "manufacturer",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "net_quantity",
+        "value": "150g",
+        "detection_status": "DETECTED",
+        "evidence": {
+          "source_text": "Net Quantity :150g",
+          "confidence": 0.9161495566368103,
+          "bbox": [
+            221.0,
+            1240.0,
+            367.0,
+            1278.0
+          ]
+        }
+      },
+      {
+        "field_name": "mrp",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "manufacturing_date",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "packaging_date",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "expiry_date",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "batch_number",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "country_of_origin",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "ingredients",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "license_number",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "customer_care",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "warnings",
+        "value": "Caution : Keep out of reach of children.",
+        "detection_status": "DETECTED",
+        "evidence": {
+          "source_text": "Caution : Keep out of reach of children.",
+          "confidence": 0.9,
+          "bbox": null
+        }
+      },
+      {
+        "field_name": "email",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "unit_sale_price",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "commodity",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "storage_instructions",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "sale_restrictions",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      }
+    ]
+  },
+  "Gold Winner Refined Sunflower Oil": {
+    "ocr_blocks_count": 42,
+    "ocr_blocks": [
+      {
+        "text": "Fotd",
+        "normalized_text": "Fotd",
+        "confidence": 0.9249043464660645,
+        "bbox": [
+          128.0,
+          489.0,
+          285.0,
+          550.0
+        ]
+      },
+      {
+        "text": "RUSTED",
+        "normalized_text": "RUSTED",
+        "confidence": 0.9877908825874329,
+        "bbox": [
+          312.0,
+          513.0,
+          425.0,
+          528.0
+        ]
+      },
+      {
+        "text": "Swinner",
+        "normalized_text": "Swinner",
+        "confidence": 0.9362989664077759,
+        "bbox": [
+          121.0,
+          537.0,
+          285.0,
+          590.0
+        ]
+      },
+      {
+        "text": "MOTHERS",
+        "normalized_text": "MOTHERS",
+        "confidence": 0.9954420924186707,
+        "bbox": [
+          296.0,
+          531.0,
+          428.0,
+          551.0
+        ]
+      },
+      {
+        "text": "tF",
+        "normalized_text": "tF",
+        "confidence": 0.8517658710479736,
+        "bbox": [
+          317.0,
+          610.0,
+          407.0,
+          681.0
+        ]
+      },
+      {
+        "text": "HNO",
+        "normalized_text": "HNO",
+        "confidence": 0.9686017036437988,
+        "bbox": [
+          509.0,
+          640.0,
+          555.0,
+          656.0
+        ]
+      },
+      {
+        "text": "NUTRITIONAL INFORMATION",
+        "normalized_text": "NUTRITIONAL INFORMATION",
+        "confidence": 0.9790119528770447,
+        "bbox": [
+          587.0,
+          690.0,
+          773.0,
+          706.0
+        ]
+      },
+      {
+        "text": "Fortified with",
+        "normalized_text": "Fortified with",
+        "confidence": 0.976874828338623,
+        "bbox": [
+          314.0,
+          701.0,
+          411.0,
+          720.0
+        ]
+      },
+      {
+        "text": "Vitamins A&D",
+        "normalized_text": "Vitamins A&D",
+        "confidence": 0.955819845199585,
+        "bbox": [
+          314.0,
+          716.0,
+          415.0,
+          736.0
+        ]
+      },
+      {
+        "text": "Par 190G",
+        "normalized_text": "Par 190G",
+        "confidence": 0.7679495811462402,
+        "bbox": [
+          640.0,
+          730.0,
+          683.0,
+          748.0
+        ]
+      },
+      {
+        "text": "ParS",
+        "normalized_text": "ParS",
+        "confidence": 0.8062084317207336,
+        "bbox": [
+          704.0,
+          733.0,
+          727.0,
+          745.0
+        ]
+      },
+      {
+        "text": " the cmmodityRefined Sunflower Oil",
+        "normalized_text": "the cmmodityRefined Sunflower Oil",
+        "confidence": 0.7604195475578308,
+        "bbox": [
+          86.0,
+          754.0,
+          332.0,
+          781.0
+        ]
+      },
+      {
+        "text": "900 ke",
+        "normalized_text": "900 ke",
+        "confidence": 0.6585807800292969,
+        "bbox": [
+          649.0,
+          755.0,
+          676.0,
+          768.0
+        ]
+      },
+      {
+        "text": "otolFo",
+        "normalized_text": "otolFo",
+        "confidence": 0.6931393146514893,
+        "bbox": [
+          522.0,
+          771.0,
+          550.0,
+          783.0
+        ]
+      },
+      {
+        "text": "Net Qvontity:500ml (455 g)",
+        "normalized_text": "Net Qvontity:500ml (455 g)",
+        "confidence": 0.9336677193641663,
+        "bbox": [
+          91.0,
+          779.0,
+          359.0,
+          811.0
+        ]
+      },
+      {
+        "text": "A",
+        "normalized_text": "A",
+        "confidence": 0.5058459639549255,
+        "bbox": [
+          727.0,
+          770.0,
+          743.0,
+          786.0
+        ]
+      },
+      {
+        "text": "d Fay Ac",
+        "normalized_text": "d Fay Ac",
+        "confidence": 0.7554008960723877,
+        "bbox": [
+          575.0,
+          804.0,
+          620.0,
+          816.0
+        ]
+      },
+      {
+        "text": "40",
+        "normalized_text": "40",
+        "confidence": 0.9839218258857727,
+        "bbox": [
+          658.0,
+          804.0,
+          679.0,
+          816.0
+        ]
+      },
+      {
+        "text": "NGRENTRefined Sunflower Oil Anioxidon",
+        "normalized_text": "NGRENTRefined Sunflower Oil Anioxidon",
+        "confidence": 0.7400109171867371,
+        "bbox": [
+          91.0,
+          814.0,
+          355.0,
+          840.0
+        ]
+      },
+      {
+        "text": "ad Fany Add",
+        "normalized_text": "ad Fany Add",
+        "confidence": 0.7462536096572876,
+        "bbox": [
+          547.0,
+          819.0,
+          597.0,
+          831.0
+        ]
+      },
+      {
+        "text": "E319-TBHQVitaminAVitamin D2",
+        "normalized_text": "E319-TBHQVitaminAVitamin D2",
+        "confidence": 0.8867064714431763,
+        "bbox": [
+          89.0,
+          838.0,
+          278.0,
+          859.0
+        ]
+      },
+      {
+        "text": "TromFAcd ",
+        "normalized_text": "TromFAcd",
+        "confidence": 0.7558974623680115,
+        "bbox": [
+          520.0,
+          833.0,
+          608.0,
+          851.0
+        ]
+      },
+      {
+        "text": "0g",
+        "normalized_text": "0g",
+        "confidence": 0.6373147964477539,
+        "bbox": [
+          658.0,
+          849.0,
+          673.0,
+          868.0
+        ]
+      },
+      {
+        "text": "FREE FROM ARGEMONE OIL",
+        "normalized_text": "FREE FROM ARGEMONE OIL",
+        "confidence": 0.9522536993026733,
+        "bbox": [
+          84.0,
+          863.0,
+          230.0,
+          883.0
+        ]
+      },
+      {
+        "text": "Off Which Soge",
+        "normalized_text": "Off Which Soge",
+        "confidence": 0.8305069208145142,
+        "bbox": [
+          521.0,
+          883.0,
+          580.0,
+          899.0
+        ]
+      },
+      {
+        "text": "For manufaduring",
+        "normalized_text": "For manufaduring",
+        "confidence": 0.9306744337081909,
+        "bbox": [
+          385.0,
+          904.0,
+          489.0,
+          923.0
+        ]
+      },
+      {
+        "text": "Addand Sugn",
+        "normalized_text": "Addand Sugn",
+        "confidence": 0.7270090579986572,
+        "bbox": [
+          518.0,
+          895.0,
+          571.0,
+          920.0
+        ]
+      },
+      {
+        "text": "itted Anti-azidard",
+        "normalized_text": "itted Anti-azidard",
+        "confidence": 0.7851963043212891,
+        "bbox": [
+          221.0,
+          908.0,
+          293.0,
+          919.0
+        ]
+      },
+      {
+        "text": "Og",
+        "normalized_text": "Og",
+        "confidence": 0.6294314861297607,
+        "bbox": [
+          659.0,
+          899.0,
+          673.0,
+          916.0
+        ]
+      },
+      {
+        "text": "FOR SALEN INDIA ONLY AND NOT FOR EXPORT",
+        "normalized_text": "FOR SALEN INDIA ONLY AND NOT FOR EXPORT",
+        "confidence": 0.9113079905509949,
+        "bbox": [
+          83.0,
+          924.0,
+          355.0,
+          949.0
+        ]
+      },
+      {
+        "text": "address&",
+        "normalized_text": "address&",
+        "confidence": 0.9586105942726135,
+        "bbox": [
+          418.0,
+          919.0,
+          479.0,
+          938.0
+        ]
+      },
+      {
+        "text": "FSSAI licence No.",
+        "normalized_text": "FSSAI licence No.",
+        "confidence": 0.9000364542007446,
+        "bbox": [
+          385.0,
+          938.0,
+          481.0,
+          956.0
+        ]
+      },
+      {
+        "text": "Please scan the QR Code.",
+        "normalized_text": "Please scan the QR Code.",
+        "confidence": 0.9458873867988586,
+        "bbox": [
+          367.0,
+          954.0,
+          506.0,
+          975.0
+        ]
+      },
+      {
+        "text": "7500 IU7",
+        "normalized_text": "7500 IU7",
+        "confidence": 0.6461272239685059,
+        "bbox": [
+          631.0,
+          968.0,
+          669.0,
+          979.0
+        ]
+      },
+      {
+        "text": "EFER FOGD CAEDR",
+        "normalized_text": "EFER FOGD CAEDR",
+        "confidence": 0.8621581196784973,
+        "bbox": [
+          559.0,
+          1001.0,
+          616.0,
+          1013.0
+        ]
+      },
+      {
+        "text": "8906010261047",
+        "normalized_text": "8906010261047",
+        "confidence": 0.9932777881622314,
+        "bbox": [
+          89.0,
+          1011.0,
+          293.0,
+          1033.0
+        ]
+      },
+      {
+        "text": "OKaleesuwari",
+        "normalized_text": "OKaleesuwari",
+        "confidence": 0.9387281537055969,
+        "bbox": [
+          546.0,
+          1039.0,
+          703.0,
+          1077.0
+        ]
+      },
+      {
+        "text": "For Marketing & Consumer Comp",
+        "normalized_text": "For Marketing & Consumer Comp",
+        "confidence": 0.9471065402030945,
+        "bbox": [
+          535.0,
+          1081.0,
+          759.0,
+          1115.0
+        ]
+      },
+      {
+        "text": "famil Nadu.Consun",
+        "normalized_text": "famil Nadu.Consun",
+        "confidence": 0.8719500303268433,
+        "bbox": [
+          539.0,
+          1136.0,
+          649.0,
+          1153.0
+        ]
+      },
+      {
+        "text": "Ssalue",
+        "normalized_text": "Ssalue",
+        "confidence": 0.61141437292099,
+        "bbox": [
+          537.0,
+          1176.0,
+          611.0,
+          1194.0
+        ]
+      },
+      {
+        "text": "10013042001073",
+        "normalized_text": "10013042001073",
+        "confidence": 0.9977756142616272,
+        "bbox": [
+          631.0,
+          1170.0,
+          761.0,
+          1201.0
+        ]
+      },
+      {
+        "text": "00004",
+        "normalized_text": "00004",
+        "confidence": 0.9462679028511047,
+        "bbox": [
+          484.0,
+          1213.0,
+          529.0,
+          1229.0
+        ]
+      }
+    ],
+    "extracted_fields": [
+      {
+        "field_name": "product_name",
+        "value": "Gold Winner Refined Sunflower Oil",
+        "detection_status": "DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "brand_name",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "manufacturer",
+        "value": "& Consumer Comp",
+        "detection_status": "DETECTED",
+        "evidence": {
+          "source_text": "For Marketing & Consumer Comp",
+          "confidence": 0.9471065402030945,
+          "bbox": [
+            535.0,
+            1081.0,
+            759.0,
+            1115.0
+          ]
+        }
+      },
+      {
+        "field_name": "net_quantity",
+        "value": "190G",
+        "detection_status": "UNCERTAIN",
+        "evidence": {
+          "source_text": "Par 190G ParS",
+          "confidence": 0.7870790064334869,
+          "bbox": [
+            640.0,
+            730.0,
+            727.0,
+            748.0
+          ]
+        }
+      },
+      {
+        "field_name": "mrp",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "manufacturing_date",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "packaging_date",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "expiry_date",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "batch_number",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "country_of_origin",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "ingredients",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "license_number",
+        "value": "ence",
+        "detection_status": "DETECTED",
+        "evidence": {
+          "source_text": "FSSAI licence No.",
+          "confidence": 0.9000364542007446,
+          "bbox": [
+            385.0,
+            938.0,
+            481.0,
+            956.0
+          ]
+        }
+      },
+      {
+        "field_name": "customer_care",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "warnings",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "email",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "unit_sale_price",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "commodity",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "storage_instructions",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "sale_restrictions",
+        "value": "FOR SALEN INDIA ONLY AND NOT FOR EXPORT address&",
+        "detection_status": "DETECTED",
+        "evidence": {
+          "source_text": "FOR SALEN INDIA ONLY AND NOT FOR EXPORT address&",
+          "confidence": 0.9,
+          "bbox": null
+        }
+      }
+    ]
+  },
+  "Sunraja Gulas Jaggery Powder": {
+    "ocr_blocks_count": 88,
+    "ocr_blocks": [
+      {
+        "text": "Gulas",
+        "normalized_text": "Gulas",
+        "confidence": 0.9472880363464355,
+        "bbox": [
+          77.0,
+          394.0,
+          346.0,
+          482.0
+        ]
+      },
+      {
+        "text": "24848",
+        "normalized_text": "24848",
+        "confidence": 0.9730629920959473,
+        "bbox": [
+          411.0,
+          413.0,
+          435.0,
+          475.0
+        ]
+      },
+      {
+        "text": "noomeom mosn",
+        "normalized_text": "noomeom mosn",
+        "confidence": 0.5997260808944702,
+        "bbox": [
+          491.0,
+          446.0,
+          742.0,
+          471.0
+        ]
+      },
+      {
+        "text": "JAGGERYPOWDER",
+        "normalized_text": "JAGGERYPOWDER",
+        "confidence": 0.9594762325286865,
+        "bbox": [
+          76.0,
+          521.0,
+          349.0,
+          543.0
+        ]
+      },
+      {
+        "text": "INGREDIENTS:Sugarcane Extract",
+        "normalized_text": "INGREDIENTS:Sugarcane Extract",
+        "confidence": 0.9547258615493774,
+        "bbox": [
+          76.0,
+          546.0,
+          349.0,
+          568.0
+        ]
+      },
+      {
+        "text": "JA/05",
+        "normalized_text": "JA/05",
+        "confidence": 0.87671959400177,
+        "bbox": [
+          411.0,
+          550.0,
+          430.0,
+          630.0
+        ]
+      },
+      {
+        "text": "Serving Size-100g",
+        "normalized_text": "Serving Size-100g",
+        "confidence": 0.9780620336532593,
+        "bbox": [
+          86.0,
+          571.0,
+          216.0,
+          593.0
+        ]
+      },
+      {
+        "text": "Net Weight:",
+        "normalized_text": "Net Weight:",
+        "confidence": 0.9551234841346741,
+        "bbox": [
+          573.0,
+          583.0,
+          699.0,
+          612.0
+        ]
+      },
+      {
+        "text": "Nutritional Information*",
+        "normalized_text": "Nutritional Information*",
+        "confidence": 0.9855770468711853,
+        "bbox": [
+          121.0,
+          601.0,
+          321.0,
+          623.0
+        ]
+      },
+      {
+        "text": "500g",
+        "normalized_text": "500g",
+        "confidence": 0.9998127818107605,
+        "bbox": [
+          573.0,
+          607.0,
+          700.0,
+          669.0
+        ]
+      },
+      {
+        "text": "Quantity Per Serve",
+        "normalized_text": "Quantity Per Serve",
+        "confidence": 0.9416788816452026,
+        "bbox": [
+          225.0,
+          628.0,
+          359.0,
+          650.0
+        ]
+      },
+      {
+        "text": "Nutrients",
+        "normalized_text": "Nutrients",
+        "confidence": 0.9892386198043823,
+        "bbox": [
+          127.0,
+          641.0,
+          182.0,
+          660.0
+        ]
+      },
+      {
+        "text": "Per 100g",
+        "normalized_text": "Per 100g",
+        "confidence": 0.9685998558998108,
+        "bbox": [
+          226.0,
+          650.0,
+          289.0,
+          673.0
+        ]
+      },
+      {
+        "text": "%RDA^",
+        "normalized_text": "%RDA^",
+        "confidence": 0.8902872204780579,
+        "bbox": [
+          297.0,
+          650.0,
+          350.0,
+          673.0
+        ]
+      },
+      {
+        "text": "DO NOT BUY IF SEAL IS BROKEN",
+        "normalized_text": "DO NOT BUY IF SEAL IS BROKEN",
+        "confidence": 0.9366320967674255,
+        "bbox": [
+          502.0,
+          663.0,
+          706.0,
+          686.0
+        ]
+      },
+      {
+        "text": "Energy",
+        "normalized_text": "Energy",
+        "confidence": 0.9971053004264832,
+        "bbox": [
+          89.0,
+          679.0,
+          131.0,
+          705.0
+        ]
+      },
+      {
+        "text": "368 kcal",
+        "normalized_text": "368 kcal",
+        "confidence": 0.939868152141571,
+        "bbox": [
+          238.0,
+          681.0,
+          286.0,
+          700.0
+        ]
+      },
+      {
+        "text": "18%",
+        "normalized_text": "18%",
+        "confidence": 0.9929118752479553,
+        "bbox": [
+          324.0,
+          681.0,
+          354.0,
+          701.0
+        ]
+      },
+      {
+        "text": "NN",
+        "normalized_text": "NN",
+        "confidence": 0.5409681797027588,
+        "bbox": [
+          390.0,
+          680.0,
+          430.0,
+          718.0
+        ]
+      },
+      {
+        "text": "0g",
+        "normalized_text": "0g",
+        "confidence": 0.6733571887016296,
+        "bbox": [
+          258.0,
+          698.0,
+          293.0,
+          730.0
+        ]
+      },
+      {
+        "text": "KEEP AWAY FROM DIRECT SUNLIGHT",
+        "normalized_text": "KEEP AWAY FROM DIRECT SUNLIGHT",
+        "confidence": 0.9549233317375183,
+        "bbox": [
+          512.0,
+          693.0,
+          732.0,
+          715.0
+        ]
+      },
+      {
+        "text": "Total Fat",
+        "normalized_text": "Total Fat",
+        "confidence": 0.9338087439537048,
+        "bbox": [
+          91.0,
+          703.0,
+          137.0,
+          721.0
+        ]
+      },
+      {
+        "text": "0%",
+        "normalized_text": "0%",
+        "confidence": 0.9575998783111572,
+        "bbox": [
+          327.0,
+          703.0,
+          354.0,
+          725.0
+        ]
+      },
+      {
+        "text": "STORE IT IN A COOL AND DRY PLACE",
+        "normalized_text": "STORE IT IN A COOL AND DRY PLACE",
+        "confidence": 0.8933389782905579,
+        "bbox": [
+          529.0,
+          708.0,
+          716.0,
+          730.0
+        ]
+      },
+      {
+        "text": "-Saturated Fat",
+        "normalized_text": "-Saturated Fat",
+        "confidence": 0.9615016579627991,
+        "bbox": [
+          98.0,
+          723.0,
+          183.0,
+          741.0
+        ]
+      },
+      {
+        "text": "0g",
+        "normalized_text": "0g",
+        "confidence": 0.7900428175926208,
+        "bbox": [
+          264.0,
+          723.0,
+          289.0,
+          745.0
+        ]
+      },
+      {
+        "text": "0%",
+        "normalized_text": "0%",
+        "confidence": 0.9937945008277893,
+        "bbox": [
+          329.0,
+          721.0,
+          354.0,
+          743.0
+        ]
+      },
+      {
+        "text": "N.",
+        "normalized_text": "N.",
+        "confidence": 0.719379186630249,
+        "bbox": [
+          392.0,
+          721.0,
+          425.0,
+          741.0
+        ]
+      },
+      {
+        "text": "C",
+        "normalized_text": "C",
+        "confidence": 0.5868607759475708,
+        "bbox": [
+          407.0,
+          740.0,
+          423.0,
+          755.0
+        ]
+      },
+      {
+        "text": "The pictures shown are for illustration",
+        "normalized_text": "The pictures shown are for illustration",
+        "confidence": 0.9685588479042053,
+        "bbox": [
+          502.0,
+          736.0,
+          698.0,
+          758.0
+        ]
+      },
+      {
+        "text": "-Trans Fat",
+        "normalized_text": "-Trans Fat",
+        "confidence": 0.965610682964325,
+        "bbox": [
+          99.0,
+          748.0,
+          155.0,
+          766.0
+        ]
+      },
+      {
+        "text": "og",
+        "normalized_text": "og",
+        "confidence": 0.7477495074272156,
+        "bbox": [
+          264.0,
+          748.0,
+          289.0,
+          770.0
+        ]
+      },
+      {
+        "text": "0%",
+        "normalized_text": "0%",
+        "confidence": 0.9940259456634521,
+        "bbox": [
+          329.0,
+          746.0,
+          354.0,
+          768.0
+        ]
+      },
+      {
+        "text": "purpose only. Actual product may vary",
+        "normalized_text": "purpose only. Actual product may vary",
+        "confidence": 0.9566274285316467,
+        "bbox": [
+          501.0,
+          753.0,
+          697.0,
+          773.0
+        ]
+      },
+      {
+        "text": "Cholesterol",
+        "normalized_text": "Cholesterol",
+        "confidence": 0.9938743114471436,
+        "bbox": [
+          89.0,
+          766.0,
+          156.0,
+          793.0
+        ]
+      },
+      {
+        "text": "0mg",
+        "normalized_text": "0mg",
+        "confidence": 0.8878517746925354,
+        "bbox": [
+          251.0,
+          767.0,
+          289.0,
+          794.0
+        ]
+      },
+      {
+        "text": "0%",
+        "normalized_text": "0%",
+        "confidence": 0.9956997632980347,
+        "bbox": [
+          329.0,
+          770.0,
+          354.0,
+          791.0
+        ]
+      },
+      {
+        "text": "Marketed by",
+        "normalized_text": "Marketed by",
+        "confidence": 0.9803457260131836,
+        "bbox": [
+          502.0,
+          774.0,
+          593.0,
+          795.0
+        ]
+      },
+      {
+        "text": "Sodium",
+        "normalized_text": "Sodium",
+        "confidence": 0.9940664768218994,
+        "bbox": [
+          89.0,
+          791.0,
+          134.0,
+          815.0
+        ]
+      },
+      {
+        "text": "110 mg",
+        "normalized_text": "110 mg",
+        "confidence": 0.9694468379020691,
+        "bbox": [
+          239.0,
+          790.0,
+          288.0,
+          818.0
+        ]
+      },
+      {
+        "text": "6%",
+        "normalized_text": "6%",
+        "confidence": 0.9838706254959106,
+        "bbox": [
+          329.0,
+          795.0,
+          354.0,
+          814.0
+        ]
+      },
+      {
+        "text": "SSUNRAJA",
+        "normalized_text": "SSUNRAJA",
+        "confidence": 0.9845256805419922,
+        "bbox": [
+          506.0,
+          798.0,
+          701.0,
+          833.0
+        ]
+      },
+      {
+        "text": "Total Carbohydrate",
+        "normalized_text": "Total Carbohydrate",
+        "confidence": 0.9801580905914307,
+        "bbox": [
+          89.0,
+          811.0,
+          197.0,
+          838.0
+        ]
+      },
+      {
+        "text": "92g",
+        "normalized_text": "92g",
+        "confidence": 0.9842073917388916,
+        "bbox": [
+          255.0,
+          814.0,
+          289.0,
+          840.0
+        ]
+      },
+      {
+        "text": "33%",
+        "normalized_text": "33%",
+        "confidence": 0.9924563765525818,
+        "bbox": [
+          322.0,
+          816.0,
+          354.0,
+          836.0
+        ]
+      },
+      {
+        "text": "-Dietary Fiber",
+        "normalized_text": "-Dietary Fiber",
+        "confidence": 0.937813401222229,
+        "bbox": [
+          99.0,
+          836.0,
+          179.0,
+          860.0
+        ]
+      },
+      {
+        "text": "0g",
+        "normalized_text": "0g",
+        "confidence": 0.8000811338424683,
+        "bbox": [
+          261.0,
+          841.0,
+          288.0,
+          863.0
+        ]
+      },
+      {
+        "text": "0%",
+        "normalized_text": "0%",
+        "confidence": 0.9928667545318604,
+        "bbox": [
+          327.0,
+          839.0,
+          354.0,
+          861.0
+        ]
+      },
+      {
+        "text": "Sunraja Oil IndustriesP",
+        "normalized_text": "Sunraja Oil IndustriesP",
+        "confidence": 0.9042248129844666,
+        "bbox": [
+          501.0,
+          831.0,
+          643.0,
+          856.0
+        ]
+      },
+      {
+        "text": "Limited",
+        "normalized_text": "Limited",
+        "confidence": 0.9837594628334045,
+        "bbox": [
+          673.0,
+          834.0,
+          722.0,
+          851.0
+        ]
+      },
+      {
+        "text": "-Total Sugars",
+        "normalized_text": "-Total Sugars",
+        "confidence": 0.9406566619873047,
+        "bbox": [
+          97.0,
+          856.0,
+          177.0,
+          883.0
+        ]
+      },
+      {
+        "text": "928",
+        "normalized_text": "928",
+        "confidence": 0.9357709884643555,
+        "bbox": [
+          252.0,
+          854.0,
+          290.0,
+          886.0
+        ]
+      },
+      {
+        "text": "88/1.PullyankaduMoolskkarai.Per",
+        "normalized_text": "88/1.PullyankaduMoolskkarai.Per",
+        "confidence": 0.8390570878982544,
+        "bbox": [
+          504.0,
+          853.0,
+          663.0,
+          868.0
+        ]
+      },
+      {
+        "text": "Naslyanur(Post),Erode",
+        "normalized_text": "Naslyanur(Post),Erode",
+        "confidence": 0.9115769267082214,
+        "bbox": [
+          506.0,
+          868.0,
+          613.0,
+          879.0
+        ]
+      },
+      {
+        "text": "Protein",
+        "normalized_text": "Protein",
+        "confidence": 0.9935323596000671,
+        "bbox": [
+          94.0,
+          884.0,
+          136.0,
+          903.0
+        ]
+      },
+      {
+        "text": "og",
+        "normalized_text": "og",
+        "confidence": 0.6778907775878906,
+        "bbox": [
+          261.0,
+          884.0,
+          286.0,
+          908.0
+        ]
+      },
+      {
+        "text": "0%",
+        "normalized_text": "0%",
+        "confidence": 0.9867342114448547,
+        "bbox": [
+          327.0,
+          883.0,
+          352.0,
+          906.0
+        ]
+      },
+      {
+        "text": "ssa1No:10012042000132",
+        "normalized_text": "ssa1No:10012042000132",
+        "confidence": 0.9341521263122559,
+        "bbox": [
+          505.0,
+          884.0,
+          729.0,
+          915.0
+        ]
+      },
+      {
+        "text": "Iron",
+        "normalized_text": "Iron",
+        "confidence": 0.8939778804779053,
+        "bbox": [
+          96.0,
+          908.0,
+          117.0,
+          923.0
+        ]
+      },
+      {
+        "text": "3mg",
+        "normalized_text": "3mg",
+        "confidence": 0.9953534007072449,
+        "bbox": [
+          253.0,
+          908.0,
+          288.0,
+          928.0
+        ]
+      },
+      {
+        "text": "16%",
+        "normalized_text": "16%",
+        "confidence": 0.9135443568229675,
+        "bbox": [
+          322.0,
+          906.0,
+          352.0,
+          928.0
+        ]
+      },
+      {
+        "text": "Consumer care",
+        "normalized_text": "Consumer care",
+        "confidence": 0.9869496822357178,
+        "bbox": [
+          502.0,
+          919.0,
+          585.0,
+          936.0
+        ]
+      },
+      {
+        "text": "Approximate Values",
+        "normalized_text": "Approximate Values",
+        "confidence": 0.9719753265380859,
+        "bbox": [
+          96.0,
+          929.0,
+          218.0,
+          956.0
+        ]
+      },
+      {
+        "text": "C",
+        "normalized_text": "C",
+        "confidence": 0.5988640785217285,
+        "bbox": [
+          405.0,
+          931.0,
+          421.0,
+          944.0
+        ]
+      },
+      {
+        "text": "Toll fre number 1800-10-20-207",
+        "normalized_text": "Toll fre number 1800-10-20-207",
+        "confidence": 0.8962147831916809,
+        "bbox": [
+          499.0,
+          924.0,
+          721.0,
+          956.0
+        ]
+      },
+      {
+        "text": "Email:consumerfee",
+        "normalized_text": "Email:consumerfee",
+        "confidence": 0.9657516479492188,
+        "bbox": [
+          501.0,
+          949.0,
+          605.0,
+          968.0
+        ]
+      },
+      {
+        "text": "ck@sunraja",
+        "normalized_text": "ck@sunraja",
+        "confidence": 0.9805842638015747,
+        "bbox": [
+          621.0,
+          949.0,
+          681.0,
+          961.0
+        ]
+      },
+      {
+        "text": "Based on Recommended Dietary",
+        "normalized_text": "Based on Recommended Dietary",
+        "confidence": 0.9620909690856934,
+        "bbox": [
+          97.0,
+          961.0,
+          298.0,
+          988.0
+        ]
+      },
+      {
+        "text": "mer Care Addr",
+        "normalized_text": "mer Care Addr",
+        "confidence": 0.8932656645774841,
+        "bbox": [
+          529.0,
+          968.0,
+          590.0,
+          979.0
+        ]
+      },
+      {
+        "text": "Nowance of anaverage adult 2000 kcal",
+        "normalized_text": "Nowance of anaverage adult 2000 kcal",
+        "confidence": 0.9227481484413147,
+        "bbox": [
+          101.0,
+          984.0,
+          331.0,
+          1009.0
+        ]
+      },
+      {
+        "text": "shop at",
+        "normalized_text": "shop at",
+        "confidence": 0.9738388657569885,
+        "bbox": [
+          608.0,
+          993.0,
+          666.0,
+          1011.0
+        ]
+      },
+      {
+        "text": "The nutritional content may slightly vary",
+        "normalized_text": "The nutritional content may slightly vary",
+        "confidence": 0.7966119050979614,
+        "bbox": [
+          104.0,
+          1004.0,
+          354.0,
+          1033.0
+        ]
+      },
+      {
+        "text": "shop.sunraja.com",
+        "normalized_text": "shop.sunraja.com",
+        "confidence": 0.9608330726623535,
+        "bbox": [
+          568.0,
+          1004.0,
+          704.0,
+          1035.0
+        ]
+      },
+      {
+        "text": "Deing natural agricultural ingredient.",
+        "normalized_text": "Deing natural agricultural ingredient.",
+        "confidence": 0.8965069651603699,
+        "bbox": [
+          99.0,
+          1028.0,
+          312.0,
+          1054.0
+        ]
+      },
+      {
+        "text": "STORAGEINSTRUCTIONS:",
+        "normalized_text": "STORAGEINSTRUCTIONS:",
+        "confidence": 0.9912398457527161,
+        "bbox": [
+          99.0,
+          1057.0,
+          222.0,
+          1080.0
+        ]
+      },
+      {
+        "text": "AnIS090012015&22000:2018",
+        "normalized_text": "AnIS090012015&22000:2018",
+        "confidence": 0.9087606072425842,
+        "bbox": [
+          502.0,
+          1042.0,
+          696.0,
+          1076.0
+        ]
+      },
+      {
+        "text": "transfer to an air tight container",
+        "normalized_text": "transfer to an air tight container",
+        "confidence": 0.9780911803245544,
+        "bbox": [
+          172.0,
+          1074.0,
+          324.0,
+          1094.0
+        ]
+      },
+      {
+        "text": "Certified Company",
+        "normalized_text": "Certified Company",
+        "confidence": 0.9666206240653992,
+        "bbox": [
+          502.0,
+          1067.0,
+          622.0,
+          1090.0
+        ]
+      },
+      {
+        "text": "ng traditional method. The colour",
+        "normalized_text": "ng traditional method. The colour",
+        "confidence": 0.9641087651252747,
+        "bbox": [
+          165.0,
+          1087.0,
+          326.0,
+          1110.0
+        ]
+      },
+      {
+        "text": "ess may vary based on the nature",
+        "normalized_text": "ess may vary based on the nature",
+        "confidence": 0.9405247569084167,
+        "bbox": [
+          193.0,
+          1103.0,
+          354.0,
+          1123.0
+        ]
+      },
+      {
+        "text": "Manufactured by",
+        "normalized_text": "Manufactured by",
+        "confidence": 0.9826396107673645,
+        "bbox": [
+          500.0,
+          1089.0,
+          628.0,
+          1116.0
+        ]
+      },
+      {
+        "text": "BATCHNo",
+        "normalized_text": "BATCHNo",
+        "confidence": 0.9559933543205261,
+        "bbox": [
+          90.0,
+          1134.0,
+          154.0,
+          1160.0
+        ]
+      },
+      {
+        "text": "PACKED ON",
+        "normalized_text": "PACKED ON",
+        "confidence": 0.9459574818611145,
+        "bbox": [
+          87.0,
+          1162.0,
+          168.0,
+          1188.0
+        ]
+      },
+      {
+        "text": "ssalNo: 12423007000724",
+        "normalized_text": "ssalNo: 12423007000724",
+        "confidence": 0.9569962024688721,
+        "bbox": [
+          500.0,
+          1144.0,
+          737.0,
+          1185.0
+        ]
+      },
+      {
+        "text": "USE BY",
+        "normalized_text": "USE BY",
+        "confidence": 0.924410879611969,
+        "bbox": [
+          93.0,
+          1190.0,
+          141.0,
+          1215.0
+        ]
+      },
+      {
+        "text": "SEE SIDE PANEL",
+        "normalized_text": "SEE SIDE PANEL",
+        "confidence": 0.9363489747047424,
+        "bbox": [
+          235.0,
+          1196.0,
+          336.0,
+          1216.0
+        ]
+      },
+      {
+        "text": "MRPRUSPAE",
+        "normalized_text": "MRPRUSPAE",
+        "confidence": 0.8635188937187195,
+        "bbox": [
+          101.0,
+          1219.0,
+          197.0,
+          1238.0
+        ]
+      },
+      {
+        "text": "ale Prc",
+        "normalized_text": "ale Prc",
+        "confidence": 0.7028599381446838,
+        "bbox": [
+          294.0,
+          1231.0,
+          327.0,
+          1243.0
+        ]
+      }
+    ],
+    "extracted_fields": [
+      {
+        "field_name": "product_name",
+        "value": "Sunraja Gulas Jaggery Powder",
+        "detection_status": "DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "brand_name",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "manufacturer",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "net_quantity",
+        "value": "100g",
+        "detection_status": "UNCERTAIN",
+        "evidence": {
+          "source_text": "Serving Size-100g JA/05 Net Weight:",
+          "confidence": 0.9366350372632345,
+          "bbox": [
+            86.0,
+            550.0,
+            699.0,
+            630.0
+          ]
+        }
+      },
+      {
+        "field_name": "mrp",
+        "value": "928",
+        "detection_status": "UNCERTAIN",
+        "evidence": {
+          "source_text": "-Total Sugars 928 Naslyanur(Post),Erode",
+          "confidence": 0.9293348590532938,
+          "bbox": [
+            97.0,
+            854.0,
+            613.0,
+            886.0
+          ]
+        }
+      },
+      {
+        "field_name": "manufacturing_date",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "packaging_date",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "expiry_date",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "batch_number",
+        "value": "No",
+        "detection_status": "DETECTED",
+        "evidence": {
+          "source_text": "BATCHNo",
+          "confidence": 0.9559933543205261,
+          "bbox": [
+            90.0,
+            1134.0,
+            154.0,
+            1160.0
+          ]
+        }
+      },
+      {
+        "field_name": "country_of_origin",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "ingredients",
+        "value": "Sugarcane Extract",
+        "detection_status": "DETECTED",
+        "evidence": {
+          "source_text": "INGREDIENTS:Sugarcane Extract",
+          "confidence": 0.9547258615493774,
+          "bbox": [
+            76.0,
+            546.0,
+            349.0,
+            568.0
+          ]
+        }
+      },
+      {
+        "field_name": "license_number",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "customer_care",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "warnings",
+        "value": "DO NOT BUY IF SEAL IS BROKEN",
+        "detection_status": "DETECTED",
+        "evidence": {
+          "source_text": "DO NOT BUY IF SEAL IS BROKEN",
+          "confidence": 0.9,
+          "bbox": null
+        }
+      },
+      {
+        "field_name": "email",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "unit_sale_price",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "commodity",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "storage_instructions",
+        "value": "Energy 368 kcal 18% NN KEEP AWAY FROM DIRECT SUNLIGHT",
+        "detection_status": "DETECTED",
+        "evidence": {
+          "source_text": "Energy 368 kcal 18% NN KEEP AWAY FROM DIRECT SUNLIGHT",
+          "confidence": 0.9,
+          "bbox": null
+        }
+      },
+      {
+        "field_name": "sale_restrictions",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      }
+    ]
+  },
+  "Tata Tea Chakra Gold": {
+    "ocr_blocks_count": 44,
+    "ocr_blocks": [
+      {
+        "text": "ALSO TRY",
+        "normalized_text": "ALSO TRY",
+        "confidence": 0.9383808374404907,
+        "bbox": [
+          287.0,
+          446.0,
+          394.0,
+          475.0
+        ]
+      },
+      {
+        "text": "TATATEA",
+        "normalized_text": "TATATEA",
+        "confidence": 0.9944646954536438,
+        "bbox": [
+          168.0,
+          496.0,
+          263.0,
+          527.0
+        ]
+      },
+      {
+        "text": "nakra",
+        "normalized_text": "nakra",
+        "confidence": 0.9871476888656616,
+        "bbox": [
+          149.0,
+          530.0,
+          246.0,
+          565.0
+        ]
+      },
+      {
+        "text": "Gola",
+        "normalized_text": "Gola",
+        "confidence": 0.9273864030838013,
+        "bbox": [
+          141.0,
+          562.0,
+          224.0,
+          597.0
+        ]
+      },
+      {
+        "text": "Rich Aroma &",
+        "normalized_text": "Rich Aroma &",
+        "confidence": 0.9372842311859131,
+        "bbox": [
+          302.0,
+          618.0,
+          393.0,
+          636.0
+        ]
+      },
+      {
+        "text": "Goodness of",
+        "normalized_text": "Goodness of",
+        "confidence": 0.9882398247718811,
+        "bbox": [
+          431.0,
+          609.0,
+          521.0,
+          633.0
+        ]
+      },
+      {
+        "text": "Refreshing",
+        "normalized_text": "Refreshing",
+        "confidence": 0.9537531733512878,
+        "bbox": [
+          572.0,
+          610.0,
+          646.0,
+          628.0
+        ]
+      },
+      {
+        "text": "aste From",
+        "normalized_text": "aste From",
+        "confidence": 0.928293764591217,
+        "bbox": [
+          317.0,
+          633.0,
+          384.0,
+          653.0
+        ]
+      },
+      {
+        "text": "Flavou",
+        "normalized_text": "Flavou",
+        "confidence": 0.9436017870903015,
+        "bbox": [
+          575.0,
+          630.0,
+          623.0,
+          641.0
+        ]
+      },
+      {
+        "text": "Added Long Leaves",
+        "normalized_text": "Added Long Leaves",
+        "confidence": 0.9725799560546875,
+        "bbox": [
+          284.0,
+          646.0,
+          413.0,
+          671.0
+        ]
+      },
+      {
+        "text": "Ingredients",
+        "normalized_text": "Ingredients",
+        "confidence": 0.9689897894859314,
+        "bbox": [
+          436.0,
+          643.0,
+          519.0,
+          665.0
+        ]
+      },
+      {
+        "text": "Real Elaichl",
+        "normalized_text": "Real Elaichl",
+        "confidence": 0.89545077085495,
+        "bbox": [
+          566.0,
+          634.0,
+          655.0,
+          663.0
+        ]
+      },
+      {
+        "text": "Date of Packaging",
+        "normalized_text": "Date of Packaging",
+        "confidence": 0.9722903966903687,
+        "bbox": [
+          238.0,
+          673.0,
+          397.0,
+          701.0
+        ]
+      },
+      {
+        "text": "Use By",
+        "normalized_text": "Use By",
+        "confidence": 0.9434918761253357,
+        "bbox": [
+          507.0,
+          668.0,
+          570.0,
+          693.0
+        ]
+      },
+      {
+        "text": "BN",
+        "normalized_text": "BN",
+        "confidence": 0.9923883080482483,
+        "bbox": [
+          106.0,
+          683.0,
+          134.0,
+          706.0
+        ]
+      },
+      {
+        "text": "05/05/27",
+        "normalized_text": "05/05/27",
+        "confidence": 0.9969821572303772,
+        "bbox": [
+          424.0,
+          711.0,
+          566.0,
+          748.0
+        ]
+      },
+      {
+        "text": "GG06E0306/05/26",
+        "normalized_text": "GG06E0306/05/26",
+        "confidence": 0.9722067713737488,
+        "bbox": [
+          153.0,
+          721.0,
+          405.0,
+          758.0
+        ]
+      },
+      {
+        "text": "2509",
+        "normalized_text": "2509",
+        "confidence": 0.999252200126648,
+        "bbox": [
+          576.0,
+          732.0,
+          648.0,
+          768.0
+        ]
+      },
+      {
+        "text": "2250.90/9",
+        "normalized_text": "2250.90/9",
+        "confidence": 0.9785284399986267,
+        "bbox": [
+          204.0,
+          746.0,
+          400.0,
+          783.0
+        ]
+      },
+      {
+        "text": "NET QUANTITY:",
+        "normalized_text": "NET QUANTITY:",
+        "confidence": 0.9342654347419739,
+        "bbox": [
+          383.0,
+          776.0,
+          531.0,
+          803.0
+        ]
+      },
+      {
+        "text": "MRP",
+        "normalized_text": "MRP",
+        "confidence": 0.9860243201255798,
+        "bbox": [
+          107.0,
+          784.0,
+          173.0,
+          814.0
+        ]
+      },
+      {
+        "text": "Incl.of all taxes",
+        "normalized_text": "Incl.of all taxes",
+        "confidence": 0.9107787013053894,
+        "bbox": [
+          109.0,
+          808.0,
+          228.0,
+          833.0
+        ]
+      },
+      {
+        "text": "Ingredients:Tea (98.5%",
+        "normalized_text": "Ingredients:Tea (98.5%",
+        "confidence": 0.9456939101219177,
+        "bbox": [
+          451.0,
+          829.0,
+          605.0,
+          855.0
+        ]
+      },
+      {
+        "text": "Mkt byTata Consumer Products LimitedTata Centre",
+        "normalized_text": "Mkt byTata Consumer Products LimitedTata Centre",
+        "confidence": 0.9217507243156433,
+        "bbox": [
+          101.0,
+          836.0,
+          420.0,
+          866.0
+        ]
+      },
+      {
+        "text": "1st Floor.43Jawaharlal Nehru Road.Kolkata-700 071",
+        "normalized_text": "1st Floor.43Jawaharlal Nehru Road.Kolkata-700 071",
+        "confidence": 0.9031049013137817,
+        "bbox": [
+          102.0,
+          854.0,
+          435.0,
+          885.0
+        ]
+      },
+      {
+        "text": "Natural Flavour",
+        "normalized_text": "Natural Flavour",
+        "confidence": 0.972133457660675,
+        "bbox": [
+          456.0,
+          856.0,
+          547.0,
+          873.0
+        ]
+      },
+      {
+        "text": "Jssal",
+        "normalized_text": "Jssal",
+        "confidence": 0.7130424976348877,
+        "bbox": [
+          159.0,
+          886.0,
+          203.0,
+          904.0
+        ]
+      },
+      {
+        "text": "FLAVOURED TEA",
+        "normalized_text": "FLAVOURED TEA",
+        "confidence": 0.9745483994483948,
+        "bbox": [
+          454.0,
+          878.0,
+          590.0,
+          905.0
+        ]
+      },
+      {
+        "text": "Lic.No.10014031001025",
+        "normalized_text": "Lic.No.10014031001025",
+        "confidence": 0.9859396815299988,
+        "bbox": [
+          104.0,
+          901.0,
+          260.0,
+          928.0
+        ]
+      },
+      {
+        "text": "ROSE MAX1.5%",
+        "normalized_text": "ROSE MAX1.5%",
+        "confidence": 0.9486948847770691,
+        "bbox": [
+          457.0,
+          902.0,
+          600.0,
+          931.0
+        ]
+      },
+      {
+        "text": "For manufacturing unit details,",
+        "normalized_text": "For manufacturing unit details,",
+        "confidence": 0.9578659534454346,
+        "bbox": [
+          107.0,
+          924.0,
+          284.0,
+          948.0
+        ]
+      },
+      {
+        "text": "REGISTRATION NO:F-07/16",
+        "normalized_text": "REGISTRATION NO:F-07/16",
+        "confidence": 0.9454445242881775,
+        "bbox": [
+          457.0,
+          926.0,
+          679.0,
+          956.0
+        ]
+      },
+      {
+        "text": "scan the QR code and see the",
+        "normalized_text": "scan the QR code and see the",
+        "confidence": 0.947919487953186,
+        "bbox": [
+          109.0,
+          943.0,
+          281.0,
+          963.0
+        ]
+      },
+      {
+        "text": "first alphabet of the Batch",
+        "normalized_text": "first alphabet of the Batch",
+        "confidence": 0.9493155479431152,
+        "bbox": [
+          109.0,
+          959.0,
+          256.0,
+          979.0
+        ]
+      },
+      {
+        "text": "Images are for illustration purpose",
+        "normalized_text": "Images are for illustration purpose",
+        "confidence": 0.9028146266937256,
+        "bbox": [
+          456.0,
+          956.0,
+          665.0,
+          985.0
+        ]
+      },
+      {
+        "text": "ber (BN",
+        "normalized_text": "ber (BN",
+        "confidence": 0.8679465651512146,
+        "bbox": [
+          137.0,
+          983.0,
+          183.0,
+          994.0
+        ]
+      },
+      {
+        "text": "CONSUMER CARE DETAILSCUSTOMER CARE EXECUTIVE",
+        "normalized_text": "CONSUMER CARE DETAILSCUSTOMER CARE EXECUTIVE",
+        "confidence": 0.9574663639068604,
+        "bbox": [
+          110.0,
+          989.0,
+          560.0,
+          1025.0
+        ]
+      },
+      {
+        "text": "TATA CONSUMER PRODUCTS LTD.,KIRLOSKAR BUSINESS PARK,",
+        "normalized_text": "TATA CONSUMER PRODUCTS LTD.,KIRLOSKAR BUSINESS PARK,",
+        "confidence": 0.9270017147064209,
+        "bbox": [
+          112.0,
+          1009.0,
+          615.0,
+          1050.0
+        ]
+      },
+      {
+        "text": "HEBBAL,BENGALURU-560024.KARNATAKA",
+        "normalized_text": "HEBBAL,BENGALURU-560024.KARNATAKA",
+        "confidence": 0.9472418427467346,
+        "bbox": [
+          114.0,
+          1039.0,
+          470.0,
+          1070.0
+        ]
+      },
+      {
+        "text": "TOLL FREE NUMBER:1800 108 4488 EMAIL:Care@tataconsumer.com",
+        "normalized_text": "TOLL FREE NUMBER:1800 108 4488 EMAIL:Care@tataconsumer.com",
+        "confidence": 0.9094468951225281,
+        "bbox": [
+          112.0,
+          1052.0,
+          684.0,
+          1095.0
+        ]
+      },
+      {
+        "text": "9571617161",
+        "normalized_text": "9571617161",
+        "confidence": 0.9984375834465027,
+        "bbox": [
+          174.0,
+          1116.0,
+          281.0,
+          1139.0
+        ]
+      },
+      {
+        "text": "7",
+        "normalized_text": "7",
+        "confidence": 0.8359118700027466,
+        "bbox": [
+          562.0,
+          1108.0,
+          578.0,
+          1123.0
+        ]
+      },
+      {
+        "text": "Foro",
+        "normalized_text": "Foro",
+        "confidence": 0.866827130317688,
+        "bbox": [
+          121.0,
+          1169.0,
+          147.0,
+          1181.0
+        ]
+      },
+      {
+        "text": "s:Once",
+        "normalized_text": "s:Once",
+        "confidence": 0.9280641674995422,
+        "bbox": [
+          230.0,
+          1183.0,
+          273.0,
+          1194.0
+        ]
+      }
+    ],
+    "extracted_fields": [
+      {
+        "field_name": "product_name",
+        "value": "Tata Tea Chakra Gold",
+        "detection_status": "DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "brand_name",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "manufacturer",
+        "value": "Tata Consumer Products LimitedTata Centre Ingredients:Tea (98.5%",
+        "detection_status": "DETECTED",
+        "evidence": {
+          "source_text": "Mkt byTata Consumer Products LimitedTata Centre Ingredients:Tea (98.5%",
+          "confidence": 0.9337223172187805,
+          "bbox": [
+            101.0,
+            829.0,
+            605.0,
+            866.0
+          ]
+        }
+      },
+      {
+        "field_name": "net_quantity",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "mrp",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "manufacturing_date",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "packaging_date",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "expiry_date",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "batch_number",
+        "value": "Date",
+        "detection_status": "DETECTED",
+        "evidence": {
+          "source_text": "BN Date of Packaging Use By",
+          "confidence": 0.9693901936213175,
+          "bbox": [
+            106.0,
+            668.0,
+            570.0,
+            706.0
+          ]
+        }
+      },
+      {
+        "field_name": "country_of_origin",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "ingredients",
+        "value": "BN Date of Packaging Use By",
+        "detection_status": "DETECTED",
+        "evidence": {
+          "source_text": "Added Long Leaves aste From Ingredients Real Elaichl",
+          "confidence": 0.9413285702466965,
+          "bbox": [
+            284.0,
+            633.0,
+            655.0,
+            671.0
+          ]
+        }
+      },
+      {
+        "field_name": "license_number",
+        "value": "10014031001025",
+        "detection_status": "DETECTED",
+        "evidence": {
+          "source_text": "Lic.No.10014031001025 ROSE MAX1.5%",
+          "confidence": 0.9673172831535339,
+          "bbox": [
+            104.0,
+            901.0,
+            600.0,
+            931.0
+          ]
+        }
+      },
+      {
+        "field_name": "customer_care",
+        "value": "1800 108 4488",
+        "detection_status": "DETECTED",
+        "evidence": {
+          "source_text": "TOLL FREE NUMBER:1800 108 4488 EMAIL:Care@tataconsumer.com",
+          "confidence": 0.9094468951225281,
+          "bbox": [
+            112.0,
+            1052.0,
+            684.0,
+            1095.0
+          ]
+        }
+      },
+      {
+        "field_name": "warnings",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "email",
+        "value": "Care@tataconsumer.com",
+        "detection_status": "DETECTED",
+        "evidence": {
+          "source_text": "TOLL FREE NUMBER:1800 108 4488 EMAIL:Care@tataconsumer.com",
+          "confidence": 0.9094468951225281,
+          "bbox": [
+            112.0,
+            1052.0,
+            684.0,
+            1095.0
+          ]
+        }
+      },
+      {
+        "field_name": "unit_sale_price",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "commodity",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "storage_instructions",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      },
+      {
+        "field_name": "sale_restrictions",
+        "value": null,
+        "detection_status": "NOT_DETECTED",
+        "evidence": null
+      }
+    ]
+  }
+}

@@ -1,13 +1,14 @@
 import requests
 import json
 import time
+from pathlib import Path
 
 BASE_URL = "http://localhost:8000/api"
 
 print("--- API Workflow Test ---")
 
 # 1. Login
-response = requests.post(f"{BASE_URL}/auth/login", json={"email": "codex-qa@test.com", "password": "TestPass123!"})
+response = requests.post(f"{BASE_URL}/auth/login", json={"email": "testuser_aygy2@example.com", "password": "password123"})
 response.raise_for_status()
 token = response.json()["access_token"]
 headers = {"Authorization": f"Bearer {token}"}
@@ -23,7 +24,7 @@ inspection_id = response.json()["id"]
 print(f"2. Created inspection: {inspection_id}")
 
 # 3. Upload Image
-image_path = r"D:\SIH26034\Images\Agarbatti_front.jpeg"
+image_path = Path(__file__).parent / "Images" / "Agarbatti_front.jpeg"
 with open(image_path, "rb") as f:
     files = {"file": ("Agarbatti_front.jpeg", f, "image/jpeg")}
     data = {"image_type": "OTHER"}

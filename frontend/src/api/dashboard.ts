@@ -28,10 +28,36 @@ export interface RecentInspectionItem {
   compliance_status: string;
 }
 
+export interface RepeatOffenderItem {
+  brand: string;
+  total_inspections: number;
+  fail_count: number;
+  review_count: number;
+  top_violation_rule_id: string | null;
+  top_violation_rule_name: string | null;
+  top_violation_count: number;
+  latest_inspection_id: string;
+  latest_inspection_number: string;
+  latest_inspection_date: string;
+}
+
+export interface GeoPointItem {
+  inspection_id: string;
+  inspection_number: string;
+  brand: string;
+  product_name: string;
+  establishment_name: string | null;
+  latitude: number;
+  longitude: number;
+  compliance_status: string;
+}
+
 export interface DashboardAnalyticsResponse {
   kpis: ComplianceKPIs;
   top_violations: ViolationSummaryItem[];
   recent_inspections: RecentInspectionItem[];
+  repeat_offenders: RepeatOffenderItem[];
+  geo_points: GeoPointItem[];
 }
 
 export async function getDashboardAnalytics(): Promise<DashboardAnalyticsResponse> {

@@ -14,6 +14,9 @@ class InspectionCreate(BaseModel):
     """Schema for creating a new inspection."""
     product_name: str = Field(..., min_length=1, max_length=500, examples=["Example Rice"])
     brand: str = Field(..., min_length=1, max_length=255, examples=["Example Brand"])
+    establishment_name: Optional[str] = Field(None, max_length=500, examples=["Example General Store"])
+    latitude: Optional[float] = Field(None, ge=-90, le=90)
+    longitude: Optional[float] = Field(None, ge=-180, le=180)
 
 
 class InspectionResponse(BaseModel):
@@ -26,6 +29,9 @@ class InspectionResponse(BaseModel):
     created_by: UUID
     created_at: datetime
     updated_at: datetime
+    establishment_name: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
     images: List[ImageResponse] = []
 
     model_config = {"from_attributes": True}
