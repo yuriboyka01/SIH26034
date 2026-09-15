@@ -30,4 +30,4 @@ services:
       - key: NODE_VERSION
         value: "20"
       - key: VITE_API_URL
-        value: "https://providing-reserve-sao-demonstrate.trycloudflare.com"
+        value: "https://istanbul-applicable-happened-script.trycloudflare.com"

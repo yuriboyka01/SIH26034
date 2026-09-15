@@ -95,7 +95,7 @@ Open: https://sih26034-frontend-aygy.onrender.com
 
 ## Current Tunnel URL (active this session)
 
-    https://providing-reserve-sao-demonstrate.trycloudflare.com
+    https://istanbul-applicable-happened-script.trycloudflare.com
 
 This URL is valid until cloudflared is restarted.
 
