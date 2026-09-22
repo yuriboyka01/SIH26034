@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { ArrowRight, ClipboardList, FileSearch, Plus, Box, Search, X, AlertOctagon, Map as MapIcon } from 'lucide-react';
+import { ArrowRight, ClipboardList, FileSearch, Plus, Box, Search, X, Map as MapIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { getDashboardAnalytics, type DashboardAnalyticsResponse } from '../api/dashboard';
 import ViolationChart from '../components/ViolationChart';
-import RepeatOffendersPanel from '../components/RepeatOffendersPanel';
 import ViolationMapPanel from '../components/ViolationMapPanel';
+
 import { Alert, EmptyState, LoadingState, Metric, SectionHeader, StatusBadge } from '../components/ui';
 
 export default function DashboardPage() {
@@ -147,16 +147,6 @@ export default function DashboardPage() {
             )}
           </div>
         </article>
-      </section>
-
-      <section className="depth-2 flex flex-col rounded-xl overflow-hidden">
-        <SectionHeader
-          eyebrow="Escalation"
-          title="Repeat offenders"
-          description="Brands that have failed compliance on 2 or more separate inspections — worth a formal notice rather than a one-off correction."
-          action={<div className="w-9 h-9 sm:w-10 sm:h-10 bg-[var(--danger-soft)] rounded-full flex items-center justify-center"><AlertOctagon size={18} className="text-[var(--danger)]" /></div>}
-        />
-        <RepeatOffendersPanel offenders={data?.repeat_offenders || []} />
       </section>
 
       <section className="depth-2 flex flex-col rounded-xl overflow-hidden">

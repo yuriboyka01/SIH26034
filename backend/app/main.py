@@ -78,6 +78,9 @@ def startup_event():
     else:
         logger.warning("Groq API config: GROQ_API_KEY is not set. Falling back to Regex extraction only.")
 
+    from app.compliance.rules import REGISTERED_RULES
+    logger.info(f"Loaded {len(REGISTERED_RULES)} compliance rules.")
+
     # PaddleOCR is now lazily initialized during the first analysis request.
     # Preloading on startup in constrained environments (like Render Free Tier with 512MB RAM)
     # caused OOM kills before the server could pass health checks.

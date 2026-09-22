@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   ArrowRight,
   ChevronLeft,
@@ -22,16 +22,27 @@ const complianceFilters = [
 ];
 
 export default function InspectionsPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlSearch = searchParams.get('search') || '';
+
   const [inspections, setInspections] = useState<InspectionListItem[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
 
-  const [searchInput, setSearchInput] = useState('');
-  const [appliedSearch, setAppliedSearch] = useState('');
+  const [searchInput, setSearchInput] = useState(urlSearch);
+  const [appliedSearch, setAppliedSearch] = useState(urlSearch);
   const [complianceStatus, setComplianceStatus] = useState('');
   const [page, setPage] = useState(1);
   const pageSize = 10;
+
+  useEffect(() => {
+    const q = searchParams.get('search') || '';
+    setSearchInput(q);
+    setAppliedSearch(q);
+    setPage(1);
+  }, [searchParams]);
+
 
   // Debounced live search
   useEffect(() => {
@@ -70,6 +81,7 @@ export default function InspectionsPage() {
     setSearchInput('');
     setAppliedSearch('');
     setComplianceStatus('');
+    setSearchParams({});
     setPage(1);
   };
 

@@ -64,3 +64,9 @@ export async function getDashboardAnalytics(): Promise<DashboardAnalyticsRespons
   const response = await client.get<DashboardAnalyticsResponse>('/dashboard/analytics');
   return response.data;
 }
+
+export async function getRepeatOffenders(): Promise<RepeatOffenderItem[]> {
+  const data = await getDashboardAnalytics();
+  return data.repeat_offenders || [];
+}
+

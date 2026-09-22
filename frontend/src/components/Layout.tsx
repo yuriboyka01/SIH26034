@@ -1,11 +1,12 @@
 import { Outlet, NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { ClipboardList, LayoutDashboard, LogOut, Menu, Plus, X, Bell, Moon, Sun, Settings, User } from 'lucide-react';
+import { ClipboardList, LayoutDashboard, LogOut, Menu, Plus, X, Bell, Moon, Sun, Settings, User, ShieldAlert } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const mainNavigation = [
   { to: '/dashboard', label: 'Overview', icon: LayoutDashboard },
   { to: '/inspections', label: 'Inspections', icon: ClipboardList },
+  { to: '/repeat-offenders', label: 'Repeat Offenders', icon: ShieldAlert },
 ];
 
 const accountNavigation = [
@@ -17,6 +18,7 @@ const pageTitles: Record<string, { eyebrow: string; title: string }> = {
   '/dashboard': { eyebrow: 'Compliance Workspace', title: 'Operations overview' },
   '/inspections': { eyebrow: 'Inspection Register', title: 'Inspection records' },
   '/inspections/new': { eyebrow: 'Case Intake', title: 'Create inspection' },
+  '/repeat-offenders': { eyebrow: 'Escalation Register', title: 'Repeat offenders' },
   '/profile': { eyebrow: 'Account', title: 'Your profile' },
   '/settings': { eyebrow: 'Account', title: 'Settings' },
 };

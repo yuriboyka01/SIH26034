@@ -13,6 +13,7 @@ import NewInspectionPage from './pages/NewInspectionPage';
 import InspectionDetailPage from './pages/InspectionDetailPage';
 import ProfilePage from './pages/ProfilePage';
 import SettingsPage from './pages/SettingsPage';
+import RepeatOffendersPage from './pages/RepeatOffendersPage';
 
 export default function App() {
   return (
@@ -34,6 +35,7 @@ export default function App() {
             <Route path="/inspections" element={<InspectionsPage />} />
             <Route path="/inspections/new" element={<NewInspectionPage />} />
             <Route path="/inspections/:id" element={<InspectionDetailPage />} />
+            <Route path="/repeat-offenders" element={<RepeatOffendersPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Route>

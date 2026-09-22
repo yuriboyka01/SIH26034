@@ -21,11 +21,12 @@ if (-not $VenvActivate) {
 # directory so the activation path always resolves correctly regardless of
 # how this script itself was launched.
 Write-Host "Starting Backend..."
-Start-Process powershell -WorkingDirectory $BackendDir -ArgumentList "-NoExit", "-Command", "& '$VenvActivate'; alembic upgrade head; python -c \"from app.compliance.rules import REGISTERED_RULES; print(f'Loaded {len(REGISTERED_RULES)} compliance rules.')\"; uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+Start-Process powershell -WorkingDirectory $BackendDir -ArgumentList "-ExecutionPolicy", "Bypass", "-NoExit", "-Command", "& '$VenvActivate'; alembic upgrade head; uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
 
 # Start the frontend in a new PowerShell window
 Write-Host "Starting Frontend..."
-Start-Process powershell -WorkingDirectory (Join-Path $RootDir "frontend") -ArgumentList "-NoExit", "-Command", "npm install; npm run dev"
+Start-Process powershell -WorkingDirectory (Join-Path $RootDir "frontend") -ArgumentList "-ExecutionPolicy", "Bypass", "-NoExit", "-Command", "npm run dev"
 
 Write-Host "✅ Backend and Frontend are starting in separate windows!"
 Write-Host "Make sure your local PostgreSQL database is running with the credentials in your .env file."
+
